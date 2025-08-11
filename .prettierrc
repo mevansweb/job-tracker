@@ -1,0 +1,25 @@
+{
+  "arrowParens": "always",
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "printWidth": 100,
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "es5",
+
+  "importOrder": ["^[./]"],
+  "importOrderParserPlugins": ["typescript", "jsx", "decorators"],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+
+  "overrides": [
+    {
+      "files": "*.tsx",
+      "options": {
+        "plugins": [
+          "@trivago/prettier-plugin-sort-imports",
+          "prettier-plugin-tailwindcss"
+        ]
+      }
+    }
+  ]
+}
