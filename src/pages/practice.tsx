@@ -1,116 +1,66 @@
 import Header from '@/components/header'
 
-class Node {
-  value: unknown;
-  next: Node | null;
+/*
+Parameters
+arr: An array of numbers.
+Example: 5, 3, 8, 1, 2
+commands: An array of strings, where each string represents a command. Supported commands are:
+"double": Multiply each number in the array by 2.
+"filter-even": Keep only even numbers in the array.
+"sort-desc": Sort the array in descending order.
+The commands should be applied in the order they appear in the commands array.
 
-  constructor(value: unknown) {
-    this.value = value;
-    this.next = null;
-  }
-}
+Function Requirements
+Apply transformations in order as defined by the commands array.
+Immutability: Do not modify the original array.
+If an unknown command is encountered, ignore it and continue processing the next command.
 
-function detectCycle(head: Node | null): boolean {
-  if (!head) return false;
-  let slow: Node | null = head
-  let fast: Node | null = head
-  while (slow && fast && fast.next) {
-    slow = slow.next
-    fast = fast.next.next
-    if (slow === fast) {
-      return true // Cycle detected
+Examples
+// Example 1: Double and sort descending
+console.log(transformArray([5, 3, 8, 1, 2], ['double', 'sort-desc'])); 
+// Output: [16, 10, 6, 4, 2] (Double: [10, 6, 16, 2, 4] -> Sort Desc: [16, 10, 6, 4, 2])
+
+// Example 2: Filter even numbers and then double
+console.log(transformArray([5, 3, 8, 1, 2], ['filter-even', 'double'])); 
+// Output: [16, 4] (Filter Even: [8, 2] -> Double: [16, 4])
+
+// Example 3: No commands (returns original array)
+console.log(transformArray([5, 3, 8, 1, 2], [])); 
+// Output: [5, 3, 8, 1, 2]
+
+// Example 4: Ignore unknown commands
+console.log(transformArray([5, 3, 8, 1, 2], ['invalid-command', 'double'])); 
+
+*/
+
+type SortType = 'filter-even' | 'double' | string | undefined
+
+const transformArray = (arr: number[], sortType: SortType[]) => {
+  let newArr = arr
+  const hasInvalidParam = sortType.some((p) => !p || !['filter-even', 'double'].includes(p))
+  sortType.forEach((sort) => {
+    if (!hasInvalidParam) {
+      if (sort === 'filter-even') {
+        newArr = newArr.filter(num => num % 2 === 0)
+      } else if (sort === 'double') {
+        newArr = newArr.map(num => num * 2)
+      } else if (sort === 'sort-desc') {
+        newArr = newArr.sort((a, b) => b - a)
+      }
     }
-  }
-  return false // No cycle
-}
-
-function mergeSortedArrays(arr1: number[], arr2: number[]): number[] {
-  const merged = []
-  let i = 0, j = 0
-  while (i < arr1.length && j < arr2.length) {
-    if (arr1[i] < arr2[j]) {
-      merged.push(arr1[i])
-      i++
-    } else {
-      merged.push(arr2[j])
-      j++
-    }
-  }
-  // Concatenate remaining elements
-  return merged.concat(arr1.slice(i)).concat(arr2.slice(j))
-}
-
-function findMissingNumber(arr: number[]): number {
-  const n = arr.length + 1;
-  const sum = (n * (n + 1)) / 2;
-  const arrSum = arr.reduce((acc, num) => acc + num, 0);
-  return sum - arrSum;
+  })
+  return newArr
 }
 
 const Practice = () => {
-  const codeTextA = `
-    class Node {
-      value: unknown;
-      next: Node | null;
-
-      constructor(value: unknown) {
-        this.value = value;
-        this.next = null;
-      }
-    }
-    function detectCycle(head: Node | null): boolean {
-      if (!head) return false;
-      let slow: Node | null = head
-      let fast: Node | null = head
-      while (slow && fast && fast.next) {
-        slow = slow.next
-        fast = fast.next.next
-        if (slow === fast) {
-          return true // Cycle detected
-        }
-      }
-      return false // No cycle
-    }
-  `
-  const codeTextB = `
-    function mergeSortedArrays(arr1: number[], arr2: number[]): number[] {
-      const merged = []
-      let i = 0, j = 0
-      while (i < arr1.length && j < arr2.length) {
-        if (arr1[i] < arr2[j]) {
-          merged.push(arr1[i])
-          i++
-        } else {
-          merged.push(arr2[j])
-          j++
-        }
-      }
-      // Concatenate remaining elements
-      return merged.concat(arr1.slice(i)).concat(arr2.slice(j))
-    }
-  `
-  const codeTextC = `
-    function findMissingNumber(arr) {
-      const n = arr.length + 1;
-      const sum = (n * (n + 1)) / 2;
-      const arrSum = arr.reduce((acc, num) => acc + num, 0);
-      return sum - arrSum;
-    }
-  `
-  // Driver Code
-  // Create a hard-coded linked list:
-  // 1 -> 3 -> 4
-  const head = new Node(1)
-  head.next = new Node(3)
-  head.next.next = new Node(4)
-
-  // Create a loop
-  head.next.next.next = head.next
-
-  const arr1 = [1, 3, 5]
-  const arr2 = [2, 4, 6]
-  const mergedArray = mergeSortedArrays(arr1, arr2)
-
+  console.log('example-1', transformArray([5, 3, 8, 1, 2], ['double', 'sort-desc']))
+  console.log('correct answer', [16, 10, 6, 4, 2])
+  console.log('example-2', transformArray([5, 3, 8, 1, 2], ['filter-even', 'double']))
+  console.log('correct answer', [16, 4])
+  console.log('example-3', transformArray([5, 3, 8, 1, 2], []))
+  console.log('correct answer', [5, 3, 8, 1, 2])
+  console.log('example-4', transformArray([5, 3, 8, 1, 2], ['invalid-command', 'double']))
+  console.log('correct answer', [5, 3, 8, 1, 2])
   return (
     <div className="p-4 flex flex-col">
       <Header
@@ -118,21 +68,6 @@ const Practice = () => {
         middle=""
         title="Practice Page"
       />
-      <pre>
-        <code className="text-gray-600">{codeTextA}</code>
-        <code className="text-gray-600">detectCycle(head): {detectCycle(head).toString()}</code>
-      </pre>
-      <pre>
-        <code className="text-gray-600">{codeTextB}</code>
-        <code className="text-gray-600">Merge two sorted arrays: {mergedArray}</code>
-      </pre>
-      <pre>
-        <code className="text-gray-600">{codeTextC}</code>
-        <code className="text-gray-600">Find Missing Number: {findMissingNumber([1, 2, 4, 5])}</code>
-      </pre>
-      <p className="mt-4 text-gray-500">
-        This page is for practicing coding problems and algorithms.
-      </p>
     </div>
   )
 

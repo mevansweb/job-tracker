@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react' //
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   type ColumnFiltersState,
   flexRender,
@@ -10,12 +10,12 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table'
-import { ChevronDown, SaveIcon, XIcon } from 'lucide-react'
-
+import { ChevronDown, FunnelIcon, SaveIcon, XIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { JobsModal } from '@/components/modal/jobs-modal'
 import {
   DropdownMenu,
+  DropdownMenuItem,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
@@ -39,15 +39,43 @@ type JobsTableProps = {
   monthSubGroup?: Job[]
 }
 
+function getNumberOfJobsByWeek(jobs: Job[], weekNumber: number) {
+  return jobs.filter((job) => {
+    const jobDate = new Date(job.applicationDate)
+    const firstDayOfMonth = new Date(jobDate.getFullYear(), jobDate.getMonth(), 1)
+    const dayOfWeek = firstDayOfMonth.getDay() // 0 (Sun) to 6 (Sat)
+    const adjustedDate = jobDate.getDate() + dayOfWeek
+    const jobWeekNumber = Math.ceil(adjustedDate / 7)
+    return jobWeekNumber === weekNumber
+  }).length
+}
+
 export function JobsTable({ month, monthSubGroup }: JobsTableProps) {
-  const { dispatch, existing, loading, postData, state } = useAuth()
+  const { dispatch, existing, postData, state } = useAuth()
   const [sorting, setSorting] = useState<SortingState>([])
+  const [filterBy, setFilterBy] = useState<string>('company')
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
   )
   const [columnVisibility, setColumnVisibility] =
     useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
+  const filteredJobs = useMemo(() => {
+    if (monthSubGroup && monthSubGroup.length > 0) {
+      return monthSubGroup.filter((job) => {
+        return columnFilters.every((filter) => {
+          const jobValue = job[filter.id as keyof Job]
+          if (typeof jobValue === 'string') {
+            return jobValue
+              .toLowerCase()
+              .includes((filter.value as string).toLowerCase())
+          }
+          return true
+        })
+      })
+    }
+    return []
+  }, [columnFilters, monthSubGroup])
 
   const handleSave = useCallback(async () => {
     const saveEmail: string = state?.email ? state.email : existing && existing.email ? existing.email : ''
@@ -64,7 +92,7 @@ export function JobsTable({ month, monthSubGroup }: JobsTableProps) {
   },[dispatch, existing, state.email])
 
   const table = useReactTable({
-    data: monthSubGroup || [],
+    data: filteredJobs || [],
     columns,
     autoResetPageIndex: false,
     autoResetExpanded: false,
@@ -91,11 +119,24 @@ export function JobsTable({ month, monthSubGroup }: JobsTableProps) {
           <Input
             placeholder='Filter companies...'
             value={(table.getColumn('company')?.getFilterValue() as string) ?? ''}
-            onChange={(event) =>
-              table.getColumn('company')?.setFilterValue(event.target.value)
-            }
+            onChange={(event) => {
+              table.getColumn(filterBy)?.setFilterValue(event.target.value)
+            }}
             className='max-w-sm'
           />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='ghost' className='absolute right-8 top-1/2 -translate-y-1/2 h-7 w-7 p-0'>
+                  <span className='sr-only'>Filter By</span>
+                  <FunnelIcon className='h-4 w-4' />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuItem onClick={() => setFilterBy('company')}>Company Name</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterBy('position')}>Position Applied For</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterBy('contactPerson')}>Recruiter</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button
             type="button"
             variant="ghost"
@@ -110,8 +151,15 @@ export function JobsTable({ month, monthSubGroup }: JobsTableProps) {
         <JobsModal />
         <Button onClick={handleSave} variant="outline"><SaveIcon />Save</Button>
         <span className="text-sm ml-4">
-          Page {table.getState().pagination.pageIndex + 1}
-          {loading? '   loading...' : ''}
+          Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+        </span>
+        <span className="text-sm ml-4">
+          Number of Jobs: {table.getFilteredRowModel().rows.length}
+        </span>
+        <span className="text-sm ml-4">
+          Jobs by week: {getNumberOfJobsByWeek(monthSubGroup || [], 1)}/{getNumberOfJobsByWeek(monthSubGroup || [], 2)}/
+          {getNumberOfJobsByWeek(monthSubGroup || [], 3)}/{getNumberOfJobsByWeek(monthSubGroup || [], 4)}/
+          {getNumberOfJobsByWeek(monthSubGroup || [], 5)}
         </span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

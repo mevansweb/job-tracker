@@ -19,7 +19,9 @@ export type ApiResult = {
 
 export const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
-const Status = {
+export const Status = {
+  BehavioralAssessment: 'behavioral-assessment',
+  CCAT: 'ccat',
   CodingAssessment: 'coding-assessment',
   Ghosted: 'ghosted',
   HiringManagerScreen: 'hiring-manager-screening',

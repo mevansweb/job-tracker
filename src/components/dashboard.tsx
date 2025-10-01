@@ -29,7 +29,8 @@ export const Dashboard = () => {
       <div className="flex align-center my-4 justify-center">
         {monthNumbers.map((m) => (
           <Button key={`view-jobs-by-month-${m}`} className={`cursor-pointer mr-2 size-min hover:bg-orange-200 hover:border-orange-500 ${month === m ? 'bg-green-200 border-green-500 font-extrabold' : ''}`} onClick={() => setMonth(m)} variant="outline">
-            {months[m - 1] ? months[m - 1] : 'Missing Date'} 
+            {months[m - 1] ? months[m - 1] : 'Missing Date'}
+            <span className="text-gray-400 text-xs">{' '}({groups[m] ? groups[m].length : 0})</span>
           </Button>
         ))}
       </div>

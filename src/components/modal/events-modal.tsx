@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select'
 import { capitalizeWords } from '@/global/functions'
 import type { Event, Job, Status } from '../../global/types'
+import { Status as Statuses } from '../../global/types'
 import { localStorageKey } from '../providers/const'
 import { useAuth } from '../providers/hooks'
 import { setJobs } from './shared'
@@ -144,14 +145,17 @@ export function EventsModal({ job } : Props){
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel>Status</SelectLabel>
-                          <SelectItem value="waiting-for-response">Waiting for Response</SelectItem>
+                          {Object.values(Statuses).map((s) => (
+                            <SelectItem value={s}>{capitalizeWords(s.replace(/-/g, ' '))}</SelectItem>
+                          ))}
+                          {/* <SelectItem value="waiting-for-response">Waiting for Response</SelectItem>
                           <SelectItem value="recruiter-screening">Recruiter Screening</SelectItem>
                           <SelectItem value="hiring-manager-screening">Hiring Manager Screening</SelectItem>
                           <SelectItem value="panel-interview">Panel Interview</SelectItem>
                           <SelectItem value="coding-assessment">Coding Assessment</SelectItem>
                           <SelectItem value="waiting-for-next-steps">Waiting for Next Steps</SelectItem>
                           <SelectItem value="rejected">Rejected</SelectItem>
-                          <SelectItem value="ghosted">Ghosted</SelectItem>
+                          <SelectItem value="ghosted">Ghosted</SelectItem> */}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -165,6 +169,8 @@ export function EventsModal({ job } : Props){
                   <div className="flex justify-between">
                     <Button onClick={() => setShowAddEvent(false)} variant="outline">Cancel</Button>
                     <Button
+                      className={newEvent.status === 'waiting-for-response' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer bg-emerald-500 hover:bg-emerald-600 text-white hover:text-white'}
+                      disabled={!newEvent.date && !newEvent.status}
                       onClick={() => {
                         addEvent(newEvent)
                         setNewEvent({

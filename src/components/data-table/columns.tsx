@@ -26,6 +26,10 @@ const getStatusColor = (status: Status) => {
       return 'bg-blue-100'
     case 'panel-interview':
       return 'bg-green-100'
+    case 'behavioral-assessment':
+      return 'bg-purple-100'
+    case 'ccat':
+      return 'bg-purple-100'
     case 'coding-assessment':
       return 'bg-purple-100'
     case 'waiting-for-next-steps':
@@ -103,26 +107,31 @@ export const columns: ColumnDef<Job>[] = [
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuItem
+              disabled={!job.company}
               onClick={() => navigator.clipboard.writeText(job.company)}
             >
               Copy Company Name
             </DropdownMenuItem>
             <DropdownMenuItem
+              disabled={!job.address}
               onClick={() => navigator.clipboard.writeText(job.address)}
             >
               Copy Company Address
             </DropdownMenuItem>
             <DropdownMenuItem
+              disabled={!job.phone}
               onClick={() => navigator.clipboard.writeText(job.phone)}
             >
               Copy Company Phone Number
             </DropdownMenuItem>
             <DropdownMenuItem
+              disabled={!job.position}
               onClick={() => navigator.clipboard.writeText(job.position)}
             >
               Copy Position Applied For
             </DropdownMenuItem>
             <DropdownMenuItem
+              disabled={!job.linkToJobPosting}
               onClick={() => navigator.clipboard.writeText(job.linkToJobPosting)}
             >
               Copy Link to Job Posting
