@@ -29,14 +29,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import type { Job } from '../../global/types'
+import { type Job, months } from '../../global/types'
 import { columns } from './columns'
 import { localStorageKey } from '../providers/const'
 import { useAuth } from '../providers/hooks'
 
 type JobsTableProps = {
+  lastWeeksJobs: Job[]
   month: number
   monthSubGroup?: Job[]
+  thisWeeksJobsCount?: number
 }
 
 function getNumberOfJobsByWeek(jobs: Job[], weekNumber: number) {
@@ -50,7 +52,7 @@ function getNumberOfJobsByWeek(jobs: Job[], weekNumber: number) {
   }).length
 }
 
-export function JobsTable({ month, monthSubGroup }: JobsTableProps) {
+export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCount }: JobsTableProps) {
   const { dispatch, existing, postData, state } = useAuth()
   const [sorting, setSorting] = useState<SortingState>([])
   const [filterBy, setFilterBy] = useState<string>('company')
@@ -92,7 +94,7 @@ export function JobsTable({ month, monthSubGroup }: JobsTableProps) {
   },[dispatch, existing, state.email])
 
   const table = useReactTable({
-    data: filteredJobs || [],
+    data: month > 0 || Number.isNaN(month) ? filteredJobs : lastWeeksJobs ?? [],
     columns,
     autoResetPageIndex: false,
     autoResetExpanded: false,
@@ -112,7 +114,7 @@ export function JobsTable({ month, monthSubGroup }: JobsTableProps) {
     },
   })
 
-  return month > 0 || Number.isNaN(month) ?  (
+  return (
     <div className='w-full'>
       <div className='flex items-center py-4'>
         <div className="relative w-full max-w-sm">
@@ -154,13 +156,16 @@ export function JobsTable({ month, monthSubGroup }: JobsTableProps) {
           Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
         </span>
         <span className="text-sm ml-4">
-          Number of Jobs: {table.getFilteredRowModel().rows.length}
+          Number of Jobs: {table.getFilteredRowModel().rows.length} {month === 0 ? ' last week' : ''}
+          {month === 0 && thisWeeksJobsCount ? ` (vs. This week: ${thisWeeksJobsCount})` : ''}
         </span>
-        <span className="text-sm ml-4">
-          Jobs by week: {getNumberOfJobsByWeek(monthSubGroup || [], 1)}/{getNumberOfJobsByWeek(monthSubGroup || [], 2)}/
-          {getNumberOfJobsByWeek(monthSubGroup || [], 3)}/{getNumberOfJobsByWeek(monthSubGroup || [], 4)}/
-          {getNumberOfJobsByWeek(monthSubGroup || [], 5)}
-        </span>
+        {month > 0 ? (
+          <span className="text-sm ml-4">
+            Jobs by week: {getNumberOfJobsByWeek(monthSubGroup || [], 1)}/{getNumberOfJobsByWeek(monthSubGroup || [], 2)}/
+            {getNumberOfJobsByWeek(monthSubGroup || [], 3)}/{getNumberOfJobsByWeek(monthSubGroup || [], 4)}/
+            {getNumberOfJobsByWeek(monthSubGroup || [], 5)}
+          </span>
+        ) : null } 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='outline' className='ml-auto'>
@@ -187,6 +192,9 @@ export function JobsTable({ month, monthSubGroup }: JobsTableProps) {
               })}
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
+      <div className='flex items-center py-4'>
+        <h2>Jobs you applied to {month === 0 ? 'last week' : `in ${months[month - 1]}`}:</h2>
       </div>
       <div className='rounded-md border'>
         <Table>
@@ -263,5 +271,5 @@ export function JobsTable({ month, monthSubGroup }: JobsTableProps) {
         </div>
       </div>
     </div>
-  ) : null
+  )
 }

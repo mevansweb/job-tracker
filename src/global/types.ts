@@ -50,6 +50,7 @@ export type Job = {
   events: Event[]
   id: string
   jobType: string
+  linkToJobAccount: string
   linkToJobPosting: string
   phone: string
   position: string

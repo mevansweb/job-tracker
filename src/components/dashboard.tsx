@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import Header from '@/components/header'
 import { JobsTable } from '@/components/data-table/jobs-table'
@@ -18,12 +18,35 @@ export const Dashboard = () => {
   })
   const groups = Object.fromEntries(groupedByMonth)// Convert Map to Object if needed
   const monthNumbers = Object.keys(groups).map(Number).sort((a, b) => a - b)
+  const lastWeeksJobs = useMemo(() => {
+    const today = new Date()
+    const lastWeekStart = new Date(today)
+    lastWeekStart.setDate(today.getDate() - today.getDay() - 7) // Last week's Sunday
+    const lastWeekEnd = new Date(lastWeekStart);
+    lastWeekEnd.setDate(lastWeekStart.getDate() + 6) // Last week's Saturday
+
+    return allJobs.filter((job) => {
+      const jobDate = new Date(job.applicationDate)
+      return jobDate >= lastWeekStart && jobDate <= lastWeekEnd
+    })
+  }, [allJobs])
+  const thisWeeksJobsCount = useMemo(() => {
+    const today = new Date()
+    const thisWeekStart = new Date(today)
+    thisWeekStart.setDate(today.getDate() - today.getDay()) // This week's Sunday
+    const thisWeekEnd = new Date(thisWeekStart);
+    thisWeekEnd.setDate(thisWeekStart.getDate() + 6) // This week's Saturday
+    return allJobs.filter((job) => {
+      const jobDate = new Date(job.applicationDate)
+      return jobDate >= thisWeekStart && jobDate <= thisWeekEnd
+    }).length
+  }, [allJobs])
 
   return (
     <div className="flex flex-col m-4">
       <Header 
         greeting={`Welcome, ${state.email.split('@')[0].toUpperCase().replace(/[^a-zA-Z0-9]/g, ' ')}!`} 
-        middle={month > 0 ? `${months[month - 1]} Jobs` : ''} 
+        middle=""
         title="Dashboard" 
       />
       <div className="flex align-center my-4 justify-center">
@@ -34,7 +57,11 @@ export const Dashboard = () => {
           </Button>
         ))}
       </div>
-      <JobsTable month={month} monthSubGroup={groups[month] ?? []} />
+      <JobsTable
+        lastWeeksJobs={lastWeeksJobs}
+        month={month} monthSubGroup={groups[month] ?? []}
+        thisWeeksJobsCount={thisWeeksJobsCount}
+      />
     </div>
   )
 }

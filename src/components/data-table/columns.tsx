@@ -91,6 +91,9 @@ export const columns: ColumnDef<Job>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const job = row.original
+      const events = row.getValue('events') as Array<{ status?: string }> | undefined
+      const lastStatus = (events && events.length > 0 ? events[events.length - 1]?.status ?? '' : 'waiting-for-response') as Status
+      const jobHost = new URL(job.linkToJobPosting).hostname.replace(/^www\./, '')
 
       return (
         <DropdownMenu>
@@ -135,6 +138,18 @@ export const columns: ColumnDef<Job>[] = [
               onClick={() => navigator.clipboard.writeText(job.linkToJobPosting)}
             >
               Copy Link to Job Posting
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={false}
+              onClick={() => navigator.clipboard.writeText(job.contactPerson ? job.contactPerson : jobHost)}
+            >
+              Copy Contact Name or Job Website
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={!job.events}
+              onClick={() => navigator.clipboard.writeText(lastStatus.replace(/-/g, ' '))}
+            >
+              Copy Applicant Status
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
