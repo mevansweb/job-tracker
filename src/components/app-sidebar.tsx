@@ -1,4 +1,4 @@
-import { Calendar, ClipboardList, CodeXml, Home, Search, Settings } from 'lucide-react'
+import { Calendar, ClipboardList, CodeXml, Edit, Home, Search, Settings } from 'lucide-react'
 
 import {
   Sidebar,
@@ -40,6 +40,11 @@ const items = [
     url: '/settings',
     icon: Settings,
   },
+  {
+    title: 'Assessments',
+    url: '/assessments',
+    icon: Edit,
+  }
 ]
 
 export function AppSidebar() {

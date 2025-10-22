@@ -93,7 +93,13 @@ export const columns: ColumnDef<Job>[] = [
       const job = row.original
       const events = row.getValue('events') as Array<{ status?: string }> | undefined
       const lastStatus = (events && events.length > 0 ? events[events.length - 1]?.status ?? '' : 'waiting-for-response') as Status
-      const jobHost = new URL(job.linkToJobPosting).hostname.replace(/^www\./, '')
+      let jobHost = ''
+      try {
+        jobHost = new URL(job.linkToJobPosting).hostname.replace(/^www\./, '')
+      } catch {
+        jobHost = job.linkToJobPosting
+      }
+      
 
       return (
         <DropdownMenu>

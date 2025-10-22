@@ -10,7 +10,7 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table'
-import { ChevronDown, FunnelIcon, SaveIcon, XIcon } from 'lucide-react'
+import { ChevronUp, ChevronDown, FunnelIcon, SaveIcon, XIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { JobsModal } from '@/components/modal/jobs-modal'
 import {
@@ -29,6 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { capitalizeWords } from '@/global/functions'
 import { type Job, months } from '../../global/types'
 import { columns } from './columns'
 import { localStorageKey } from '../providers/const'
@@ -52,6 +53,14 @@ function getNumberOfJobsByWeek(jobs: Job[], weekNumber: number) {
   }).length
 }
 
+function getJobsActivity (jobs: Job[]) {
+  const jobsWithActivity = jobs.filter((job) => {
+    const events = job.events || []
+    return events.length > 1
+  })
+  return jobsWithActivity
+}
+
 export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCount }: JobsTableProps) {
   const { dispatch, existing, postData, state } = useAuth()
   const [sorting, setSorting] = useState<SortingState>([])
@@ -62,6 +71,8 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
   const [columnVisibility, setColumnVisibility] =
     useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
+  const [viewSummary, setViewSummary] = useState(false)
+
   const filteredJobs = useMemo(() => {
     if (monthSubGroup && monthSubGroup.length > 0) {
       return monthSubGroup.filter((job) => {
@@ -78,6 +89,10 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
     }
     return []
   }, [columnFilters, monthSubGroup])
+
+  const jobsWithActivity = useMemo(() => {
+    return getJobsActivity(monthSubGroup || [])
+  }, [monthSubGroup])
 
   const handleSave = useCallback(async () => {
     const saveEmail: string = state?.email ? state.email : existing && existing.email ? existing.email : ''
@@ -96,7 +111,7 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
   const table = useReactTable({
     data: month > 0 || Number.isNaN(month) ? filteredJobs : lastWeeksJobs ?? [],
     columns,
-    autoResetPageIndex: false,
+    autoResetPageIndex: true,
     autoResetExpanded: false,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -196,6 +211,38 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
       <div className='flex items-center py-4'>
         <h2>Jobs you applied to {month === 0 ? 'last week' : `in ${months[month - 1]}`}:</h2>
       </div>
+      {jobsWithActivity.length > 0 && (
+        <Button
+          className="cursor-pointer mb-4"
+          variant={viewSummary ? 'default' : 'outline'}
+          size='sm'
+          onClick={() => setViewSummary(!viewSummary)}
+        >
+          {viewSummary ? 'Hide' : 'View'} Summary of Job Activity
+          {viewSummary ? <ChevronUp className="ml-2" /> : <ChevronDown className="ml-2" />}
+        </Button>
+      )}
+      {jobsWithActivity.length > 0 && viewSummary && (
+        <div className='mb-4 italic text-sm'>
+          {jobsWithActivity.map((job) => (
+            <div key={job.id}>
+              Activity on <strong>{job.position}</strong> at <strong>{job.company}</strong>:{' '}
+              <ul>
+              {job.events
+                .slice()
+                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                .map((event, index) => event.status !== 'waiting-for-response' && (
+                  <li className="ml-4" key={index}>
+                    {event.date} - {capitalizeWords(event.status.replace(/-/g, ' '))}
+                    {event.note ? ` (${event.note})` : ''}
+                    {index < job.events.length - 1 ? '; ' : ''}
+                  </li>
+                ))}
+                </ul>
+            </div>
+          ))}
+        </div>
+      )}
       <div className='rounded-md border'>
         <Table>
           <TableHeader>

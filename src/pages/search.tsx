@@ -4,7 +4,7 @@ const Search = () => {
   return (
     <div className="p-4 flex flex-col">
       <Header 
-        greeting="This is where you search for a job that you have applied for." 
+        greeting="This is where you search for a job that you have applied for (TODO)." 
         middle="" 
         title="Search"
       />

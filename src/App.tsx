@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import Assessments from './pages/assessments'
 import Layout from './components/layout'
 import Home from './pages/home'
 import Practice from './pages/practice'
@@ -14,6 +15,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout><Home /></Layout>} />
+          <Route path="/assessments" element={<Layout><Assessments /></Layout>} />
           <Route path="/practice" element={<Layout><Practice /></Layout>} />
           <Route path="/search" element={<Layout><Search /></Layout>} />
           <Route path="/settings" element={<Layout><Settings /></Layout>} />
