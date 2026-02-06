@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Assessments from './pages/assessments'
+import Assessments from "./pages/assessments";
 import Layout from './components/layout'
 import Home from './pages/home'
 import Practice from './pages/practice'

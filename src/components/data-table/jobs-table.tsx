@@ -40,6 +40,7 @@ type JobsTableProps = {
   month: number
   monthSubGroup?: Job[]
   thisWeeksJobsCount?: number
+  year?: number
 }
 
 function getNumberOfJobsByWeek(jobs: Job[], weekNumber: number) {
@@ -61,7 +62,7 @@ function getJobsActivity (jobs: Job[]) {
   return jobsWithActivity
 }
 
-export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCount }: JobsTableProps) {
+export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCount, year }: JobsTableProps) {
   const { dispatch, existing, postData, state } = useAuth()
   const [sorting, setSorting] = useState<SortingState>([])
   const [filterBy, setFilterBy] = useState<string>('company')
@@ -111,7 +112,7 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
   const table = useReactTable({
     data: month > 0 || Number.isNaN(month) ? filteredJobs : lastWeeksJobs ?? [],
     columns,
-    autoResetPageIndex: true,
+    autoResetPageIndex: false,
     autoResetExpanded: false,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -209,7 +210,7 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
         </DropdownMenu>
       </div>
       <div className='flex items-center py-4'>
-        <h2>Jobs you applied to {month === 0 ? 'last week' : `in ${months[month - 1]}`}:</h2>
+        <h2>Jobs you applied to {month === 0 ? 'last week' : `in ${months[month - 1]} ${year ? year : ''}`}:</h2>
       </div>
       {jobsWithActivity.length > 0 && (
         <Button

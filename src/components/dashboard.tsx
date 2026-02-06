@@ -2,22 +2,28 @@ import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import Header from '@/components/header'
 import { JobsTable } from '@/components/data-table/jobs-table'
-import { months } from '@/global/types'
-
+import { type Job, months } from '@/global/types'
 import { useAuth } from './providers/hooks'
+
+const groupJobsByMonthAndYear = (jobs: Job[]) => {
+  const grouped: { [key: string]: Job[] } = {}
+  jobs.forEach(job => {
+    const date = new Date(job.applicationDate)
+    const monthYear = `${date.getMonth() + 1}-${date.getFullYear()}`
+    if (!grouped[monthYear]) {
+      grouped[monthYear] = []
+    }
+    grouped[monthYear].push(job)
+  })
+  return grouped
+}
 
 export const Dashboard = () => {
   const { data, state } = useAuth()
   const [month, setMonth] = useState<number>(0)
+  const [year, setYear] = useState<number>(0)
   const allJobs = data?.jobs ? data?.jobs : state.jobs
-  const groupedByMonth = new Map();
-  allJobs.forEach(obj => {
-    const month = new Date(obj.applicationDate).getMonth() + 1 // Get month (1-12)
-    if (!groupedByMonth.has(month)) groupedByMonth.set(month, [])
-    groupedByMonth.get(month).push(obj)
-  })
-  const groups = Object.fromEntries(groupedByMonth)// Convert Map to Object if needed
-  const monthNumbers = Object.keys(groups).map(Number).sort((a, b) => a - b)
+  const groupedByMonthAndYear = useMemo(() => groupJobsByMonthAndYear(allJobs), [allJobs])
   const lastWeeksJobs = useMemo(() => {
     const today = new Date()
     const lastWeekStart = new Date(today)
@@ -50,17 +56,26 @@ export const Dashboard = () => {
         title="Dashboard" 
       />
       <div className="flex align-center my-4 justify-center">
-        {monthNumbers.map((m) => (
-          <Button key={`view-jobs-by-month-${m}`} className={`cursor-pointer mr-2 size-min hover:bg-orange-200 hover:border-orange-500 ${month === m ? 'bg-green-200 border-green-500 font-extrabold' : ''}`} onClick={() => setMonth(m)} variant="outline">
-            {months[m - 1] ? months[m - 1] : 'Missing Date'}
-            <span className="text-gray-400 text-xs">{' '}({groups[m] ? groups[m].length : 0})</span>
-          </Button>
-        ))}
+        {groupedByMonthAndYear && Object.keys(groupedByMonthAndYear).sort((a, b) => {
+          const [monthA, yearA] = a.split('-').map(Number)
+          const [monthB, yearB] = b.split('-').map(Number)
+          return yearA === yearB ? monthA - monthB : yearA - yearB
+        }).map((monthYear) => {
+          const [monthPart, yearPart] = monthYear.split('-').map(Number)
+          return (
+            <Button key={`view-jobs-by-month-year-${monthYear}`} className={`cursor-pointer mr-2 size-min hover:bg-orange-200 hover:border-orange-500 ${month === monthPart && year === new Date().getFullYear() ? 'bg-green-200 border-green-500 font-extrabold' : ''}`} onClick={() => { setMonth(monthPart); setYear(yearPart); }} variant="outline">
+              {months[monthPart - 1] ? `${months[monthPart - 1]} ${yearPart}` : 'Missing Date'}
+              <span className="text-gray-400 text-xs">{' '}({groupedByMonthAndYear[monthYear] ? groupedByMonthAndYear[monthYear].length : 0})</span>
+            </Button>
+          )
+        }
+        )}
       </div>
       <JobsTable
         lastWeeksJobs={lastWeeksJobs}
-        month={month} monthSubGroup={groups[month] ?? []}
+        month={month} monthSubGroup={groupedByMonthAndYear[`${month}-${year}`] ?? []}
         thisWeeksJobsCount={thisWeeksJobsCount}
+        year={year}
       />
     </div>
   )

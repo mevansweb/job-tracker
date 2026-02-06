@@ -26,6 +26,8 @@ export const Status = {
   Ghosted: 'ghosted',
   HiringManagerScreen: 'hiring-manager-screening',
   PanelInterview: 'panel-interview',
+  RecruiterEmailed: 'recruiter-emailed',
+  RecruiterMessaged: 'recruiter-messaged',
   RecruiterScreen: 'recruiter-screening',
   Rejected: 'rejected',
   WaitingForNextSteps: 'waiting-for-next-steps',

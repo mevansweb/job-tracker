@@ -47,6 +47,30 @@ const getStatusColor = (status: Status) => {
   }
 }
 
+const jobHostToContactName = (link: string) => {
+  try {
+    const url = new URL(link)
+    const host = url.hostname.replace(/^www\./, '').replace('.com', '')
+    switch (host) {
+      case 'linkedin':
+        return 'LinkedIn'
+      case 'indeed':
+        return 'Indeed'
+      case 'glassdoor':
+        return 'Glassdoor'
+      case 'monster.com':
+        return 'Monster'
+      case 'ziprecruiter':
+        return 'ZipRecruiter'
+      default:
+        return host
+    }
+
+  } catch {
+    return link
+  }
+}
+
 export const columns: ColumnDef<Job>[] = [
   {
     accessorKey: 'applicationDate',
@@ -93,13 +117,7 @@ export const columns: ColumnDef<Job>[] = [
       const job = row.original
       const events = row.getValue('events') as Array<{ status?: string }> | undefined
       const lastStatus = (events && events.length > 0 ? events[events.length - 1]?.status ?? '' : 'waiting-for-response') as Status
-      let jobHost = ''
-      try {
-        jobHost = new URL(job.linkToJobPosting).hostname.replace(/^www\./, '')
-      } catch {
-        jobHost = job.linkToJobPosting
-      }
-      
+      const jobHost = job.linkToJobPosting ? jobHostToContactName(job.linkToJobPosting) : 'N/A'
 
       return (
         <DropdownMenu>
