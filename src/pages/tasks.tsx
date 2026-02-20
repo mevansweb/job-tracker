@@ -1,6 +1,12 @@
 import Header from '@/components/header'
+import { useAuth } from '@/components/providers/hooks'
+import { Card } from '@/components/ui/card'
+import { TasksModal } from '@/components/modal/tasks-modal'
 
 const Tasks = () => {
+  const { data, state } = useAuth()
+  const allTasks = data?.tasks ? data?.tasks : state.tasks
+  console.log('All tasks:', data?.tasks, state.tasks)
   return (
     <div className="p-4 flex flex-col">
       <Header 
@@ -8,6 +14,36 @@ const Tasks = () => {
         middle="" 
         title="Tasks"
       />
+      <div className="mx-auto my-4"><TasksModal /></div>
+      <div className="flex align-center my-4 justify-center">
+        {allTasks && allTasks.length > 0 ? (
+          <div className="w-full">
+            {allTasks.map((task) => (
+              <Card key={task.id} className="mb-4 p-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-lg font-semibold">{task.description}</h3>
+                    <p className="text-sm text-gray-500">Status: {task.status}</p>
+                    {task.events && task.events.length > 0 && (
+                      <div className="mt-2">
+                        <p className="text-sm font-light italic">Sub-Tasks:</p>
+                        <ul className="list-disc list-inside text-sm text-gray-700">
+                          {task.events.map((event, index) => (
+                            <li key={index}>{event.dueDate ? `${event.dueDate}: ` : ''}{event.note}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                  <TasksModal task={task} />
+                </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-700">No tasks found. Use the button above to add your first task.</p>
+        )}
+      </div>
     </div>
   )
 }

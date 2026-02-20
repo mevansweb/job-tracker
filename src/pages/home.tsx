@@ -64,10 +64,10 @@ const Home = () => {
   useEffect(() => {
     if (!existing && data && state.view === 'sign-in') {
       const user = data as ApiResult
-      bcrypt.compare(state.password, user.hashedPassword, function(err, res) {
+      bcrypt.compare(state.password, user.hashedPassword, function(_err, res) {
         if (res) {
           localStorage.setItem(localStorageKey, JSON.stringify({ id: user._id, email: user.email, jobs: user.jobs || []}))
-          dispatch({ type: 'SET_ALL_DATA', email: user.email, error: '', loggedIn: true, password: user.hashedPassword, jobs: user?.jobs || [] })
+          dispatch({ type: 'SET_ALL_DATA', email: user.email, error: '', loggedIn: true, password: user.hashedPassword, jobs: user?.jobs || [], tasks: user?.tasks || [], view: 'sign-in' })
           setErrors([])
         } else if (res === false) {
           setErrors(['The password you have entered is incorrect.'])

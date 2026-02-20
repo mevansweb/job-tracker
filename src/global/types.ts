@@ -13,6 +13,7 @@ export type ApiResult = {
   _id: string
   jobs?: Job[]
   salt: string
+  tasks?: Task[]
 }
 
 
@@ -65,4 +66,19 @@ export type JobsData = {
   password: string
   email: string
   jobs: Job[]
+}
+
+export type TaskEvent = {
+  date: string
+  note: string
+}
+
+export type TaskStatus = 'to-do' | 'in-progress' | 'completed'
+
+export type Task = {
+  id: string
+  createdDate: string
+  description: string
+  events: TaskEvent[]
+  status: TaskStatus
 }
