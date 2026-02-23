@@ -10,6 +10,7 @@ export type EditJobsProps = {
 }
 
 export type EditTasksProps = {
+  action: 'add' | 'edit' | 'delete'
   dispatch: (action: Action) => void
   email: string
   postData: (method: "POST" | "GET" | "PUT" | "DELETE", body: unknown) => Promise<void>
@@ -42,19 +43,21 @@ export const setJobs = async ({ dispatch, email, jobs, postData, setEditJob } : 
   })
 }
 
-export const setTasks = async ({ dispatch, email, tasks, postData, setEditTask } : EditTasksProps) => {
+export const setTasks = async ({ action, dispatch, email, tasks, postData, setEditTask } : EditTasksProps) => {
   dispatch({ type: 'SET_TASKS', tasks: tasks.sort((a, b) => new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime()) })
-  await postData('PUT', { email, form: 'update-tasks' })
-  setEditTask({
-    id: '',
-    createdDate: '',
-    description: '',
-    events: [
-      {
-        dueDate: '',
-        note: '',
-      }
-    ],
-    status: 'to-do'
-  })
+  await postData('PUT', { email, tasks, form: 'update-tasks' })
+  if (action === 'delete' || action === 'add') {
+    setEditTask({
+      id: '',
+      createdDate: '',
+      description: '',
+      events: [
+        {
+          dueDate: '',
+          note: '',
+        }
+      ],
+      status: 'to-do'
+    })
+  }
 }

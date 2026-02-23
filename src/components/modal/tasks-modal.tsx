@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { newTask } from '../../global/template'
-import type { Task, TaskEvent } from '../../global/types'
+import type { Task, TaskEvent, TaskStatus } from '../../global/types'
 import { localStorageKey } from '../providers/const'
 import { useAuth } from '../providers/hooks'
 import { setTasks } from './shared'
@@ -39,14 +39,17 @@ type Props = {
 }
 
 export function TasksModal({ task } : Props){
+  console.log('task in modal', task)
   const { dispatch, existing, postData, state } = useAuth()
-  const tasks = useMemo(() => state.tasks ?? [], [state])
-  const [editTask, setEditTask ] = useState<Task>(task && task.id ? task : newTask)
+  const tasks = useMemo(() => state.tasks && state.tasks.length > 0 ? state.tasks : existing && existing.tasks ? existing.tasks : [], [state, existing])
+  const [editTask, setEditTask ] = useState<Task>(task ? task : newTask)
+  console.log('editTask in modal', editTask)
   const [editTaskEvent, setEditTaskEvent] = useState<TaskEvent>({
     dueDate: '',
     note: '',
   })
   const { createdDate, description, status } = editTask
+  console.log('description, status', description, status)
   const [open, setOpen] = useState(false)
   const [calendarOpen, setCalendarOpen] = useState(false)
   const [date, setDate] = useState<Date>(createdDate ? new Date(createdDate) : new Date())
@@ -62,21 +65,25 @@ export function TasksModal({ task } : Props){
 
   const handleDelete = useCallback(async () => {
     const tasksCopy = tasks.filter((j) => j.id !== editTask.id)
-    await setTasks({ dispatch, email: state.email, tasks: tasksCopy, postData, setEditTask })
+    await setTasks({ action: 'delete', dispatch, email: state.email, tasks: tasksCopy, postData, setEditTask })
     localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, tasks: tasksCopy || []}))
   }, [dispatch, editTask.id, existing, tasks, postData, state.email])
 
   const handleSave = useCallback(async () => {
-    let tasksCopy = tasks
-    if (task) {
-      const pos = tasks.map((e) => e.id).indexOf(task.id)
-      tasksCopy = tasks.filter((j) => j.id !== editTask.id)
-      tasksCopy.splice(pos, 0, editTask)
-    } else {
-      tasksCopy.push({ ...editTask, createdDate: `${!editTask.createdDate && date ? date.toLocaleDateString() : editTask.createdDate}`, id:crypto.randomUUID()})
+    const saveEmail: string = state?.email ? state.email : existing && existing.email ? existing.email : ''
+    if (saveEmail) {
+      let tasksCopy = tasks
+      if (task) {
+        const pos = tasks.map((e) => e.id).indexOf(task.id)
+        tasksCopy = tasks.filter((j) => j.id !== editTask.id)
+        tasksCopy.splice(pos, 0, editTask)
+      } else {
+        tasksCopy.push({ ...editTask, createdDate: `${!editTask.createdDate && date ? date.toLocaleDateString() : editTask.createdDate}`, id:crypto.randomUUID()})
+      }
+      await setTasks({ action: task ? 'edit' : 'add', dispatch, email: saveEmail, tasks: tasksCopy, postData, setEditTask })
+      localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, tasks: tasksCopy || []}))
     }
-    await setTasks({ dispatch, email: state.email, tasks: tasksCopy, postData, setEditTask })
-    localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, tasks: tasksCopy || []}))
+   
   }, [date, dispatch, editTask, existing, task, tasks, postData, state.email])
 
   return (
@@ -96,23 +103,23 @@ export function TasksModal({ task } : Props){
             <Textarea onChange={update} name="description" placeholder="Description" defaultValue={description} />
             </div>
         <div className="flex justify-between">
-            <Select name="taskType" defaultValue={status} onValueChange={(val) => {
-            setEditTask((prevData) => ({
-                ...prevData,
-                taskType: val,
-            }))
-            }}>
-            <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Task Type" />
-            </SelectTrigger>
-            <SelectContent>
-                <SelectGroup>
-                <SelectLabel>Status</SelectLabel>
-                <SelectItem value="to-do">To-Do</SelectItem>
-                <SelectItem value="in-progress">In-Progress</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                </SelectGroup>
-            </SelectContent>
+            <Select name="status" defaultValue={status} onValueChange={(val) => {
+              setEditTask((prevData) => ({
+                  ...prevData,
+                  status: val as TaskStatus,
+              }))
+              }}>
+              <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Task Type" />
+              </SelectTrigger>
+              <SelectContent>
+                  <SelectGroup>
+                  <SelectLabel>Status</SelectLabel>
+                  <SelectItem value="to-do">To-Do</SelectItem>
+                  <SelectItem value="in-progress">In-Progress</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  </SelectGroup>
+              </SelectContent>
             </Select>
             <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>

@@ -69,7 +69,7 @@ export type JobsData = {
 }
 
 export type TaskEvent = {
-  date: string
+  dueDate: string
   note: string
 }
 

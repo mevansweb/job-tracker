@@ -4,10 +4,10 @@ import { Card } from '@/components/ui/card'
 import { TasksModal } from '@/components/modal/tasks-modal'
 
 const Tasks = () => {
-  const { data, state } = useAuth()
-  const allTasks = data?.tasks ? data?.tasks : state.tasks
-  console.log('All tasks:', data?.tasks, state.tasks)
-  return (
+  const { data, existing, state } = useAuth()
+  const allTasks = data?.tasks && data.tasks.length > 0 ? data.tasks : state.tasks && state.tasks.length > 0 ? state.tasks : existing && existing.tasks ? existing.tasks : []
+
+  return (  
     <div className="p-4 flex flex-col">
       <Header 
         greeting="This is where you log your job training/career development tasks (TODO)." 
@@ -19,7 +19,7 @@ const Tasks = () => {
         {allTasks && allTasks.length > 0 ? (
           <div className="w-full">
             {allTasks.map((task) => (
-              <Card key={task.id} className="mb-4 p-4">
+              <Card key={`${task.id}-card`} className="mb-4 p-4">
                 <div className="flex justify-between items-center">
                   <div>
                     <h3 className="text-lg font-semibold">{task.description}</h3>
@@ -29,13 +29,13 @@ const Tasks = () => {
                         <p className="text-sm font-light italic">Sub-Tasks:</p>
                         <ul className="list-disc list-inside text-sm text-gray-700">
                           {task.events.map((event, index) => (
-                            <li key={index}>{event.dueDate ? `${event.dueDate}: ` : ''}{event.note}</li>
+                            <li key={`${task.id}-event-${index}`}>{event.dueDate ? `${event.dueDate}: ` : ''}{event.note}</li>
                           ))}
                         </ul>
                       </div>
                     )}
                   </div>
-                  <TasksModal task={task} />
+                  <TasksModal key={`${task.id}-modal`} task={task} />
                 </div>
               </Card>
             ))}
