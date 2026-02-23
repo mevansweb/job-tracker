@@ -39,17 +39,14 @@ type Props = {
 }
 
 export function TasksModal({ task } : Props){
-  console.log('task in modal', task)
   const { dispatch, existing, postData, state } = useAuth()
   const tasks = useMemo(() => state.tasks && state.tasks.length > 0 ? state.tasks : existing && existing.tasks ? existing.tasks : [], [state, existing])
   const [editTask, setEditTask ] = useState<Task>(task ? task : newTask)
-  console.log('editTask in modal', editTask)
   const [editTaskEvent, setEditTaskEvent] = useState<TaskEvent>({
     dueDate: '',
     note: '',
   })
   const { createdDate, description, status } = editTask
-  console.log('description, status', description, status)
   const [open, setOpen] = useState(false)
   const [calendarOpen, setCalendarOpen] = useState(false)
   const [date, setDate] = useState<Date>(createdDate ? new Date(createdDate) : new Date())
