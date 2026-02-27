@@ -5,6 +5,7 @@ import { useAuth } from '@/components/providers/hooks'
 import type { Job } from '@/global/types'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { capitalizeWords } from '@/global/functions'
 
 const MIN_QUERY_LENGTH = 3
 
@@ -65,7 +66,7 @@ const Search = () => {
   return (
     <div className="p-4 flex flex-col">
       <Header 
-        greeting="This is where you search for a job that you have applied for (TODO)." 
+        greeting="This is where you search for a job that you have applied for." 
         middle="" 
         title="Search"
       />
@@ -94,9 +95,15 @@ const Search = () => {
                     <ul className="list-disc list-inside text-sm text-gray-700">
                       {job.events.map((event, index) => {
                         if (event.status === 'waiting-for-response') {
-                          return <li key={`${job.id}-event-${index}`}>{event.date ? `${new Date(event.date).toLocaleDateString()}: ` : ''}Application Sent.</li>
+                          return (
+                            <li key={`${job.id}-event-${index}`}>{job.applicationDate ? `${new Date(job.applicationDate).toLocaleDateString()}: ` : ''}Application Sent.</li>
+                          )
                         } else {
-                          return <li key={`${job.id}-event-${index}`}>{event.date ? `${new Date(event.date).toLocaleDateString()}: ` : ''}{event.note}</li>
+                          return (
+                            <li key={`${job.id}-event-${index}`}>{event.date ? `${new Date(event.date).toLocaleDateString()}: ` : ''}
+                              {capitalizeWords(event.status.replace(/-/g, ' '))} {event.note ? `- ${event.note}` : ''}
+                            </li>
+                          )
                         }
                       })}
                     </ul>
