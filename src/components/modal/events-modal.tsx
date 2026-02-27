@@ -91,8 +91,8 @@ export function EventsModal({ job } : Props){
             </DialogDescription>
           </DialogHeader>
             {editJob.events.map((event, index) => (
-              <>
-                <div key={`event-${event.status}-${index}`} className="flex justify-between">
+              <div key={`${job.id}-event-${event.status}-${index}`} >
+                <div className="flex justify-between">
                   {event.date ? event.date : job.applicationDate}:&nbsp;&nbsp;{capitalizeWords(event.status.replace(/-/g, ' '))}
                   <X
                     className="cursor-pointer stroke-red-500"
@@ -103,7 +103,7 @@ export function EventsModal({ job } : Props){
                     } } />
                 </div>
                 {event.note ? <p className="text-center text-sm font-light italic">{event.note}</p> : null}
-              </>
+              </div>
             ))}
             {!showAddEvent ? (
               <Button onClick={() => setShowAddEvent(true)} variant="outline">Add New Event</Button>

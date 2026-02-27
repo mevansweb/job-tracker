@@ -105,7 +105,7 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
 
   useEffect(() => {
     if (existing && existing.email && !state.email) {
-      dispatch({ type: 'SET_ALL_DATA', ...existing, error: '', jobs: existing.jobs ?? [], tasks: existing.tasks ?? [], loggedIn: true, password: ''})
+      dispatch({ type: 'SET_ALL_DATA', ...existing, id: existing._id, error: '', jobs: existing.jobs ?? [], tasks: existing.tasks ?? [], loggedIn: true, password: ''})
     }
   },[dispatch, existing, state.email])
 

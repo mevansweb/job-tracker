@@ -1,6 +1,10 @@
 {
   "arrowParens": "always",
-  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "plugins": ["@trivago/prettier-plugin-sort-imports", "prettier-plugin-organize-attributes"],
+  "organizeAttributes": {
+    "maxAttrsOnTag": 3,
+    "forceExpandMultiline": true
+  },
   "printWidth": 100,
   "semi": false,
   "singleQuote": true,
@@ -17,7 +21,8 @@
       "options": {
         "plugins": [
           "@trivago/prettier-plugin-sort-imports",
-          "prettier-plugin-tailwindcss"
+          "prettier-plugin-tailwindcss",
+          "prettier-plugin-organize-attributes"
         ]
       }
     }

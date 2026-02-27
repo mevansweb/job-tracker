@@ -1,6 +1,6 @@
 import React, { useReducer } from 'react'
 
-import type { Job, Task } from '@/global/types'
+import type { Job, Note, Task } from '@/global/types'
 import useApi from '../../hooks/useApi'
 import { AuthContext, localStorageKey } from './const'
 import type { AuthProviderProps } from './types'
@@ -8,8 +8,10 @@ import type { AuthProviderProps } from './types'
 export type State = {
   email: string
   error: string
+  id: string
   jobs: Job[]
   loggedIn: boolean
+  notes?: Note[]
   password: string
   tasks: Task[]
   view?: string
@@ -21,15 +23,18 @@ export type Action =
   | ({ type: 'SET_PASSWORD' } & Pick<State, 'password'>)
   | ({ type: 'SET_ERRORS' } & Pick<State, 'error'>)
   | ({ type: 'SET_LOGGED_IN' } & Pick<State, 'loggedIn'>)
+  | ({ type: 'SET_NOTES' } & Pick<State, 'notes'>)
   | ({ type: 'SET_TASKS' } & Pick<State, 'tasks'>)
   | ({ type: 'SET_VIEW' } & Pick<State, 'view'>)
   | ({ type: 'SET_JOBS' } & Pick<State, 'jobs'>)
 
 const initialState: State = { 
   email: '', 
-  error: '', 
+  error: '',
+  id: '',
   jobs: [], 
   loggedIn: false,  
+  notes: [],
   password: '',
   tasks: [],
   view: 'sign-in'
@@ -72,6 +77,11 @@ const reducer = (state: State, action: Action) => {
       return {
         ...state,
         jobs: action.jobs
+      }
+    case 'SET_NOTES':
+      return {
+        ...state,
+        notes: action.notes
       }
     case 'SET_TASKS':
       return {

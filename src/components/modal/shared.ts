@@ -1,5 +1,5 @@
 import { type Action } from '@/components/providers/auth-provider'
-import { type Job, type Task } from '@/global/types'
+import type { Job, Note, Task } from '@/global/types'
 
 export type EditJobsProps = {
   dispatch: (action: Action) => void
@@ -8,6 +8,15 @@ export type EditJobsProps = {
   postData: (method: "POST" | "GET" | "PUT" | "DELETE", body: unknown) => Promise<void>
   setEditJob: (value: React.SetStateAction<Job>) => void
 }
+
+export type EditNotesProps = {
+  action: 'add' | 'edit' | 'delete'
+  dispatch: (action: Action) => void
+  email: string
+  postData: (method: "POST" | "GET" | "PUT" | "DELETE", body: unknown) => Promise<void>
+  setEditNote: (value: React.SetStateAction<Note>) => void
+  notes: Note[]
+} 
 
 export type EditTasksProps = {
   action: 'add' | 'edit' | 'delete'
@@ -41,6 +50,22 @@ export const setJobs = async ({ dispatch, email, jobs, postData, setEditJob } : 
     jobType: 'remote',
     salaryRange: '',
   })
+}
+
+export const setNotes = async ({ action, dispatch, email, notes, postData, setEditNote } : EditNotesProps) => {
+  dispatch({ type: 'SET_NOTES', notes })
+  await postData('PUT', { email, notes, form: 'update-notes' })
+  if (action === 'delete' || action === 'add') {
+    setEditNote({
+      id: '',
+      description: '',
+      problem: '',
+      solution: '',
+      source: '',
+      steps: [],
+      title: '',
+    })
+  }
 }
 
 export const setTasks = async ({ action, dispatch, email, tasks, postData, setEditTask } : EditTasksProps) => {

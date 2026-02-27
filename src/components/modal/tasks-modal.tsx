@@ -152,13 +152,13 @@ export function TasksModal({ task } : Props){
         <div className="flex flex-col gap-3">
             <div className="text-sm font-light italic">Events:</div>
             {editTask.events.map((event, index) => (
-                <div key={`event-${index}`} className="flex justify-between">
-                    {event.dueDate ? event.dueDate : createdDate}:&nbsp;&nbsp;{event.note}
-                    <X className="cursor-pointer stroke-red-500" aria-label="Click to Remove" onClick={() => {
-                        const updatedEvents = editTask.events.filter((_, i) => i !== index)
-                        setEditTask({ ...editTask, events: updatedEvents })
-                    }} />
-                </div>
+              <div key={`event-${index}`} className="flex justify-between">
+                  {event.dueDate ? event.dueDate : createdDate}:&nbsp;&nbsp;{event.note}
+                  <X className="cursor-pointer stroke-red-500" aria-label="Click to Remove" onClick={() => {
+                      const updatedEvents = editTask.events.filter((_, i) => i !== index)
+                      setEditTask({ ...editTask, events: updatedEvents })
+                  }} />
+              </div>
             ))}
             {!editTask.events || editTask.events.length === 0 ? <div className="text-sm font-light italic">No events added yet.</div> : null}
             <div className="flex-col">
