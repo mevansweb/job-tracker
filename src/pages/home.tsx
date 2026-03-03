@@ -66,8 +66,8 @@ const Home = () => {
       const user = data as ApiResult
       bcrypt.compare(state.password, user.hashedPassword, function(_err, res) {
         if (res) {
-          localStorage.setItem(localStorageKey, JSON.stringify({ id: user._id, email: user.email, jobs: user.jobs || []}))
-          dispatch({ type: 'SET_ALL_DATA', email: user.email, error: '', id: user._id, loggedIn: true, password: user.hashedPassword, jobs: user?.jobs || [], tasks: user?.tasks || [], view: 'sign-in' })
+          localStorage.setItem(localStorageKey, JSON.stringify({ id: user._id, email: user.email, jobs: user.jobs || [], notes: user.notes || [], tasks: user.tasks || [], settings: user.settings }))
+          dispatch({ type: 'SET_ALL_DATA', email: user.email, error: '', id: user._id, loggedIn: true, password: user.hashedPassword, jobs: user?.jobs || [], notes: user?.notes || [], tasks: user?.tasks || [], settings: user.settings, view: 'sign-in' })
           setErrors([])
         } else if (res === false) {
           setErrors(['The password you have entered is incorrect.'])

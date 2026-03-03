@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import {
   type ColumnFiltersState,
   flexRender,
@@ -63,7 +63,7 @@ function getJobsActivity (jobs: Job[]) {
 }
 
 export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCount, year }: JobsTableProps) {
-  const { dispatch, existing, postData, state } = useAuth()
+  const { existing, postData, state } = useAuth()
   const [sorting, setSorting] = useState<SortingState>([])
   const [filterBy, setFilterBy] = useState<string>('company')
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
@@ -96,18 +96,12 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
   }, [monthSubGroup])
 
   const handleSave = useCallback(async () => {
-    const saveEmail: string = state?.email ? state.email : existing && existing.email ? existing.email : ''
+    const saveEmail: string = state.email
     if (saveEmail) {
       postData('PUT', { email: saveEmail, jobs: state.jobs.length > 0 ? state.jobs : [] })
       localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, jobs: state.jobs || []}))
     }
   }, [existing, postData, state.email, state.jobs])
-
-  useEffect(() => {
-    if (existing && existing.email && !state.email) {
-      dispatch({ type: 'SET_ALL_DATA', ...existing, id: existing._id, error: '', jobs: existing.jobs ?? [], tasks: existing.tasks ?? [], loggedIn: true, password: ''})
-    }
-  },[dispatch, existing, state.email])
 
   const table = useReactTable({
     data: month > 0 || Number.isNaN(month) ? filteredJobs : lastWeeksJobs ?? [],

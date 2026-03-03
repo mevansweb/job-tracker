@@ -1,6 +1,6 @@
 import React, { useReducer } from 'react'
 
-import type { Job, Note, Task } from '@/global/types'
+import type { Job, Note, Settings, Task } from '@/global/types'
 import useApi from '../../hooks/useApi'
 import { AuthContext, localStorageKey } from './const'
 import type { AuthProviderProps } from './types'
@@ -13,6 +13,7 @@ export type State = {
   loggedIn: boolean
   notes?: Note[]
   password: string
+  settings?: Settings
   tasks: Task[]
   view?: string
 }
@@ -20,13 +21,15 @@ export type State = {
 export type Action =
   | ({ type: 'SET_ALL_DATA'} & State)
   | ({ type: 'SET_EMAIL' } & Pick<State, 'email'>)
-  | ({ type: 'SET_PASSWORD' } & Pick<State, 'password'>)
   | ({ type: 'SET_ERRORS' } & Pick<State, 'error'>)
+  | ({ type: 'SET_JOBS' } & Pick<State, 'jobs'>)
   | ({ type: 'SET_LOGGED_IN' } & Pick<State, 'loggedIn'>)
   | ({ type: 'SET_NOTES' } & Pick<State, 'notes'>)
+  | ({ type: 'SET_PASSWORD' } & Pick<State, 'password'>)
+  | ({ type: 'SET_SETTINGS' } & Pick<State, 'settings'>)
   | ({ type: 'SET_TASKS' } & Pick<State, 'tasks'>)
   | ({ type: 'SET_VIEW' } & Pick<State, 'view'>)
-  | ({ type: 'SET_JOBS' } & Pick<State, 'jobs'>)
+  
 
 const initialState: State = { 
   email: '', 
@@ -36,6 +39,7 @@ const initialState: State = {
   loggedIn: false,  
   notes: [],
   password: '',
+  settings: undefined,
   tasks: [],
   view: 'sign-in'
 }
@@ -48,9 +52,13 @@ const reducer = (state: State, action: Action) => {
         ...state,
         email: action.email,
         error: action.error,
+        id: action.id,
         jobs: action.jobs,
         loggedIn: action.loggedIn,
+        notes: action.notes,
         password: action.password,
+        settings: action.settings,
+        tasks: action.tasks,
         view: action.view
       }
     case 'SET_EMAIL':
@@ -82,6 +90,11 @@ const reducer = (state: State, action: Action) => {
       return {
         ...state,
         notes: action.notes
+      }
+    case 'SET_SETTINGS':
+      return {
+        ...state,
+        settings: action.settings
       }
     case 'SET_TASKS':
       return {

@@ -40,7 +40,7 @@ type Props = {
 
 export function TasksModal({ task } : Props){
   const { dispatch, existing, postData, state } = useAuth()
-  const tasks = useMemo(() => state.tasks && state.tasks.length > 0 ? state.tasks : existing && existing.tasks ? existing.tasks : [], [state, existing])
+  const tasks = useMemo(() => state.tasks ?? [], [state.tasks])
   const [editTask, setEditTask ] = useState<Task>(task ? task : newTask)
   const [editTaskEvent, setEditTaskEvent] = useState<TaskEvent>({
     dueDate: '',
@@ -67,7 +67,7 @@ export function TasksModal({ task } : Props){
   }, [dispatch, editTask.id, existing, tasks, postData, state.email])
 
   const handleSave = useCallback(async () => {
-    const saveEmail: string = state?.email ? state.email : existing && existing.email ? existing.email : ''
+    const saveEmail: string = state.email
     if (saveEmail) {
       let tasksCopy = tasks
       if (task) {

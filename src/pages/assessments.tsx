@@ -12,14 +12,14 @@ import { setNotes } from '@/components/modal/shared'
 import { frontendFrameworks, patterns, programmingLanguages, type Framework, type Note, type Step } from '@/global/types'
 
 const Assessments = () => {
-  const { data, dispatch, existing, postData, state } = useAuth()
-  const notes = useMemo(() => state.notes && state.notes.length > 0 ? state.notes : existing && existing.notes ? existing.notes : [], [state, existing])
+  const { dispatch, existing, postData, state } = useAuth()
+  const notes = useMemo(() => state.notes ?? [], [state.notes])
   const [ open, setOpen ] = useState(false)
   const [ expanded , setExpanded ] = useState<string[]>([])
   const [ openSteps, setOpenSteps ] = useState(false)
   const [ editNote, setEditNote ] = useState<Note>({ id: '', description: '', problem: '', solution: '', source: '', steps: [], title: '' })
   const { description, problem, solution, source, steps, title } = editNote
-  const allNotes = data?.notes && data.notes.length > 0 ? data.notes : state.notes && state.notes.length > 0 ? state.notes : existing && existing.notes ? existing.notes : []
+  const allNotes = useMemo(() => state.notes ?? [], [state.notes])
 
   const update = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target
@@ -36,7 +36,7 @@ const Assessments = () => {
   }, [dispatch, editNote.id, existing, notes, postData, state.email])
 
   const handleSaveNote = useCallback(async () => {
-    const saveEmail: string = state?.email ? state.email : existing && existing.email ? existing.email : ''
+    const saveEmail: string = state.email
     if (saveEmail) {
       let notesCopy = notes
       if (editNote.id) {

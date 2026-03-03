@@ -1,5 +1,5 @@
 import { type Action } from '@/components/providers/auth-provider'
-import type { Job, Note, Task } from '@/global/types'
+import type { Job, Note, Task, Settings } from '@/global/types'
 
 export type EditJobsProps = {
   dispatch: (action: Action) => void
@@ -25,7 +25,16 @@ export type EditTasksProps = {
   postData: (method: "POST" | "GET" | "PUT" | "DELETE", body: unknown) => Promise<void>
   setEditTask: (value: React.SetStateAction<Task>) => void
   tasks: Task[]
-} 
+}
+
+export type EditSettingsProps = {
+  action: 'add' | 'edit' | 'delete'
+  dispatch: (action: Action) => void
+  email: string
+  postData: (method: "POST" | "GET" | "PUT" | "DELETE", body: unknown) => Promise<void>
+  setEditSettings: (value: React.SetStateAction<unknown>) => void
+  settings: Settings
+}
 
 export const setJobs = async ({ dispatch, email, jobs, postData, setEditJob } : EditJobsProps) => {
   dispatch({ type: 'SET_JOBS', jobs: jobs.sort((a, b) => new Date(a.applicationDate).getTime() - new Date(b.applicationDate).getTime()) })
@@ -73,6 +82,25 @@ export const setTasks = async ({ action, dispatch, email, tasks, postData, setEd
   await postData('PUT', { email, tasks, form: 'update-tasks' })
   if (action === 'delete' || action === 'add') {
     setEditTask({
+      id: '',
+      createdDate: '',
+      description: '',
+      events: [
+        {
+          dueDate: '',
+          note: '',
+        }
+      ],
+      status: 'to-do'
+    })
+  }
+}
+
+export const setSettings = async ({ action, dispatch, email, settings, postData, setEditSettings } : EditSettingsProps) => {
+  dispatch({ type: 'SET_SETTINGS', settings })
+  await postData('PUT', { email, settings, form: 'update-settings' })
+  if (action === 'delete' || action === 'add') {
+    setEditSettings({
       id: '',
       createdDate: '',
       description: '',

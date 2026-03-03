@@ -15,6 +15,7 @@ export type ApiResult = {
   jobs?: Job[]
   notes?: Note[]
   salt: string
+  settings?: Settings
   tasks?: Task[]
 }
 
@@ -81,6 +82,13 @@ export type Task = {
   description: string
   events: TaskEvent[]
   status: TaskStatus
+}
+
+export type Settings = {
+  font?: string
+  backgroundColor?: string
+  sidebarColor?: string
+  theme: string
 }
 
 export type Step = {

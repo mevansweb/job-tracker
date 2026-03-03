@@ -4,8 +4,8 @@ import { Card } from '@/components/ui/card'
 import { TasksModal } from '@/components/modal/tasks-modal'
 
 const Tasks = () => {
-  const { data, existing, state } = useAuth()
-  const allTasks = data?.tasks && data.tasks.length > 0 ? data.tasks : state.tasks && state.tasks.length > 0 ? state.tasks : existing && existing.tasks ? existing.tasks : []
+  const { state } = useAuth()
+  const allTasks = state.tasks || []
 
   return (  
     <div className="p-4 flex flex-col">

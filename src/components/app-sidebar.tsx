@@ -1,4 +1,4 @@
-import { Calendar, ClipboardList, CodeXml, Edit, Home, Search, Settings } from 'lucide-react'
+import { Calendar, CodeXml, Edit, Home, Search, Settings } from 'lucide-react'
 
 import {
   Sidebar,
@@ -54,8 +54,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>
             <div className="flex items-center">
-                <ClipboardList className="mr-2 h-8 w-8 text-orange-500 text-shadow-lg" />
-                <h1 className="text-xl capitalize underline decoration-4 decoration-orange-500 font-extrabold text-shadow-sm text-gray-500">
+                <h1 className="text-xl capitalize">
                   Job Tracker
                 </h1>
             </div>

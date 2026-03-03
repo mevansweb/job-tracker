@@ -12,8 +12,8 @@ const MIN_QUERY_LENGTH = 3
 const SEARCH_URL = 'http://localhost:8080/api/data/search/'
 
 const Search = () => {
-  const { existing } = useAuth()
-  const id = existing && existing.id ? existing.id : ''
+  const { state } = useAuth()
+  const id = state.id ?? ''
   const [query, setQuery] = useState('')
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [searchResults, setSearchResults] = useState<Job[]>([])

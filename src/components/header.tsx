@@ -1,23 +1,34 @@
-import { Button } from '@/components/ui/button'
+import { useNavigate } from 'react-router-dom'
 
+import lightLogo from '@/assets/job-tracker-logo-light.png'
+import { Button } from '@/components/ui/button'
 import { useAuth } from './providers/hooks'
 
 const Header = ({ greeting, middle, title }: { greeting: string, middle: string, title: string }) => {
   const { dispatch, logout, state } = useAuth()
+  const navigate = useNavigate()
+
   return (
     <div className="flex justify-between">
-      {title}
+      <div className="flex flex-col">
+        <img src={lightLogo} alt="Job Tracker Logo" width="350" />
+        <div className="absolute left-[210px] top-[20px]">{title}</div>
+      </div>
       <div className="flex items-center">
         <span className="mr-2">{greeting}</span>
       </div>
       {middle}
       <Button className="cursor-pointer size-min" 
         onClick={() => { 
-          logout(state.email)
-          dispatch({ type: 'SET_VIEW', view: 'sign-in' })
+          if (state.loggedIn) {
+            logout(state.email)
+            dispatch({ type: 'SET_VIEW', view: 'sign-in' })
+          } else {
+            navigate('/')
+          }
         }
       }>
-        Log Out
+        {state.loggedIn ? 'Log Out' : 'Log In'}
       </Button>
     </div>
   )
