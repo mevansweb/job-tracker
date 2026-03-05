@@ -3,8 +3,26 @@ import { useEffect } from 'react'
 import { useAuth } from './providers/hooks'
 import type { ApiResult } from '@/global/types'
 
+function getThemeClasses({ backgroundColor, font, sidebarColor, theme }: { backgroundColor?: string; font?: string; sidebarColor?: string; theme?: string }) {
+  let classes = ''
+  if (theme) {
+    classes += theme
+  }
+  if (backgroundColor) {
+    classes += ` ${backgroundColor} ${backgroundColor === 'bg-black' ? 'text-white' : 'text-black'}`
+  }
+  if (font) {
+    classes += ` ${font}`
+  }
+  if (sidebarColor) {
+    classes += ` ${sidebarColor}`
+  }
+  return classes.trim()
+}
+
 export default function Theme({ children }: { children: React.ReactNode }) {
     const { data, dispatch, existing, state } = useAuth()
+    const themeClasses = getThemeClasses(state.settings || {})
 
     useEffect(() => {
       if (existing && existing.id && state.id === '' && data === null) {
@@ -15,7 +33,7 @@ export default function Theme({ children }: { children: React.ReactNode }) {
     },[])  
 
   return (
-    <main className={`${state.settings?.theme ? state.settings.theme : 'light'} w-[calc(100vw-48px)] peer-data-[state=expanded]:w-[calc(100vw-256px)] h-screen`}>
+    <main className={`${themeClasses} w-[calc(100vw-48px)] peer-data-[state=expanded]:w-[calc(100vw-256px)] h-screen`}>
     {children}
     </main>
   )

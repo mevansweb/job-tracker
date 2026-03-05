@@ -66,13 +66,13 @@ const Search = () => {
   return (
     <div className="p-4 flex flex-col">
       <Header 
-        greeting="This is where you search for a job that you have applied for." 
+        greeting="Search for a job that you have applied for." 
         middle="" 
         title="Search"
       />
       <Input
         type="text"
-        placeholder="Search for a job..."
+        placeholder="Search for a job by company name..."
         value={query}
         onChange={handleOnChange}
         className="my-4 w-full"

@@ -10,14 +10,16 @@ const Header = ({ greeting, middle, title }: { greeting: string, middle: string,
 
   return (
     <div className="flex justify-between">
-      <div className="flex flex-col">
-        <img src={lightLogo} alt="Job Tracker Logo" width="350" />
-        <div className="absolute left-[210px] top-[20px]">{title}</div>
+      <div className="flex">
+        <div className="flex flex-col">
+          <img src={lightLogo} alt="Job Tracker Logo" width="350" />
+          <div className="absolute left-[210px] top-[20px]">{title}</div>
+        </div>
+        <div className="flex flex-col ml-20 justify-center items-center">
+          <div className="">{middle}</div>
+          <div className="">{greeting}</div>
+        </div>
       </div>
-      <div className="flex items-center">
-        <span className="mr-2">{greeting}</span>
-      </div>
-      {middle}
       <Button className="cursor-pointer size-min" 
         onClick={() => { 
           if (state.loggedIn) {
