@@ -79,6 +79,10 @@ const Settings = () => {
               <Label htmlFor="font-default">Outfit</Label>
             </div>
             <div className="flex items-center gap-3">
+              <RadioGroupItem value="font-(family-name:--font-inter)" id="inter" />
+              <Label htmlFor="inter">Inter</Label>
+            </div>
+            <div className="flex items-center gap-3">
               <RadioGroupItem value="font-serif" id="serif" />
               <Label htmlFor="serif">Serif Font</Label>
             </div>

@@ -1,18 +1,20 @@
 import { useNavigate } from 'react-router-dom'
 
 import lightLogo from '@/assets/job-tracker-logo-light.png'
+import darkLogo from '@/assets/job-tracker-logo-dark.png'
 import { Button } from '@/components/ui/button'
 import { useAuth } from './providers/hooks'
 
 const Header = ({ greeting, middle, title }: { greeting: string, middle: string, title: string }) => {
   const { dispatch, logout, state } = useAuth()
+  const { theme } = state.settings || {}
   const navigate = useNavigate()
 
   return (
     <div className="flex justify-between">
       <div className="flex">
         <div className="flex flex-col">
-          <img src={lightLogo} alt="Job Tracker Logo" width="350" />
+          <img src={theme === 'dark' ? darkLogo : lightLogo} alt="Job Tracker Logo" width="350" />
           <div className="absolute left-[210px] top-[20px]">{title}</div>
         </div>
         <div className="flex flex-col ml-20 justify-center items-center">

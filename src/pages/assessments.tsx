@@ -64,7 +64,7 @@ const Assessments = () => {
           {open ? 'Close Note Editor' : 'Add Note'}
         </button>
         {open ? (
-          <div className="mt-4 p-4 border rounded bg-white">
+          <div className="mt-4 p-4 border rounded">
             <Input
               id="title"
               name="title"
@@ -236,15 +236,15 @@ const Assessments = () => {
       {allNotes && allNotes.length > 0 ? (
         <div className="w-full">
           {allNotes.map((note) => (
-            <div key={`${note.id}-card`} className="mt-4 p-4 border rounded bg-white">
+            <div key={`${note.id}-card`} className="mt-4 p-4 border rounded light:bg-white dark:bg-input">
               <h3 className="text-lg font-semibold">{note.title}</h3>
-              <p className="text-gray-700">{note.description}</p>
-              <p className="text-gray-700 mt-2">{note.problem}</p>
-              {note.source ? <p className="text-gray-700 mt-2">Source: {note.source}</p> : null}
+              <p className="light:text-gray-700">{note.description}</p>
+              <p className="light:text-gray-700 mt-2">{note.problem}</p>
+              {note.source ? <p className="light:text-gray-700 mt-2">Source: {note.source}</p> : null}
               {note.frameworks && note.frameworks.length > 0 ? (
                 <div className="flex mt-2">
                   {note.frameworks.map((fw) => (
-                    <div key={`${note.id}-${fw}`} className="flex px-2 py-1 bg-gray-200 rounded whitespace-nowrap mr-2">
+                    <div key={`${note.id}-${fw}`} className="flex px-2 py-1 light:bg-gray-200 dark:bg-gray-600 rounded whitespace-nowrap mr-2">
                       {fw}
                     </div>
                   ))}
@@ -262,7 +262,7 @@ const Assessments = () => {
                 {note.steps.length > 0 ? (
                   <div className="mt-2">
                     <p className="text-sm font-light italic">Steps:</p>
-                    <ul className="list-disc list-inside text-sm text-gray-700">
+                    <ul className="list-disc list-inside text-sm light:text-gray-700">
                       {note.steps.map((step, index) => (
                         <li key={`${note.id}-step-${index}`}>{`Step ${step.stepNumber}: ${step.description}`}</li>
                       ))}

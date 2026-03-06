@@ -3,14 +3,8 @@ import { useEffect } from 'react'
 import { useAuth } from './providers/hooks'
 import type { ApiResult } from '@/global/types'
 
-function getThemeClasses({ backgroundColor, font, sidebarColor, theme }: { backgroundColor?: string; font?: string; sidebarColor?: string; theme?: string }) {
+function getThemeClasses({ font, sidebarColor }: { backgroundColor?: string; font?: string; sidebarColor?: string; theme?: string }) {
   let classes = ''
-  if (theme) {
-    classes += theme
-  }
-  if (backgroundColor) {
-    classes += ` ${backgroundColor} ${backgroundColor === 'bg-black' ? 'text-white' : 'text-black'}`
-  }
   if (font) {
     classes += ` ${font}`
   }
@@ -23,6 +17,12 @@ function getThemeClasses({ backgroundColor, font, sidebarColor, theme }: { backg
 export default function Theme({ children }: { children: React.ReactNode }) {
     const { data, dispatch, existing, state } = useAuth()
     const themeClasses = getThemeClasses(state.settings || {})
+
+    useEffect(() => {
+      if (state.settings?.theme) {
+        document.documentElement.classList.add(state.settings.theme)
+      }
+    }, [state.settings?.theme])
 
     useEffect(() => {
       if (existing && existing.id && state.id === '' && data === null) {

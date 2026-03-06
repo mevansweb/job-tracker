@@ -17,33 +17,34 @@ import { type Job, type Status } from '../../global/types'
 //"waiting-for-response" | "recruiter-screening" | "rejected" | "coding-assessment" | "ghosted" | "hiring-manager-screening" | "panel-interview" | "waiting-for-next-steps"
 
 const getStatusColor = (status: Status) => {
+  const isDarkMode = document.documentElement.classList.contains('dark')
   switch (status) {
     case 'waiting-for-response':
-      return 'bg-gray-100'
+      return isDarkMode ? 'bg-gray-500' : 'bg-gray-100'
     case 'recruiter-screening':
-      return 'bg-yellow-100'
+      return isDarkMode ? 'bg-yellow-500' : 'bg-yellow-100'
     case 'hiring-manager-screening':
-      return 'bg-blue-100'
+      return isDarkMode ? 'bg-blue-500' : 'bg-blue-100'
     case 'panel-interview':
-      return 'bg-green-100'
+      return isDarkMode ? 'bg-green-500' : 'bg-green-100'
     case 'behavioral-assessment':
-      return 'bg-purple-100'
+      return isDarkMode ? 'bg-purple-500' : 'bg-purple-100'
     case 'ccat':
-      return 'bg-purple-100'
+      return isDarkMode ? 'bg-purple-500' : 'bg-purple-100'
     case 'coding-assessment':
-      return 'bg-purple-100'
+      return isDarkMode ? 'bg-purple-500' : 'bg-purple-100'
     case 'waiting-for-next-steps':
-      return 'bg-green-200'
+      return isDarkMode ? 'bg-green-500' : 'bg-green-200'
     case 'received-offer':
-      return 'bg-green-300'
+      return isDarkMode ? 'bg-green-500' : 'bg-green-300'
     case 'accepted-offer':
-      return 'bg-green-400'
+      return isDarkMode ? 'bg-green-500' : 'bg-green-400'
     case 'ghosted':
-      return 'bg-red-100'      
+      return isDarkMode ? 'bg-red-500' : 'bg-red-100' 
     case 'rejected':
-      return 'bg-red-100'
+      return isDarkMode ? 'bg-red-500' : 'bg-red-100'
     default:
-      return 'text-gray-500'
+      return isDarkMode ? 'text-gray-100' : 'text-gray-500'
   }
 }
 
