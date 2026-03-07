@@ -88,11 +88,11 @@ const Search = () => {
                 <strong>{job.position}</strong> at {job.company} (Applied on: {new Date(job.applicationDate).toLocaleDateString()})
                 {job.linkToJobPosting ? <span> - <a href={job.linkToJobPosting} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">View Posting</a></span> : null}
               </div>
-               <div className="text-sm text-gray-700">
+               <div className="text-sm light:text-gray-700 dark:text-gray-400">
                 {job.events && job.events.length > 1 ? (
                   <div>
                     <p className="text-sm font-light italic">Events:</p>
-                    <ul className="list-disc list-inside text-sm text-gray-700">
+                    <ul className="list-disc list-inside text-sm light:text-gray-700 dark:text-gray-400">
                       {job.events.map((event, index) => {
                         if (event.status === 'waiting-for-response') {
                           return (
@@ -117,7 +117,7 @@ const Search = () => {
           </div>
         </div>
       ) : (
-        query.trim().length >= MIN_QUERY_LENGTH && <p className="text-gray-700">No results found for "{query}".</p>
+        query.trim().length >= MIN_QUERY_LENGTH && <p className="light:text-gray-700 dark:text-gray-400">No results found for "{query}".</p>
       )}
     </div>
   )

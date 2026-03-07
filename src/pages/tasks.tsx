@@ -27,7 +27,7 @@ const Tasks = () => {
                     {task.events && task.events.length > 0 && (
                       <div className="mt-2">
                         <p className="text-sm font-light italic">Sub-Tasks:</p>
-                        <ul className="list-disc list-inside text-sm text-gray-700">
+                        <ul className="list-disc list-inside text-sm light:text-gray-700 dark:text-gray-400">
                           {task.events.map((event, index) => (
                             <li key={`${task.id}-event-${index}`}>{event.dueDate ? `${event.dueDate}: ` : ''}{event.note}</li>
                           ))}
@@ -41,7 +41,7 @@ const Tasks = () => {
             ))}
           </div>
         ) : (
-          <p className="text-gray-700">No tasks found. Use the button above to add your first task.</p>
+          <p className="light:text-gray-700 dark:text-gray-400">No tasks found. Use the button above to add your first task.</p>
         )}
       </div>
     </div>

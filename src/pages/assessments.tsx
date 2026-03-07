@@ -170,7 +170,7 @@ const Assessments = () => {
                   </button>
                 </div>
                 {steps && steps.length > 0 ? (
-                  <ul className="list-decimal list-inside text-gray-700">
+                  <ul className="list-decimal list-inside light:text-gray-700 dark:text-gray-400">
                     {steps.map((step, index) => (
                       <li key={`${editNote.id}-step-${index}`} className="mb-1 flex">
                         <Input
@@ -195,7 +195,7 @@ const Assessments = () => {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-gray-700 mb-2">No steps added yet.</p>
+                  <p className="light:text-gray-700 dark:text-gray-400 mb-2">No steps added yet.</p>
                 )}
                 <Button onClick={() => {
                   const newStep: Step = { stepNumber: steps ? steps.length + 1 : 1, description: '' }
@@ -302,7 +302,7 @@ const Assessments = () => {
           ))}
         </div>
       ) : (
-        <p className="text-gray-700">No notes found. Use the button above to add your first note.</p>
+        <p className="light:text-gray-700 dark:text-gray-400">No notes found. Use the button above to add your first note.</p>
       )}
       
     </div>
