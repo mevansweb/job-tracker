@@ -16,8 +16,7 @@ import { type Job, type Status } from '../../global/types'
 
 //"waiting-for-response" | "recruiter-screening" | "rejected" | "coding-assessment" | "ghosted" | "hiring-manager-screening" | "panel-interview" | "waiting-for-next-steps"
 
-const getStatusColor = (status: Status) => {
-  const isDarkMode = document.documentElement.classList.contains('dark')
+export const getStatusColor = (status: Status, isDarkMode: boolean) => {
   switch (status) {
     case 'waiting-for-response':
       return isDarkMode ? 'bg-gray-500' : 'bg-gray-100'
@@ -72,7 +71,7 @@ const jobHostToContactName = (link: string) => {
   }
 }
 
-export const columns: ColumnDef<Job>[] = [
+export const createColumns = (getStatusColor: (status: Status, isDarkMode: boolean) => string, theme: string): ColumnDef<Job>[] => [
   {
     accessorKey: 'applicationDate',
     header: ({ column }) => {
@@ -188,7 +187,7 @@ export const columns: ColumnDef<Job>[] = [
       const events = row.getValue('events') as Array<{ status?: string }> | undefined
       const lastStatus = (events && events.length > 0 ? events[events.length - 1]?.status ?? '' : 'waiting-for-response') as Status
       return (
-      <div className={`font-medium p-1 rounded-lg w-auto text-center ${getStatusColor(lastStatus)}`}>{capitalizeWords(lastStatus.replace(/-/g, ' '))}</div>
+      <div className={`font-medium p-1 rounded-lg w-auto text-center ${getStatusColor(lastStatus, theme === 'dark' ? true : false)}`}>{capitalizeWords(lastStatus.replace(/-/g, ' '))}</div>
       )
     }
   },

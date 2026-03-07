@@ -31,7 +31,7 @@ import {
 } from '@/components/ui/table'
 import { capitalizeWords } from '@/global/functions'
 import { type Job, months } from '../../global/types'
-import { columns } from './columns'
+import { createColumns, getStatusColor } from './columns'
 import { localStorageKey } from '../providers/const'
 import { useAuth } from '../providers/hooks'
 
@@ -102,6 +102,8 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
       localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, jobs: state.jobs || []}))
     }
   }, [existing, postData, state.email, state.jobs])
+
+  const columns = useMemo(() => createColumns(getStatusColor, state.settings?.theme || 'light'), [state.settings])
 
   const table = useReactTable({
     data: month > 0 || Number.isNaN(month) ? filteredJobs : lastWeeksJobs ?? [],

@@ -85,9 +85,9 @@ export type Task = {
 }
 
 export type Settings = {
-  font?: string
-  backgroundColor?: string
-  sidebarColor?: string
+  font: string
+  backgroundColor: string
+  sidebarColor: string
   theme: string
 }
 

@@ -3,8 +3,11 @@ import { useEffect } from 'react'
 import { useAuth } from './providers/hooks'
 import type { ApiResult } from '@/global/types'
 
-function getThemeClasses({ font, sidebarColor }: { backgroundColor?: string; font?: string; sidebarColor?: string; theme?: string }) {
+function getThemeClasses({ backgroundColor, font, sidebarColor }: { backgroundColor?: string; font?: string; sidebarColor?: string; theme?: string }) {
   let classes = ''
+  if (backgroundColor) {
+    classes += ` ${backgroundColor}`
+  }
   if (font) {
     classes += ` ${font}`
   }
@@ -19,7 +22,10 @@ export default function Theme({ children }: { children: React.ReactNode }) {
     const themeClasses = getThemeClasses(state.settings || {})
 
     useEffect(() => {
+      // TODO: find another way to utilize the built in tailwind and shadcn light/dark modes without 
+      // directly modifying DOM
       if (state.settings?.theme) {
+        document.documentElement.classList.remove(state.settings.theme === 'light' ? 'dark' : 'light')
         document.documentElement.classList.add(state.settings.theme)
       }
     }, [state.settings?.theme])
