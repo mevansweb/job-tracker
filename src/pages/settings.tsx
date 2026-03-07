@@ -1,15 +1,63 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, memo } from 'react'
 import { useAuth } from '@/components/providers/hooks'
 import { localStorageKey } from '@/components/providers/const'
 import Header from '@/components/header'
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { capitalizeWords } from '@/global/functions'
 
 const initialState = { backgroundColor: '', sidebarColor: '', font: '', theme: ''}
+
+const themes = ['light', 'dark']
+const backgroundColors = ['default|x', 'blue|bg-blue-200', 'green|bg-green-200']
+const fonts = ['inter|font-(family-name:--font-inter)', 'montserrat|font-(family-name:--font-monterrat)', 'monospace|font-mono', 'outfit|font-(family-name:--font-outfit)', 'roboto|font-(family-name:--font-roboto)', 'sans-serif|font-sans', 'serif|font-serif']
+const sidebarColors = ['default|x', 'blue|bg-blue-200', 'green|bg-green-200']
+
+type SettingToggleProps = {
+  name: string
+  handleChange: ({ name, value }: {
+    name: string;
+    value: string;
+}) => Promise<void>
+  options: string[]
+  selectedValue: string
+  title: string
+}
+
+const SettingToggle = memo(function SettingToggle({ name, handleChange, options, selectedValue, title } : SettingToggleProps) {
+  return (
+    <div className="flex flex-col mt-4">
+      <div className="flex flex-col my-4 ml-4">
+        <h1 className="text-lg mb-2">{title}</h1>
+        <RadioGroup className="flex" name="backgroundColor" defaultValue={selectedValue} onValueChange={(val) => handleChange({ name, value: val })}>
+          {options.map((option) => {
+            let optionValue = option
+            let optionTitle = capitalizeWords(option)
+            if (option.includes('|')) {
+              const pair = option.split('|');
+              if (pair[0] && pair[1]) {
+                optionTitle = capitalizeWords(pair[0])
+                optionValue = pair[1]
+              }
+            }
+
+            return (
+              <div className="flex items-center gap-3" key={`${name}-${optionTitle}`}>
+                <RadioGroupItem checked={selectedValue === optionValue} value={optionValue} id={optionTitle} />
+                <Label htmlFor={name}>{optionTitle}</Label>
+              </div>
+            )
+          })}
+        </RadioGroup>
+      </div>
+    </div>
+  )
+})
 
 const Settings = () => {
   const { dispatch, postData, state } = useAuth()
   const [editSettings, setEditSettings] = useState(initialState)
+  console.log('editSettings', editSettings)
   
   useEffect(() => {
     if (state.settings && (state.settings.backgroundColor || state.settings.font || state.settings.sidebarColor || state.settings.theme )) {
@@ -38,97 +86,34 @@ const Settings = () => {
       />
       <h1 className="text-2xl flex justify-center">Settings</h1>
       <div className="flex flex-col my-8 w-[800px] mx-auto border border-gray-300 rounded-lg shadow">
-        <div className="flex flex-col my-4 ml-4">
-          <div className="flex flex-col mt-4">
-            <h1 className="text-lg mb-2">Theme</h1>
-            <RadioGroup className="flex" name="theme" defaultValue={editSettings.theme} onValueChange={(value) => handleSettingsChange({ name: 'theme', value })}>
-              <div className="flex items-center gap-3">
-                <RadioGroupItem checked={editSettings.theme === 'light' || editSettings.theme === 'light'} value="light" id="light" />
-                <Label htmlFor="light">Light Theme</Label>
-              </div>
-              <div className="flex items-center gap-3">
-                <RadioGroupItem checked={editSettings.theme === 'dark'} value="dark" id="dark" />
-                <Label htmlFor="dark">Dark Theme</Label>
-              </div>
-            </RadioGroup>
-          </div>
-        </div>
-        <hr className="my-6" />
-        <div className="flex flex-col mt-4">
-          <div className="flex flex-col my-4 ml-4">
-            <h1 className="text-lg mb-2">Background Color</h1>
-            <RadioGroup className="flex" name="backgroundColor" defaultValue={editSettings.backgroundColor} onValueChange={(value) => handleSettingsChange({ name: 'backgroundColor', value })}>
-              <div className="flex items-center gap-3">
-                <RadioGroupItem checked={editSettings.backgroundColor === ''} value="" id="default" />
-                <Label htmlFor="default">Default Background</Label>
-              </div>
-              <div className="flex items-center gap-3">
-                <RadioGroupItem checked={editSettings.backgroundColor === 'blue'} value="bg-blue-500" id="blue" />
-                <Label htmlFor="blue">Blue Background</Label>
-              </div>
-              <div className="flex items-center gap-3">
-                <RadioGroupItem checked={editSettings.backgroundColor === 'green'} value="bg-green-500" id="green" />
-                <Label htmlFor="green">Green Background</Label>
-              </div>
-            </RadioGroup>
-          </div>
-        </div>
-        <hr className="my-6" />
-        <div className="flex flex-col mt-4">
-          <div className="flex flex-col my-4 ml-4">
-            <h1 className="text-lg mb-2">Font</h1>
-            <RadioGroup className="flex" name="font" defaultValue={editSettings.font} onValueChange={(value) => handleSettingsChange({ name: 'font', value })}>
-            <div className="flex items-center gap-3">
-              <RadioGroupItem checked={editSettings.font.includes('outfit')} value="font-(family-name:--font-outfit)" id="font-default" />
-              <Label htmlFor="font-default">Outfit</Label>
-            </div>
-            <div className="flex items-center gap-3">
-              <RadioGroupItem checked={editSettings.font.includes('inter')} value="font-(family-name:--font-inter)" id="inter" />
-              <Label htmlFor="inter">Inter</Label>
-            </div>
-            <div className="flex items-center gap-3">
-              <RadioGroupItem checked={editSettings.font.includes('montserrat')} value="font-(family-name:--font-montserrat)" id="montserrat" />
-              <Label htmlFor="montserrat">Montserrat</Label>
-            </div>
-            <div className="flex items-center gap-3">
-              <RadioGroupItem checked={editSettings.font.includes('serif')} value="font-serif" id="serif" />
-              <Label htmlFor="serif">Serif Font</Label>
-            </div>
-            <div className="flex items-center gap-3">
-              <RadioGroupItem checked={editSettings.font.includes('sans')}value="font-sans" id="sans" />
-              <Label htmlFor="sans-serif">Sans-Serif Font</Label>
-            </div>
-            <div className="flex items-center gap-3">
-              <RadioGroupItem checked={editSettings.font.includes('mono')} value="font-mono" id="mono" />
-              <Label htmlFor="mono">Monospace Font</Label>
-            </div>
-            <div className="flex items-center gap-3">
-              <RadioGroupItem checked={editSettings.font.includes('roboto')} value="font-(family-name:--font-roboto)" id="roboto" />
-              <Label htmlFor="roboto">Roboto</Label>
-            </div>
-          </RadioGroup>
-          </div>
-        </div>
-        <hr className="my-6" />
-        <div className="flex flex-col mt-4">
-          <div className="flex flex-col my-4 ml-4">
-            <h1 className="text-lg mb-2">Sidebar Color</h1>
-            <RadioGroup className="flex" name="sidebarColor" defaultValue={editSettings.sidebarColor} onValueChange={(value) => handleSettingsChange({ name: 'sidebarColor', value })}>
-              <div className="flex items-center gap-3">
-                <RadioGroupItem checked={editSettings.sidebarColor === ''} value="" id="sidebarColor-default" />
-                <Label htmlFor="sidebarColor-default">Default Sidebar Color</Label>
-              </div>
-              <div className="flex items-center gap-3">
-                <RadioGroupItem checked={editSettings.sidebarColor === 'blue'} value="blue" id="sidebarColor-blue" />
-                <Label htmlFor="sidebarColor-blue">Blue Sidebar</Label>
-              </div>
-              <div className="flex items-center gap-3">
-                <RadioGroupItem checked={editSettings.sidebarColor === 'green'} value="green" id="sidebarColor-green" />
-                <Label htmlFor="sidebarColor-green">Green Sidebar</Label>
-              </div>
-            </RadioGroup>
-          </div>
-        </div>
+        <SettingToggle
+          name="theme"
+          handleChange={handleSettingsChange}
+          options={themes}
+          selectedValue={editSettings.theme}
+          title="Theme"
+        />
+        <SettingToggle
+          name="backgroundColor"
+          handleChange={handleSettingsChange}
+          options={backgroundColors}
+          selectedValue={editSettings.backgroundColor}
+          title="Background Color"
+        />
+        <SettingToggle
+          name="font"
+          handleChange={handleSettingsChange}
+          options={fonts}
+          selectedValue={editSettings.font}
+          title="Font"
+        />
+        <SettingToggle
+          name="sidebarColor"
+          handleChange={handleSettingsChange}
+          options={sidebarColors}
+          selectedValue={editSettings.sidebarColor}
+          title="Sidebar Color"
+        />
       </div>
     </div>
   )

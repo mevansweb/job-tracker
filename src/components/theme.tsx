@@ -22,8 +22,6 @@ export default function Theme({ children }: { children: React.ReactNode }) {
     const themeClasses = getThemeClasses(state.settings || {})
 
     useEffect(() => {
-      // TODO: find another way to utilize the built in tailwind and shadcn light/dark modes without 
-      // directly modifying DOM
       if (state.settings?.theme) {
         document.documentElement.classList.remove(state.settings.theme === 'light' ? 'dark' : 'light')
         document.documentElement.classList.add(state.settings.theme)
