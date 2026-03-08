@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 /*@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));*/
 @theme {
-  --default-font-family: "Outfit", var(--font-sans);
+  /*--default-font-family: "Outfit", var(--font-sans);*/
   --font-outfit: "Outfit", var(--font-sans);
   --font-roboto: "Roboto", var(--font-sans);
   --font-inter: "Inter", var(--font-sans);

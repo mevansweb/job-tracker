@@ -1,5 +1,5 @@
 import { Calendar, CodeXml, Edit, Home, Search, Settings } from 'lucide-react'
-
+import { sbThemeVariants } from '@/global/constants'
 import {
   Sidebar,
   SidebarContent,
@@ -12,6 +12,8 @@ import {
   SidebarMenuItem,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
+
+import { useAuth } from './providers/hooks'
 
 // Menu items.
 const items = [
@@ -48,7 +50,19 @@ const items = [
 ]
 
 export function AppSidebar() {
+  const { state } = useAuth()
+  const { sidebarColor, theme } = state.settings || { sidebarColor: '', theme: ''}
+  let themeClasses = ''
+  if (sidebarColor && theme) {
+    if (sbThemeVariants[theme as keyof typeof sbThemeVariants] && sbThemeVariants[theme as keyof typeof sbThemeVariants][sidebarColor as keyof typeof sbThemeVariants[keyof typeof sbThemeVariants]])  {
+      themeClasses+= ' ' + sbThemeVariants[theme as keyof typeof sbThemeVariants][sidebarColor as keyof typeof sbThemeVariants[keyof typeof sbThemeVariants]]
+    }
+  } else if (sidebarColor) {
+    themeClasses+= ' ' + sbThemeVariants['light'][sidebarColor as keyof typeof sbThemeVariants[keyof typeof sbThemeVariants]]
+  }
+
   return (
+    <div className={themeClasses}>
     <Sidebar collapsible={'icon'}>
       <SidebarContent>
         <SidebarGroup>
@@ -79,5 +93,6 @@ export function AppSidebar() {
         <SidebarTrigger /> 
       </SidebarFooter>
     </Sidebar>
+    </div>
   )
 }

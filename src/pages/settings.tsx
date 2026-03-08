@@ -5,13 +5,9 @@ import Header from '@/components/header'
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { capitalizeWords } from '@/global/functions'
+import { themes, backgroundColors, fonts, sidebarColors } from '@/global/constants'
 
 const initialState = { backgroundColor: '', sidebarColor: '', font: '', theme: ''}
-
-const themes = ['light', 'dark']
-const backgroundColors = ['default|x', 'blue|bg-blue-200', 'green|bg-green-200']
-const fonts = ['inter|font-(family-name:--font-inter)', 'montserrat|font-(family-name:--font-monterrat)', 'monospace|font-mono', 'outfit|font-(family-name:--font-outfit)', 'roboto|font-(family-name:--font-roboto)', 'sans-serif|font-sans', 'serif|font-serif']
-const sidebarColors = ['default|x', 'blue|bg-blue-200', 'green|bg-green-200']
 
 type SettingToggleProps = {
   name: string
@@ -31,20 +27,12 @@ const SettingToggle = memo(function SettingToggle({ name, handleChange, options,
         <h1 className="text-lg mb-2">{title}</h1>
         <RadioGroup className="flex" name="backgroundColor" defaultValue={selectedValue} onValueChange={(val) => handleChange({ name, value: val })}>
           {options.map((option) => {
-            let optionValue = option
-            let optionTitle = capitalizeWords(option)
-            if (option.includes('|')) {
-              const pair = option.split('|');
-              if (pair[0] && pair[1]) {
-                optionTitle = capitalizeWords(pair[0])
-                optionValue = pair[1]
-              }
-            }
-
+            const optionValue = option === 'default' ? '' : option
+            const optionTitle = capitalizeWords(option)
             return (
               <div className="flex items-center gap-3" key={`${name}-${optionTitle}`}>
                 <RadioGroupItem checked={selectedValue === optionValue} value={optionValue} id={optionTitle} />
-                <Label htmlFor={name}>{optionTitle}</Label>
+                <Label htmlFor={name}>{optionTitle ? optionTitle : 'Default'}</Label>
               </div>
             )
           })}
@@ -57,7 +45,6 @@ const SettingToggle = memo(function SettingToggle({ name, handleChange, options,
 const Settings = () => {
   const { dispatch, postData, state } = useAuth()
   const [editSettings, setEditSettings] = useState(initialState)
-  console.log('editSettings', editSettings)
   
   useEffect(() => {
     if (state.settings && (state.settings.backgroundColor || state.settings.font || state.settings.sidebarColor || state.settings.theme )) {
@@ -71,10 +58,11 @@ const Settings = () => {
   }, [state.settings])
 
   const handleSettingsChange = useCallback(async ({ name, value }: { name: string; value: string }) => {
-    setEditSettings((prev) => ({ ...prev, [name]: value }))
-    postData('PUT', { email: state.email, settings: { ...editSettings, [name]: value }, form: 'update-settings' })
-    dispatch({ type: 'SET_SETTINGS', settings: { ...editSettings, [name]: value } })
-    localStorage.setItem(localStorageKey, JSON.stringify({ ...state, settings: { ...editSettings, [name]: value } }))
+    const updatedSettings = { ...editSettings, [name]: value }
+    setEditSettings(updatedSettings)
+    postData('PUT', { email: state.email, settings: updatedSettings, form: 'update-settings' })
+    dispatch({ type: 'SET_SETTINGS', settings: updatedSettings })
+    localStorage.setItem(localStorageKey, JSON.stringify({ ...state, settings: updatedSettings }))
   }, [dispatch, postData, state, editSettings])
 
   return (

@@ -14,8 +14,6 @@ import { EventsModal } from '../modal/events-modal'
 import { JobsModal } from '../modal/jobs-modal'
 import { type Job, type Status } from '../../global/types'
 
-//"waiting-for-response" | "recruiter-screening" | "rejected" | "coding-assessment" | "ghosted" | "hiring-manager-screening" | "panel-interview" | "waiting-for-next-steps"
-
 export const getStatusColor = (status: Status, isDarkMode: boolean) => {
   switch (status) {
     case 'waiting-for-response':
