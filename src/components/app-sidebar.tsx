@@ -62,8 +62,7 @@ export function AppSidebar() {
   }
 
   return (
-    <div className={themeClasses}>
-    <Sidebar collapsible={'icon'}>
+    <Sidebar className={themeClasses} collapsible={'icon'}>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
@@ -93,6 +92,5 @@ export function AppSidebar() {
         <SidebarTrigger /> 
       </SidebarFooter>
     </Sidebar>
-    </div>
   )
 }

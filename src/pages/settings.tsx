@@ -25,7 +25,7 @@ const SettingToggle = memo(function SettingToggle({ name, handleChange, options,
     <div className="flex flex-col mt-4">
       <div className="flex flex-col my-4 ml-4">
         <h1 className="text-lg mb-2">{title}</h1>
-        <RadioGroup className="flex" name="backgroundColor" defaultValue={selectedValue} onValueChange={(val) => handleChange({ name, value: val })}>
+        <RadioGroup className="flex flex-wrap" name="backgroundColor" defaultValue={selectedValue} onValueChange={(val) => handleChange({ name, value: val })}>
           {options.map((option) => {
             const optionValue = option === 'default' ? '' : option
             const optionTitle = capitalizeWords(option)

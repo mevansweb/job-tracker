@@ -1,67 +1,123 @@
 export const themes = ['light', 'dark']
-export const backgroundColors = ['default', 'blue', 'gray', 'green', 'purple', 'red']
+export const backgroundColors = ['default', 'amber', 'blue', 'cyan', 'emerald', 'fuchsia', 'gray', 'green', 'indigo', 'lime', 'mauve', 'mist', 'neutral', 'olive', 'orange', 'pink', 'purple', 'red', 'rose', 'slate', 'sky', 'stone', 'taupe', 'teal', 'violet', 'yellow', 'zinc']
 export const fonts = ['default', 'inter', 'montserrat', 'monospace', 'outfit', 'roboto', 'sans', 'serif']
-export const sidebarColors = ['default', 'blue', 'gray', 'green', 'purple', 'red']
-/*
-red 
-orange 
-amber
-yellow
-lime
-green
-emerald
-teal
-cyan
-sky
-blue
-indigo
-violet
-purple
-fuchsia
-pink
-rose
-slate
-gray
-zinc
-neutral
-stone
-taupe
-mauve
-mist
-olive
-*/
+export const sidebarColors = ['default', 'amber', 'blue', 'cyan', 'emerald', 'fuchsia', 'gray', 'green', 'indigo', 'lime', 'mauve', 'mist', 'neutral', 'olive', 'orange', 'pink', 'purple', 'red', 'rose', 'slate', 'sky', 'stone', 'taupe', 'teal', 'violet', 'yellow', 'zinc']
 
 export const bgThemeVariants = {
   dark: {
+    amber: 'bg-amber-900',
     blue: 'bg-blue-900',
+    cyan: 'bg-cyan-900',
+    emerald: 'bg-emerald-900',
+    fuchsia: 'bg-fuchsia-900',
     gray: 'bg-gray-900',
     green: 'bg-green-900',
+    indigo: 'bg-indigo-900',
+    lime: 'bg-lime-900',
+    mauve: 'bg-mauve-900',
+    mist: 'bg-mist-900',
+    neutral: 'bg-neutral-900',
+    olive: 'bg-olive-900',
+    orange: 'bg-orange-900',
+    pink: 'bg-pink-900',
     purple: 'bg-purple-900',
-    red: 'bg-red-900'
+    red: 'bg-red-900',
+    rose: 'bg-rose-900',
+    slate: 'bg-slate-900',
+    sky: 'bg-sky-900',
+    stone: 'bg-stone-900',
+    taupe: 'bg-taupe-900',
+    teal: 'bg-teal-900',
+    yellow: 'bg-yellow-900',
+    violet: 'bg-violet-900',
+    zinc: 'bg-zinc-900'
   },
   light: {
+    amber: 'bg-amber-200',
     blue: 'bg-blue-200',
+    cyan: 'bg-cyan-200',
+    emerald: 'bg-emerald-200',
+    fuchsia: 'bg-fuchsia-200',
+    indigo: 'bg-indigo-200',
     gray: 'bg-gray-200',
     green: 'bg-green-200',
+    lime: 'bg-lime-200',
+    mauve: 'bg-mauve-200',
+    mist: 'bg-mist-200',
+    neutral: 'bg-neutral-200',
+    olive: 'bg-olive-200',
+    orange: 'bg-orange-200',
+    pink: 'bg-pink-200',
     purple: 'bg-purple-200',
-    red: 'bg-red-200'
+    red: 'bg-red-200',
+    rose: 'bg-rose-200',
+    slate: 'bg-slate-200',
+    sky: 'bg-sky-200',
+    stone: 'bg-stone-200',
+    taupe: 'bg-taupe-200',
+    teal: 'bg-teal-200',
+    violet: 'bg-violet-200',
+    yellow: 'bg-yellow-200',
+    zinc: 'bg-zinc-200'
   } 
 }
 
 export const sbThemeVariants = {
   dark: {
-    blue: '[&_>_div_>_div_>_div]:!bg-blue-900',
-    gray: '[&_>_div_>_div_>_div]:!bg-gray-900',
-    green: '[&_>_div_>_div_>_div]:!bg-green-900',
-    purple: '[&_>_div_>_div_>_div]:bg-purple-900',
-    red: '[&_>_div_>_div_>_div]:bg-red-900'
+    amber: '[&_>_div_>_div]:!bg-amber-900',
+    blue: '[&_>_div_>_div]:!bg-blue-900',
+    cyan: '[&_>_div_>_div]:!bg-cyan-900',
+    emerald: '[&_>_div_>_div]:!bg-emerald-900',
+    fuchsia: '[&_>_div_>_div]:!bg-fuchsia-900',
+    gray: '[&_>_div_>_div]:!bg-gray-900',
+    green: '[&_>_div_>_div]:!bg-green-900',
+    indigo: '[&_>_div_>_div]:!bg-indigo-900',
+    lime: '[&_>_div_>_div]:!bg-lime-900',
+    mauve: '[&_>_div_>_div]:!bg-mauve-900',
+    mist: '[&_>_div_>_div]:!bg-mist-900',
+    neutral: '[&_>_div_>_div]:!bg-neutral-900',
+    olive: '[&_>_div_>_div]:!bg-olive-900',
+    orange: '[&_>_div_>_div]:!bg-orange-900',
+    pink: '[&_>_div_>_div]:!bg-pink-900',
+    purple: '[&_>_div_>_div]:!bg-purple-900',
+    red: '[&_>_div_>_div]:!bg-red-900',
+    rose: '[&_>_div_>_div]:!bg-rose-900',
+    slate: '[&_>_div_>_div]:!bg-slate-900',
+    sky: '[&_>_div_>_div]:!bg-sky-900',
+    stone: '[&_>_div_>_div]:!bg-stone-900',
+    taupe: '[&_>_div_>_div]:!bg-taupe-900',
+    teal: '[&_>_div_>_div]:!bg-teal-900',
+    violet: '[&_>_div_>_div]:!bg-violet-900',
+    yellow: '[&_>_div_>_div]:!bg-yellow-900',
+    zinc: '[&_>_div_>_div]:!bg-zinc-900'
   },
   light: {
-    blue: '[&_>_div_>_div_>_div]:!bg-blue-200',
-    gray: '[&_>_div_>_div_>_div]:!bg-gray-200',
-    green: '[&_>_div_>_div_>_div]:!bg-green-200',
-    purple: '[&_>_div_>_div_>_div]:bg-purple-900',
-    red: '[&_>_div_>_div_>_div]:bg-red-200'
+    amber: '[&_>_div_>_div]:!bg-amber-200',
+    blue: '[&_>_div_>_div]:!bg-blue-200',
+    cyan: '[&_>_div_>_div]:!bg-cyan-200',
+    emerald: '[&_>_div_>_div]:!bg-emerald-200',
+    fuchsia: '[&_>_div_>_div]:!bg-fuchsia-200',
+    gray: '[&_>_div_>_div]:!bg-gray-200',
+    green: '[&_>_div_>_div]:!bg-green-200',
+    indigo: '[&_>_div_>_div]:!bg-indigo-200',
+    lime: '[&_>_div_>_div]:!bg-lime-200',
+    mauve: '[&_>_div_>_div]:!bg-mauve-200',
+    mist: '[&_>_div_>_div]:!bg-mist-200',
+    neutral: '[&_>_div_>_div]:!bg-neutral-200',
+    olive: '[&_>_div_>_div]:!bg-olive-200',
+    orange: '[&_>_div_>_div]:!bg-orange-200',
+    pink: '[&_>_div_>_div]:!bg-pink-200',
+    purple: '[&_>_div_>_div]:!bg-purple-200',
+    red: '[&_>_div_>_div]:!bg-red-200',
+    rose: '[&_>_div_>_div]:!bg-rose-200',
+    slate: '[&_>_div_>_div]:!bg-slate-200',
+    sky: '[&_>_div_>_div]:!bg-sky-200',
+    stone: '[&_>_div_>_div]:!bg-stone-200',
+    taupe: '[&_>_div_>_div]:!bg-taupe-200',
+    teal: '[&_>_div_>_div]:!bg-teal-200',
+    violet: '[&_>_div_>_div]:!bg-violet-200',
+    yellow: '[&_>_div_>_div]:!bg-yellow-200',
+    zinc: '[&_>_div_>_div]:!bg-zinc-200'
   }
 }
 
