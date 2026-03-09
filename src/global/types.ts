@@ -71,7 +71,9 @@ export type JobsData = {
 
 export type TaskEvent = {
   dueDate: string
+  id: string
   note: string
+  done: boolean
 }
 
 export type TaskStatus = 'to-do' | 'in-progress' | 'completed'

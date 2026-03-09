@@ -86,7 +86,7 @@ const Assessments = () => {
                 <div className="flex">
                   <div className="flex gap-2">
                     {editNote.frameworks.map((fw) => (
-                      <div key={`${editNote.id}-${fw}`} className="flex px-2 py-1 bg-gray-200 rounded whitespace-nowrap">
+                      <div key={`${editNote.id}-${fw}`} className="flex px-2 py-1 light:bg-gray-200 dark:bg-gray-900 rounded whitespace-nowrap">
                         {fw}
                         <X onClick={() => {
                           const newFrameworks = editNote.frameworks ? editNote.frameworks.filter((f) => f !== fw) : []

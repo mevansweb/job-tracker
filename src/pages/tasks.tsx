@@ -1,6 +1,8 @@
+
 import Header from '@/components/header'
 import { useAuth } from '@/components/providers/hooks'
 import { Card } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { TasksModal } from '@/components/modal/tasks-modal'
 
 const Tasks = () => {
@@ -21,19 +23,22 @@ const Tasks = () => {
             {allTasks.map((task) => (
               <Card key={`${task.id}-card`} className="mb-4 p-4">
                 <div className="flex justify-between items-center">
-                  <div>
+                  <div className="w-2/3">
                     <h3 className="text-lg font-semibold">{task.description}</h3>
                     <p className="text-sm text-gray-500">Status: {task.status}</p>
-                    {task.events && task.events.length > 0 && (
+                    {task.events && task.events.length > 0 ? (
                       <div className="mt-2">
                         <p className="text-sm font-light italic">Sub-Tasks:</p>
                         <ul className="list-disc list-inside text-sm light:text-gray-700 dark:text-gray-400">
                           {task.events.map((event, index) => (
-                            <li key={`${task.id}-event-${index}`}>{event.dueDate ? `${event.dueDate}: ` : ''}{event.note}</li>
+                            <li className="flex justify-between" key={`${task.id}-event-${index}`}>
+                              <div>{event.dueDate ? `${event.dueDate}: ` : ''}{event.note}</div>
+                              <Checkbox checked={event.done} className="ml-4" />
+                            </li>
                           ))}
                         </ul>
                       </div>
-                    )}
+                    ) : null }
                   </div>
                   <TasksModal key={`${task.id}-modal`} task={task} />
                 </div>

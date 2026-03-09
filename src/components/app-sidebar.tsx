@@ -28,7 +28,7 @@ const items = [
     icon: CodeXml,
   },
   {
-    title: 'Calendar',
+    title: 'Tasks',
     url: '/tasks',
     icon: Calendar,
   },

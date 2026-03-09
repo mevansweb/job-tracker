@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, memo } from 'react'
 import { useAuth } from '@/components/providers/hooks'
 import { localStorageKey } from '@/components/providers/const'
 import Header from '@/components/header'
+import { Card } from '@/components/ui/card'
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { capitalizeWords } from '@/global/functions'
@@ -72,8 +73,8 @@ const Settings = () => {
         middle="" 
         title="Settings"
       />
-      <h1 className="text-2xl flex justify-center">Settings</h1>
-      <div className="flex flex-col my-8 w-[800px] mx-auto border border-gray-300 rounded-lg shadow">
+      <Card className="flex flex-col my-8 w-[800px] mx-auto mb-4 p-4">
+        <h1 className="text-2xl flex justify-center">Settings</h1>
         <SettingToggle
           name="theme"
           handleChange={handleSettingsChange}
@@ -102,7 +103,7 @@ const Settings = () => {
           selectedValue={editSettings.sidebarColor}
           title="Sidebar Color"
         />
-      </div>
+      </Card>
     </div>
   )
 }

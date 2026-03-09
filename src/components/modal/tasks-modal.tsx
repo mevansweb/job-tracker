@@ -1,7 +1,7 @@
-import { useCallback, useMemo, useState } from 'react'
+import { memo, useCallback, useMemo, useState, type SetStateAction } from 'react'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import { ChevronDownIcon, X } from 'lucide-react'
+import { PlusIcon, Edit, ChevronDownIcon, X } from 'lucide-react'
 import {
   Dialog,
   DialogClose,
@@ -32,25 +32,151 @@ import type { Task, TaskEvent, TaskStatus } from '../../global/types'
 import { localStorageKey } from '../providers/const'
 import { useAuth } from '../providers/hooks'
 import { setTasks } from './shared'
-import { Input } from '../ui/input'
 
 type Props = {
   task?: Task
 }
 
+type SubTaskProps = {
+  calendarOpen: boolean
+  defaultDueDate: Date
+  editingEvent: string
+  setCalendarOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setDateDue: React.Dispatch<React.SetStateAction<Date>>
+  setEditTask: React.Dispatch<React.SetStateAction<Task>>
+  setSubTask: React.Dispatch<React.SetStateAction<TaskEvent>>
+  setToggleEventEdit: React.Dispatch<React.SetStateAction<string>>
+  subtask: TaskEvent
+  task: Task
+  toggleEdit: React.Dispatch<React.SetStateAction<string>>
+  mode: 'edit' | 'add'
+}
+
+const SubTask = memo(function SubTask({ calendarOpen, defaultDueDate, editingEvent, mode, setCalendarOpen, setDateDue, setEditTask, setSubTask, subtask, task, toggleEdit} : SubTaskProps) {
+  const handleSelectDate = useCallback((d: SetStateAction<Date>) => {
+    if (d) {
+      if (mode === 'edit') {
+        const eventCopy = { ...subtask, dueDate: d.toLocaleString('en-US') }
+        const pos = task.events.map((e) => e.id).indexOf(subtask.id)
+        const eventsCopy = task.events.filter((j) => j.id !== subtask.id)
+        eventsCopy.splice(pos, 0, eventCopy)
+        setEditTask({ ...task, events: eventsCopy })
+        setDateDue(d)
+        setCalendarOpen(false)
+      } else {
+        setSubTask((prev) => ({
+          ...prev,
+          dueDate: d.toLocaleString('en-US'),
+        }))
+      }
+    }
+  }, [mode, setCalendarOpen, setDateDue, setEditTask, setSubTask, subtask, task])
+
+  const handleUpdateNote = useCallback((e: { target: { value: string } }) => {
+    if (mode === 'edit') {
+      const eventCopy = { ...subtask, note: e.target.value }
+      const pos = task.events.map((e) => e.id).indexOf(subtask.id)
+      const eventsCopy = task.events.filter((j) => j.id !== subtask.id)
+      eventsCopy.splice(pos, 0, eventCopy)
+      setEditTask({ ...task, events: eventsCopy })
+    } else {
+      setSubTask((prev) => ({
+        ...prev,
+        note: e.target.value
+      }))
+    }
+  },[mode, setEditTask, setSubTask, subtask, task])
+  
+  return (
+    <div className="flex justify-between">
+        {editingEvent === subtask.id || mode === 'add' ? (
+          <div className="flex flex-col w-full">
+            <h2 className="text-sm font-light italic">{mode === 'add' ? 'Add a new sub-task' : 'Editing sub-task'}</h2>
+            <div className="flex">
+              <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" id="date" className="w-[95px] flex text-muted-foreground font-normal justify-between">
+                    {subtask.dueDate ? subtask.dueDate : "Due date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={subtask?.dueDate ? new Date(subtask.dueDate) : defaultDueDate}
+                    captionLayout="dropdown"
+                    defaultMonth={subtask?.dueDate ? new Date(subtask.dueDate) : new Date()}
+                    onSelect={handleSelectDate}
+                    required={true}
+                  />
+                </PopoverContent>
+              </Popover>
+              <Textarea className="ml-2 w-[230px]" placeholder="Sub-task description" value={subtask.note} 
+                onChange={handleUpdateNote}
+              />
+            </div>
+          </div>
+        ) : (
+          <div>
+            <div>{subtask.dueDate ? subtask.dueDate : task.createdDate}:</div>
+            <div>{subtask.note}</div>
+          </div>
+        )}
+        {mode === 'edit' ? (
+          <div className={editingEvent === subtask.id ? 'mt-[15px]' : ''}>
+            <Edit className="cursor-pointer w-4 relative left-1" 
+              onClick={() => {
+                if (editingEvent === subtask.id) {
+                  toggleEdit('')
+                } else { 
+                  toggleEdit(subtask.id)
+                }
+              }}
+            />
+            <X className="cursor-pointer stroke-red-500" aria-label="Click to Remove" onClick={() => {
+                const updatedEvents = task.events.filter((st) => st.id !== subtask.id)
+                setEditTask({ ...task, events: updatedEvents })
+            }} />
+          </div>
+        ) : (
+          <Button
+            className="mt-4 cursor-pointer"
+            disabled={!subtask.dueDate || !subtask.note}
+            variant="link"
+            onClick={() => {
+            if (!subtask.dueDate || !subtask.note) return
+            setEditTask((prev) => ({ ...prev, events: [...prev.events, subtask] }))
+            setSubTask({
+                dueDate: '',
+                done: false,
+                id: crypto.randomUUID(),
+                note: '',
+            })
+          }}><PlusIcon /></Button>
+        )}
+    </div>
+  )
+})
+
 export function TasksModal({ task } : Props){
+  const today = new Date()
+  const newDate = new Date(today)
+  newDate.setDate(newDate.getDate() + 30)
   const { dispatch, existing, postData, state } = useAuth()
   const tasks = useMemo(() => state.tasks ?? [], [state.tasks])
   const [editTask, setEditTask ] = useState<Task>(task ? task : newTask)
   const [editTaskEvent, setEditTaskEvent] = useState<TaskEvent>({
     dueDate: '',
+    done: false,
+    id: crypto.randomUUID(),
     note: '',
   })
+  const [toggleEventEdit, setToggleEventEdit] = useState('')
   const { createdDate, description, status } = editTask
   const [open, setOpen] = useState(false)
   const [calendarOpen, setCalendarOpen] = useState(false)
+  const [calendar2Open, setCalendar2Open] = useState(false)
   const [date, setDate] = useState<Date>(createdDate ? new Date(createdDate) : new Date())
-  const [dateDue, setDateDue] = useState<Date>(editTaskEvent.dueDate ? new Date(editTaskEvent.dueDate) : new Date())
+  const [dateDue, setDateDue] = useState<Date>(newDate)
 
   const update = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target
@@ -96,10 +222,10 @@ export function TasksModal({ task } : Props){
               {task ? 'Edit information for' : 'Add information about'} this Task. <br />Click save when you are done.
             </DialogDescription>
           </DialogHeader>
-        <div className="grid gap-3">
+          <div className="grid gap-3">
             <Textarea onChange={update} name="description" placeholder="Description" defaultValue={description} />
-            </div>
-        <div className="flex justify-between">
+          </div>
+          <div className="flex justify-between">
             <Select name="status" defaultValue={status} onValueChange={(val) => {
               setEditTask((prevData) => ({
                   ...prevData,
@@ -120,86 +246,72 @@ export function TasksModal({ task } : Props){
             </Select>
             <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <Button
-                    variant="outline"
-                    id="date"
-                    className="w-[180px] flex text-muted-foreground font-normal justify-between"
-                    >
-                    {date ? date.toLocaleDateString() : "Create date"}
-                    <ChevronDownIcon />
-                </Button>
+              <Button
+                  variant="outline"
+                  id="date"
+                  className="w-[180px] flex text-muted-foreground font-normal justify-between"
+                  >
+                  {date ? date.toLocaleDateString() : "Create date"}
+                  <ChevronDownIcon />
+              </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                <Calendar
-                    mode="single"
-                    selected={date}
-                    captionLayout="dropdown"
-                    defaultMonth={date || new Date()}
-                    onSelect={(d) => {
-                        if (d) {
-                        setEditTask((prevData) => ({
-                            ...prevData,
-                            createdDate: d.toLocaleDateString('en-US'),
-                        }))
-                        setDate(d)
-                        setOpen(false)
-                        } 
-                    }}
-                />
+              <Calendar
+                  mode="single"
+                  selected={date}
+                  captionLayout="dropdown"
+                  defaultMonth={date || new Date()}
+                  onSelect={(d) => {
+                      if (d) {
+                      setEditTask((prevData) => ({
+                          ...prevData,
+                          createdDate: d.toLocaleDateString('en-US'),
+                      }))
+                      setDate(d)
+                      setOpen(false)
+                      } 
+                  }}
+              />
             </PopoverContent>
             </Popover>
         </div>
         <div className="flex flex-col gap-3">
-            <div className="text-sm font-light italic">Events:</div>
-            {editTask.events.map((event, index) => (
-              <div key={`event-${index}`} className="flex justify-between">
-                  {event.dueDate ? event.dueDate : createdDate}:&nbsp;&nbsp;{event.note}
-                  <X className="cursor-pointer stroke-red-500" aria-label="Click to Remove" onClick={() => {
-                      const updatedEvents = editTask.events.filter((_, i) => i !== index)
-                      setEditTask({ ...editTask, events: updatedEvents })
-                  }} />
-              </div>
-            ))}
+            <div className="text-sm font-light italic">Sub-tasks:</div>
+            <div className="max-h-[400px] overflow-auto scrollbar-transparent">
+              {editTask.events.map((event, i) => (
+                <SubTask
+                  calendarOpen={calendarOpen}
+                  defaultDueDate={dateDue}
+                  editingEvent={toggleEventEdit}
+                  key={`edit-subtask-${i}-${event.id}`}
+                  mode="edit"
+                  subtask={event}
+                  setCalendarOpen={setCalendarOpen}
+                  setDateDue={setDateDue}
+                  setEditTask={setEditTask}
+                  setSubTask={setEditTaskEvent}
+                  setToggleEventEdit={setToggleEventEdit}
+                  task={editTask}
+                  toggleEdit={setToggleEventEdit}
+                />
+              ))}
+            </div>
+            
             {!editTask.events || editTask.events.length === 0 ? <div className="text-sm font-light italic">No events added yet.</div> : null}
-            <div className="flex-col">
-                <div className="flex justify-between">
-                    <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-                        <PopoverTrigger asChild>
-                        <Button variant="outline" id="date" className="w-[180px] flex text-muted-foreground font-normal justify-between">
-                            {editTaskEvent.dueDate ? editTaskEvent.dueDate : "Event due date"}
-                            <ChevronDownIcon />
-                        </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                        <Calendar
-                            mode="single"
-                            selected={dateDue}
-                            captionLayout="dropdown"
-                            defaultMonth={date || new Date()}
-                            onSelect={(d) => {
-                                if (d) {
-                                    setEditTaskEvent((prev) => ({ ...prev, dueDate: d.toLocaleDateString('en-US') }))
-                                    setDateDue(d)
-                                    setOpen(false)
-                                } 
-                            }}
-                        />
-                        </PopoverContent>
-                    </Popover>
-                    <Button
-                        disabled={!editTaskEvent.dueDate || !editTaskEvent.note}
-                        variant="outline" 
-                        onClick={() => {
-                        if (!editTaskEvent.dueDate || !editTaskEvent.note) return
-                        setEditTask((prev) => ({ ...prev, events: [...prev.events, editTaskEvent] }))
-                        setEditTaskEvent({
-                            dueDate: '',
-                            note: '',
-                        })
-                    }}>Add Event</Button>
-                </div>
-                <Input className="mt-4" placeholder="Event note" value={editTaskEvent.note} onChange={(e) => setEditTaskEvent((prev) => ({ ...prev, note: e.target.value }))} />
-             </div>
+            <SubTask
+              calendarOpen={calendar2Open}
+              defaultDueDate={dateDue}
+              editingEvent={toggleEventEdit}
+              mode="add"
+              setDateDue={setDateDue}
+              subtask={editTaskEvent}
+              setCalendarOpen={setCalendar2Open}
+              setEditTask={setEditTask}
+              setSubTask={setEditTaskEvent}
+              setToggleEventEdit={setToggleEventEdit}
+              task={editTask}
+              toggleEdit={setToggleEventEdit}
+            />
           </div>
           <DialogFooter>
             {task ? (
