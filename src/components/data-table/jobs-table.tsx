@@ -242,7 +242,7 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
       )}
       <div className='rounded-md border'>
         <Table>
-          <TableHeader>
+          <TableHeader className={``}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {

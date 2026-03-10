@@ -122,7 +122,7 @@ const SubTask = memo(function SubTask({ calendarOpen, defaultDueDate, editingEve
           </div>
         )}
         {mode === 'edit' ? (
-          <div className={editingEvent === subtask.id ? 'mt-[15px]' : ''}>
+          <div className={editingEvent === subtask.id ? 'mt-3.75' : ''}>
             <Edit className="cursor-pointer w-4 relative left-1" 
               onClick={() => {
                 if (editingEvent === subtask.id) {
@@ -215,7 +215,7 @@ export function TasksModal({ task } : Props){
         <DialogTrigger asChild>
           <Button className={`${task ? 'justify-start px-2 ml-2' : 'mx-4'} cursor-pointer`} variant="outline">{task ? 'Edit Task Info' : 'Add New Task +'}</Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-106.25">
           <DialogHeader>
             <DialogTitle>{task ? 'Edit Task Info' : 'Add New Task'}</DialogTitle>
             <DialogDescription>
@@ -232,7 +232,7 @@ export function TasksModal({ task } : Props){
                   status: val as TaskStatus,
               }))
               }}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-45">
                   <SelectValue placeholder="Task Type" />
               </SelectTrigger>
               <SelectContent>
@@ -249,7 +249,7 @@ export function TasksModal({ task } : Props){
               <Button
                   variant="outline"
                   id="date"
-                  className="w-[180px] flex text-muted-foreground font-normal justify-between"
+                  className="w-45 flex text-muted-foreground font-normal justify-between"
                   >
                   {date ? date.toLocaleDateString() : "Create date"}
                   <ChevronDownIcon />
@@ -277,7 +277,7 @@ export function TasksModal({ task } : Props){
         </div>
         <div className="flex flex-col gap-3">
             <div className="text-sm font-light italic">Sub-tasks:</div>
-            <div className="max-h-[400px] overflow-auto scrollbar-transparent">
+            <div className="max-h-100 overflow-auto scrollbar-transparent">
               {editTask.events.map((event, i) => (
                 <SubTask
                   calendarOpen={calendarOpen}
