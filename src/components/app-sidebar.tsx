@@ -1,5 +1,5 @@
 import { Calendar, CodeXml, Edit, Home, Search, Settings } from 'lucide-react'
-import { sbThemeVariants } from '@/global/constants'
+import { getStyles } from '@/global/functions'
 import {
   Sidebar,
   SidebarContent,
@@ -52,14 +52,7 @@ const items = [
 export function AppSidebar() {
   const { state } = useAuth()
   const { sidebarColor, theme } = state.settings || { sidebarColor: '', theme: ''}
-  let themeClasses = ''
-  if (sidebarColor && theme) {
-    if (sbThemeVariants[theme as keyof typeof sbThemeVariants] && sbThemeVariants[theme as keyof typeof sbThemeVariants][sidebarColor as keyof typeof sbThemeVariants[keyof typeof sbThemeVariants]])  {
-      themeClasses+= ' ' + sbThemeVariants[theme as keyof typeof sbThemeVariants][sidebarColor as keyof typeof sbThemeVariants[keyof typeof sbThemeVariants]]
-    }
-  } else if (sidebarColor) {
-    themeClasses+= ' ' + sbThemeVariants['light'][sidebarColor as keyof typeof sbThemeVariants[keyof typeof sbThemeVariants]]
-  }
+  const themeClasses = `${getStyles({ theme, name: 'sidebarColor', strKey: sidebarColor})}`
 
   return (
     <Sidebar className={themeClasses} collapsible={'icon'}>
@@ -76,8 +69,8 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url} title={item.title} className="flex items-center gap-2">
+                  <SidebarMenuButton asChild tooltip={item.title}>
+                    <a href={item.url} className="flex items-center gap-2">
                       <item.icon />
                       <span>{item.title}</span>
                     </a>

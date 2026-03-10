@@ -95,7 +95,7 @@ const SubTask = memo(function SubTask({ calendarOpen, defaultDueDate, editingEve
             <div className="flex">
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" id="date" className="w-[95px] flex text-muted-foreground font-normal justify-between">
+                  <Button variant="outline" id="date" className="w-23.75 flex text-muted-foreground font-normal justify-between">
                     {subtask.dueDate ? subtask.dueDate : "Due date"}
                   </Button>
                 </PopoverTrigger>
@@ -110,7 +110,7 @@ const SubTask = memo(function SubTask({ calendarOpen, defaultDueDate, editingEve
                   />
                 </PopoverContent>
               </Popover>
-              <Textarea className="ml-2 w-[230px]" placeholder="Sub-task description" value={subtask.note} 
+              <Textarea className="ml-2 w-57.5" placeholder="Sub-task description" value={subtask.note} 
                 onChange={handleUpdateNote}
               />
             </div>

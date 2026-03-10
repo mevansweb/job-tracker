@@ -2,10 +2,18 @@ import { useCallback, useEffect, useState, memo } from 'react'
 import { useAuth } from '@/components/providers/hooks'
 import { localStorageKey } from '@/components/providers/const'
 import Header from '@/components/header'
+import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { ChevronDownIcon } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { capitalizeWords } from '@/global/functions'
+import { capitalizeWords, getAfterChar, getStyles } from '@/global/functions'
 import { themes, backgroundColors, fonts, sidebarColors } from '@/global/constants'
 
 const initialState = { backgroundColor: '', sidebarColor: '', font: '', theme: ''}
@@ -18,26 +26,63 @@ type SettingToggleProps = {
 }) => Promise<void>
   options: string[]
   selectedValue: string
+  selectedStyle: string
   title: string
+  type: 'radio'| 'dropdown' | 'checkbox'
 }
 
-const SettingToggle = memo(function SettingToggle({ name, handleChange, options, selectedValue, title } : SettingToggleProps) {
+const SettingToggle = memo(function SettingToggle({ name, handleChange, options, selectedStyle, selectedValue, title, type } : SettingToggleProps) {
+  const buttonCss = getAfterChar(selectedStyle, ':')
   return (
     <div className="flex flex-col mt-4">
       <div className="flex flex-col my-4 ml-4">
         <h1 className="text-lg mb-2">{title}</h1>
-        <RadioGroup className="flex flex-wrap" name="backgroundColor" defaultValue={selectedValue} onValueChange={(val) => handleChange({ name, value: val })}>
-          {options.map((option) => {
-            const optionValue = option === 'default' ? '' : option
-            const optionTitle = capitalizeWords(option)
-            return (
-              <div className="flex items-center gap-3" key={`${name}-${optionTitle}`}>
-                <RadioGroupItem checked={selectedValue === optionValue} value={optionValue} id={optionTitle} />
-                <Label htmlFor={name}>{optionTitle ? optionTitle : 'Default'}</Label>
-              </div>
-            )
-          })}
-        </RadioGroup>
+        {type === 'radio' ? (
+          <RadioGroup className="flex flex-wrap" name="backgroundColor" defaultValue={selectedValue} onValueChange={(val) => handleChange({ name, value: val })}>
+            {options.map((option) => {
+              const optionValue = option === 'default' ? '' : option
+              const optionTitle = capitalizeWords(option)
+              return (
+                <div className="flex items-center gap-3" key={`${name}-${optionTitle}`}>
+                  <RadioGroupItem checked={selectedValue === optionValue} value={optionValue} id={optionTitle} />
+                  <Label htmlFor={name}>{optionTitle ? optionTitle : 'Default'}</Label>
+                </div>
+              )
+            })}
+          </RadioGroup>
+        ) : ''}
+        {type === 'dropdown' ? (
+          <div className="flex justify-between">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  className={`cursor-pointer w-50 ${buttonCss ? `${buttonCss} hover:${buttonCss}` : ''}`}
+                  variant="outline"
+                >
+                  {title}
+                  <ChevronDownIcon />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-50" align="start">
+                {options.map((option) => {
+                  const optionValue = option === 'default' ? '' : option
+                  const optionTitle = capitalizeWords(option)
+                  return (
+                    <DropdownMenuItem
+                      id={optionTitle}
+                      key={`${name}-${optionTitle}`}
+                      onClick={() => {
+                        handleChange({ name, value: optionValue })
+                      }}
+                    >
+                      {optionTitle ? optionTitle : 'Default'}
+                    </DropdownMenuItem>
+                  )
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ) : null}
       </div>
     </div>
   )
@@ -45,6 +90,10 @@ const SettingToggle = memo(function SettingToggle({ name, handleChange, options,
 
 const Settings = () => {
   const { dispatch, postData, state } = useAuth()
+  const { backgroundColor = '', font, sidebarColor = '', theme } = state.settings ? state.settings : { backgroundColor: '', font: '', theme: ''}
+  const bgStyle = getStyles({ theme, name: 'backgroundColor', strKey: backgroundColor})
+  const sbStyle = getStyles({ theme, name: 'sidebarColor', strKey: sidebarColor})
+  const fontStyle = getStyles({ theme, name: 'font', strKey: font})
   const [editSettings, setEditSettings] = useState(initialState)
   
   useEffect(() => {
@@ -73,35 +122,43 @@ const Settings = () => {
         middle="" 
         title="Settings"
       />
-      <Card className="flex flex-col my-8 w-[800px] mx-auto mb-4 p-4">
+      <Card className="flex flex-col my-8 w-200 mx-auto mb-4 p-4">
         <h1 className="text-2xl flex justify-center">Settings</h1>
         <SettingToggle
           name="theme"
           handleChange={handleSettingsChange}
           options={themes}
+          selectedStyle=""
           selectedValue={editSettings.theme}
           title="Theme"
+          type="radio"
         />
         <SettingToggle
           name="backgroundColor"
           handleChange={handleSettingsChange}
           options={backgroundColors}
+          selectedStyle={bgStyle}
           selectedValue={editSettings.backgroundColor}
           title="Background Color"
+          type="dropdown"
         />
         <SettingToggle
           name="font"
           handleChange={handleSettingsChange}
           options={fonts}
+          selectedStyle={fontStyle}
           selectedValue={editSettings.font}
           title="Font"
+          type="radio"
         />
         <SettingToggle
           name="sidebarColor"
           handleChange={handleSettingsChange}
           options={sidebarColors}
+          selectedStyle={sbStyle}
           selectedValue={editSettings.sidebarColor}
           title="Sidebar Color"
+          type="dropdown"
         />
       </Card>
     </div>

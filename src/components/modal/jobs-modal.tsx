@@ -78,7 +78,7 @@ export function JobsModal({ job } : Props){
         <DialogTrigger asChild>
           <Button className={`${job ? 'justify-start px-2 ml-2' : 'mx-4'} cursor-pointer`} variant="outline">{job ? 'Edit Job Info' : 'Add New Job +'}</Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-106.25">
           <DialogHeader>
             <DialogTitle>{job ? 'Edit Job Info' : 'Add New Job'}</DialogTitle>
             <DialogDescription>
@@ -117,7 +117,7 @@ export function JobsModal({ job } : Props){
                   jobType: val,
                 }))
               }}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-45">
                   <SelectValue placeholder="Job Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -135,7 +135,7 @@ export function JobsModal({ job } : Props){
                   <Button
                     variant="outline"
                     id="date"
-                    className="w-[180px] flex text-muted-foreground font-normal justify-between"
+                    className="w-45 flex text-muted-foreground font-normal justify-between"
                   >
                     {date ? date.toLocaleDateString() : "Application date"}
                     <ChevronDownIcon />

@@ -8,9 +8,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <AuthProvider>
       <SidebarProvider defaultOpen={false}>
         <AppSidebar />
-          <Theme>
-            {children}
-          </Theme>
+        <Theme>
+          {children}
+        </Theme>
       </SidebarProvider>
     </AuthProvider>
   )

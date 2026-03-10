@@ -2,22 +2,12 @@ import { useEffect } from 'react'
 
 import { useAuth } from './providers/hooks'
 import { type ApiResult } from '@/global/types'
-import { bgThemeVariants, fontVariants } from '@/global/constants'
+import { getStyles } from '@/global/functions'
 
 export default function Theme({ children }: { children: React.ReactNode }) {
     const { data, dispatch, existing, state } = useAuth()
     const { backgroundColor = '', font, theme } = state.settings ? state.settings : { backgroundColor: '', font: '', theme: ''}
-    let themeClasses = theme || ''
-    if (backgroundColor && theme) {
-      if (bgThemeVariants[theme as keyof typeof bgThemeVariants] && bgThemeVariants[theme as keyof typeof bgThemeVariants][backgroundColor as keyof typeof bgThemeVariants[keyof typeof bgThemeVariants]])  {
-        themeClasses+= ' ' + bgThemeVariants[theme as keyof typeof bgThemeVariants][backgroundColor as keyof typeof bgThemeVariants[keyof typeof bgThemeVariants]]
-      }
-    } else if (backgroundColor) {
-      themeClasses+= ' ' + bgThemeVariants['light'][backgroundColor as keyof typeof bgThemeVariants[keyof typeof bgThemeVariants]]
-    }
-    if (font) {
-      themeClasses+= ' ' + fontVariants[font as keyof typeof fontVariants]
-    }
+    const themeClasses = `${getStyles({ theme, name: 'backgroundColor', strKey: backgroundColor})} ${getStyles({ theme, name: 'font', strKey: font})}`
 
     useEffect(() => {
       if (state.settings?.theme) {

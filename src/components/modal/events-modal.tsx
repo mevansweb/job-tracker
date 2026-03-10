@@ -83,7 +83,7 @@ export function EventsModal({ job } : Props){
         <DialogTrigger asChild>
           <Button className="justify-start mr-2 px-2 cursor-pointer" variant="outline">Edit Events</Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-106.25">
           <DialogHeader>
             <DialogTitle>Edit Events for {company} - {position} ({applicationDate})</DialogTitle>
             <DialogDescription>
@@ -116,7 +116,7 @@ export function EventsModal({ job } : Props){
                         <Button
                           variant="outline"
                           id="date"
-                          className="w-[180px] flex text-muted-foreground font-normal justify-between"
+                          className="w-45 flex text-muted-foreground font-normal justify-between"
                         >
                           {date ? date.toLocaleDateString() : "Event date"}
                           <ChevronDownIcon />
