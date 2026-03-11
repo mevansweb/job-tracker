@@ -1,13 +1,44 @@
 
+import { useCallback, useEffect, useMemo } from 'react'
+import { toast } from 'sonner'
 import Header from '@/components/header'
 import { useAuth } from '@/components/providers/hooks'
 import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { TasksModal } from '@/components/modal/tasks-modal'
+import { setTasks } from '@/components/modal/shared'
+import { localStorageKey } from '@/components/providers/const'
+import type { Task, TaskEvent } from '@/global/types'
 
 const Tasks = () => {
-  const { state } = useAuth()
-  const allTasks = state.tasks || []
+  const { data, dispatch, error, existing, loading, postData, state } = useAuth()
+  const allTasks = useMemo(() => state.tasks || [], [state.tasks])
+
+  const handleChange = useCallback(async ({ checked, task, subtask } : { checked: boolean, task: Task, subtask: TaskEvent }) => {
+    const saveEmail: string = state.email
+    if (saveEmail) {
+      let updatedTasks = allTasks
+      const updatedSubtask = { ...subtask, done: checked }
+      let pos = task.events.map((e) => e.id).indexOf(subtask.id)
+      const updatedEvents = task.events.filter((j) => j.id !== subtask.id)
+      updatedEvents.splice(pos, 0, updatedSubtask)
+      const updatedTask = { ...task, events: updatedEvents }
+      pos = allTasks.map((e) => e.id).indexOf(task.id)
+      updatedTasks = updatedTasks.filter((j) => j.id !== task.id)
+      updatedTasks.splice(pos, 0, updatedTask)
+      await setTasks({ action: 'edit', dispatch, email: saveEmail, tasks: updatedTasks, postData })
+      localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, tasks: updatedTasks || []}))
+    }
+    
+  }, [dispatch, existing, postData, state.email, allTasks])
+
+  useEffect(() => {
+    if (!loading && data) {
+      toast.success('Updated status successfully')
+    } else if (error) {
+      toast.error(`Status was not updated. Error: ${error}`)
+    }
+  }, [data, error, loading])
 
   return (  
     <div className="p-4 flex flex-col">
@@ -33,7 +64,11 @@ const Tasks = () => {
                           {task.events.map((event, index) => (
                             <li className="flex justify-between" key={`${task.id}-event-${index}`}>
                               <div>{event.dueDate ? `${event.dueDate}: ` : ''}{event.note}</div>
-                              <Checkbox checked={event.done} className="ml-4" />
+                              <Checkbox 
+                                checked={event.done} 
+                                className="ml-4"
+                                onCheckedChange={(checked) => handleChange({checked: checked === true, task, subtask: event})}
+                              />
                             </li>
                           ))}
                         </ul>

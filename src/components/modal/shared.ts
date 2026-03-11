@@ -23,7 +23,7 @@ export type EditTasksProps = {
   dispatch: (action: Action) => void
   email: string
   postData: (method: "POST" | "GET" | "PUT" | "DELETE", body: unknown) => Promise<void>
-  setEditTask: (value: React.SetStateAction<Task>) => void
+  setEditTask?: (value: React.SetStateAction<Task>) => void
   tasks: Task[]
 }
 
@@ -80,7 +80,7 @@ export const setNotes = async ({ action, dispatch, email, notes, postData, setEd
 export const setTasks = async ({ action, dispatch, email, tasks, postData, setEditTask } : EditTasksProps) => {
   dispatch({ type: 'SET_TASKS', tasks: tasks.sort((a, b) => new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime()) })
   await postData('PUT', { email, tasks, form: 'update-tasks' })
-  if (action === 'delete' || action === 'add') {
+  if ((action === 'delete' || action === 'add') && setEditTask) {
     setEditTask({
       id: '',
       createdDate: '',
@@ -89,6 +89,8 @@ export const setTasks = async ({ action, dispatch, email, tasks, postData, setEd
         {
           dueDate: '',
           note: '',
+          id: '',
+          done: false
         }
       ],
       status: 'to-do'

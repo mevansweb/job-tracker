@@ -6,6 +6,7 @@ import { type State, type Action } from '../providers/auth-provider'
 export interface AuthContextType {
   data: ApiResult | null
   dispatch: React.ActionDispatch<[action: Action]>
+  error: string | null
   existing: ApiResult | null
   loading: boolean
   logout: ( email: string ) => void

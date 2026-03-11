@@ -96,7 +96,7 @@ const SubTask = memo(function SubTask({ calendarOpen, defaultDueDate, editingEve
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
                   <Button variant="outline" id="date" className="w-23.75 flex text-muted-foreground font-normal justify-between">
-                    {subtask.dueDate ? subtask.dueDate : "Due date"}
+                    {subtask.dueDate ? new Date(subtask.dueDate).toLocaleDateString() : "Due date"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto overflow-hidden p-0" align="start">
@@ -228,10 +228,10 @@ export function TasksModal({ task } : Props){
           <div className="flex justify-between">
             <Select name="status" defaultValue={status} onValueChange={(val) => {
               setEditTask((prevData) => ({
-                  ...prevData,
-                  status: val as TaskStatus,
+                ...prevData,
+                status: val as TaskStatus,
               }))
-              }}>
+            }}>
               <SelectTrigger className="w-45">
                   <SelectValue placeholder="Task Type" />
               </SelectTrigger>

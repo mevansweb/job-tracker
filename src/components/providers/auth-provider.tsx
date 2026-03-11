@@ -113,7 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const stored = localStorage.getItem(localStorageKey)
   const existing = stored ? JSON.parse(stored) : null
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { data, loading, postData } = useApi('http://localhost:8080/api/data')
+  const { data, error, loading, postData } = useApi('http://localhost:8080/api/data')
 
   const logout = async ( email: string ) => {
     await postData('POST', { email, form: 'log-out' })
@@ -122,7 +122,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ data, dispatch, existing, loading, postData, state, logout }}>
+    <AuthContext.Provider value={{ data, dispatch, error, existing, loading, postData, state, logout }}>
       {children}
     </AuthContext.Provider>
   )

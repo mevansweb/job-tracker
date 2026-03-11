@@ -12,8 +12,8 @@ const Header = ({ greeting, middle, title }: { greeting: string, middle: string,
   return (
     <div className="flex justify-between">
       <div className="flex">
-        <div className={`${logo} w-[350px] h-[100px] bg-center bg-cover`}>
-          <span className="relative left-[150px]">{title}</span>  
+        <div className={`${logo} w-87.5 h-25 bg-center bg-cover`}>
+          <span className="relative left-37.5">{title}</span>  
         </div>
         <div className="flex flex-col ml-20 justify-center items-center">
           <div className="">{middle}</div>
