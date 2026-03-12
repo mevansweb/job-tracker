@@ -1,6 +1,5 @@
 import { type ColumnDef } from '@tanstack/react-table'
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
-
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -9,7 +8,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { capitalizeWords } from '@/global/functions'
+import { ProgressBar } from '@/components/progress-bar'
+import { capitalizeWords, getProgress } from '@/global/functions'
 import { EventsModal } from '../modal/events-modal'
 import { JobsModal } from '../modal/jobs-modal'
 import { type Job, type Status } from '../../global/types'
@@ -184,8 +184,12 @@ export const createColumns = (getStatusColor: (status: Status, isDarkMode: boole
     cell: ({ row }) => {
       const events = row.getValue('events') as Array<{ status?: string }> | undefined
       const lastStatus = (events && events.length > 0 ? events[events.length - 1]?.status ?? '' : 'waiting-for-response') as Status
+      const progress = getProgress(lastStatus)
       return (
-      <div className={`font-medium p-1 rounded-lg w-auto text-center ${getStatusColor(lastStatus, theme === 'dark' ? true : false)}`}>{capitalizeWords(lastStatus.replace(/-/g, ' '))}</div>
+        <div>
+          <ProgressBar color={['ghosted', 'rejected'].includes(lastStatus) ? 'red' : 'blue'} progress={progress} />
+          <div className={`font-medium mt-2 p-1 rounded-lg w-auto text-center ${getStatusColor(lastStatus, theme === 'dark' ? true : false)}`}>{capitalizeWords(lastStatus.replace(/-/g, ' '))}</div>
+        </div>
       )
     }
   },

@@ -1,4 +1,5 @@
 import { bgThemeVariants, fontVariants, sbThemeVariants } from '@/global/constants'
+import { Status } from '@/global/types'
 
 type StylesProps = {
   name: string
@@ -49,4 +50,37 @@ export function getAfterChar(str: string | string[], char: string | string[]) {
     }
 
     return str.slice(index + char.length)
+}
+
+export function getProgress(status: Status) {
+  switch (status) {
+    case 'waiting-for-response': {
+      return 10
+    }
+    case 'behavioral-assessment':
+    case 'ccat':
+    case 'recruiter-emailed':
+    case 'recruiter-messaged':
+    case 'recruiter-screening':
+    case 'waiting-for-next-steps': {
+      return 20
+    }
+    case 'coding-assessment':
+    case 'hiring-manager-screening': {
+      return 30
+    }
+    case 'panel-interview': {
+      return 40
+    }
+    case 'received-offer': {
+      return 90
+    }
+    case 'accepted-offer': {
+      return 100
+    }
+    case 'ghosted':
+    case 'rejected': {
+      return 100
+    }
+  }
 }

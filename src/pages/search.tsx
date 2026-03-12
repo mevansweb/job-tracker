@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import Header from '@/components/header'
-import { useCallback, useEffect, useRef } from 'react'
 import { useAuth } from '@/components/providers/hooks'
 import type { Job } from '@/global/types'
+import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { capitalizeWords } from '@/global/functions'
@@ -13,10 +14,34 @@ const SEARCH_URL = 'http://localhost:8080/api/data/search/'
 
 const Search = () => {
   const { state } = useAuth()
-  const id = state.id ?? ''
+  const { id, jobs } = state
   const [query, setQuery] = useState('')
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [searchResults, setSearchResults] = useState<Job[]>([])
+
+  const getUpcomingEvents = useCallback(async () => {
+    // Get today's date without time (midnight)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Filter logic
+    const filteredData = jobs
+      .map(job => {
+        // Keep only events with date > today
+        const filteredDates = job.events.filter((event) => {
+          const date = new Date(event.date);
+          return !isNaN(date.getTime()) && date >= today;
+        });
+
+        // Return job only if it has future events
+        return filteredDates.length > 0
+          ? { ...job, events: filteredDates }
+          : null;
+      })
+      .filter((job): job is Job => job !== null); // Remove null entries
+
+    setSearchResults(filteredData)
+  }, [jobs])
 
   const performSearch = useCallback(async (searchQuery: string) => {
     try {
@@ -29,14 +54,14 @@ const Search = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
+        toast.error(`Error: ${response.statusText}`)
       }
 
-      const result = await response.json();
+      const result = await response.json()
       setSearchResults(result)
     } catch (err) {
       const error = err as Error
-      console.error('Search error:', error.message)
+      toast.error(`'Search error: ${error.message}`)
     }
   }, [id])
 
@@ -70,17 +95,30 @@ const Search = () => {
         middle="" 
         title="Search"
       />
-      <Input
-        type="text"
-        placeholder="Search for a job by company name..."
-        value={query}
-        onChange={handleOnChange}
-        className="my-4 w-full"
-      />
+      <div className="w-200 mx-auto border border-input rounded-xl shadow p-10 mt-8">
+        <div className="flex flex-col my-4 ml-4">
+        <h1 className="text-lg mb-2">Search</h1>
+        <Input
+          type="text"
+          placeholder="Search for a job by company name..."
+          value={query}
+          onChange={handleOnChange}
+          className="my-4 w-full"
+        />
+        </div>
+        <Button
+          onClick={getUpcomingEvents}
+        >Get Upcoming Events</Button>
+      </div>
+
       {searchResults.length > 0 ? (
-        <div className="flex-col">
-          <div className="text-sm text-gray-500 mb-2">Showing results for "{query}":</div>
-          <h2 className="text-lg font-semibold mb-2">Search Results:</h2>
+        <div className="flex flex-col w-200 mx-auto">
+          {query ? (
+            <div className="text-sm text-gray-500 mt-8">Showing results for "{query}":</div>
+          ) : (
+            <div className="text-sm text-gray-500 mt-8">Showing upcoming events:</div>
+          )}
+          <h2 className="text-lg font-semibold">Search Results:</h2>
           <div className="mt-2">
             {searchResults.map((job) => (
               <Card className="p-4 my-4" key={job.id}>
@@ -89,7 +127,7 @@ const Search = () => {
                 {job.linkToJobPosting ? <span> - <a href={job.linkToJobPosting} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">View Posting</a></span> : null}
               </div>
                <div className="text-sm light:text-gray-700 dark:text-gray-400">
-                {job.events && job.events.length > 1 ? (
+                {job.events && job.events.length > 0 ? (
                   <div>
                     <p className="text-sm font-light italic">Events:</p>
                     <ul className="list-disc list-inside text-sm light:text-gray-700 dark:text-gray-400">
