@@ -1,14 +1,15 @@
-
 import { useCallback, useEffect, useMemo } from 'react'
+
 import { toast } from 'sonner'
+
 import Header from '@/components/header'
-import { useAuth } from '@/components/providers/hooks'
 import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
-import { TasksModal } from '@/components/modal/tasks-modal'
 import { setTasks } from '@/components/modal/shared'
-import { localStorageKey } from '@/components/providers/const'
+import { useAuth } from '@/components/providers/hooks'
 import type { Task, TaskEvent } from '@/global/types'
+import { TasksModal } from '@/components/modal/tasks-modal'
+import { localStorageKey } from '@/components/providers/const'
 
 const Tasks = () => {
   const { data, dispatch, error, existing, loading, postData, state } = useAuth()
@@ -48,7 +49,7 @@ const Tasks = () => {
         title="Tasks"
       />
       <div className="mx-auto my-4"><TasksModal /></div>
-      <div className="flex align-center my-4 justify-center">
+      <div className="flex align-center my-4 justify-center w-220 mx-auto">
         {allTasks && allTasks.length > 0 ? (
           <div className="w-full">
             {allTasks.map((task) => (
@@ -63,7 +64,7 @@ const Tasks = () => {
                         <ul className="list-disc list-inside text-sm light:text-gray-700 dark:text-gray-400">
                           {task.events.map((event, index) => (
                             <li className="flex justify-between" key={`${task.id}-event-${index}`}>
-                              <div>{event.dueDate ? `${event.dueDate}: ` : ''}{event.note}</div>
+                              <div>{event.dueDate ? `${new Date(event.dueDate).toLocaleDateString()}: ` : ''}{event.note}</div>
                               <Checkbox 
                                 checked={event.done} 
                                 className="ml-4"

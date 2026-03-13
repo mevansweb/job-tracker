@@ -1,5 +1,5 @@
-import { bgThemeVariants, fontVariants, sbThemeVariants } from '@/global/constants'
 import { Status } from '@/global/types'
+import { bgThemeVariants, fontVariants, sbThemeVariants } from '@/global/constants'
 
 type StylesProps = {
   name: string

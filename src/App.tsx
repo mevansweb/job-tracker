@@ -1,12 +1,13 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import Assessments from "./pages/assessments";
-import Layout from './components/layout'
 import Home from './pages/home'
-import Practice from './pages/practice'
-import Search from './pages/search'
-import Settings from './pages/settings'
 import Tasks from './pages/tasks'
+import Search from './pages/search'
+import Practice from './pages/practice'
+import Settings from './pages/settings'
+import Layout from './components/layout'
+import Assessments from "./pages/assessments";
+
 import './App.css'
 
 function App() {

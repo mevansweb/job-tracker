@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
+
 import { type ApiResult } from '../../global/types'
-import { type State, type Action } from '../providers/auth-provider'
+import { type Action, type State } from '../providers/auth-provider'
 
 
 export interface AuthContextType {

@@ -1,37 +1,19 @@
-import { memo, useCallback, useMemo, useState, type SetStateAction } from 'react'
+import { memo, type SetStateAction, useCallback, useMemo, useState } from 'react'
+
+import { ChevronDownIcon, Edit, PlusIcon, X } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import { PlusIcon, Edit, ChevronDownIcon, X } from 'lucide-react'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { newTask } from '../../global/template'
-import type { Task, TaskEvent, TaskStatus } from '../../global/types'
-import { localStorageKey } from '../providers/const'
-import { useAuth } from '../providers/hooks'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+
 import { setTasks } from './shared'
+import { useAuth } from '../providers/hooks'
+import { newTask } from '../../global/template'
+import { localStorageKey } from '../providers/const'
+import type { Task, TaskEvent, TaskStatus } from '../../global/types'
 
 type Props = {
   task?: Task
@@ -110,13 +92,13 @@ const SubTask = memo(function SubTask({ calendarOpen, defaultDueDate, editingEve
                   />
                 </PopoverContent>
               </Popover>
-              <Textarea className="ml-2 w-57.5" placeholder="Sub-task description" value={subtask.note} 
+              <Textarea className="ml-2 w-57.5 text-muted-foreground text-sm" placeholder="Sub-task description" value={subtask.note} 
                 onChange={handleUpdateNote}
               />
             </div>
           </div>
         ) : (
-          <div>
+          <div className="text-muted-foreground text-sm">
             <div>{subtask.dueDate ? subtask.dueDate : task.createdDate}:</div>
             <div>{subtask.note}</div>
           </div>

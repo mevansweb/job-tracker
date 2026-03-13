@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+
 import { toast } from 'sonner'
+
 import Header from '@/components/header'
-import { useAuth } from '@/components/providers/hooks'
 import type { Job } from '@/global/types'
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { capitalizeWords } from '@/global/functions'
+import { useAuth } from '@/components/providers/hooks'
 
 const MIN_QUERY_LENGTH = 3
 

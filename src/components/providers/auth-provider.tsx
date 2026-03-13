@@ -1,9 +1,10 @@
 import React, { useReducer } from 'react'
 
 import type { Job, Note, Settings, Task } from '@/global/types'
+
 import useApi from '../../hooks/useApi'
-import { AuthContext, localStorageKey } from './const'
 import type { AuthProviderProps } from './types'
+import { AuthContext, localStorageKey } from './const'
 
 export type State = {
   email: string

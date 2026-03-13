@@ -120,3 +120,10 @@ export type Note = {
   steps: Step[]
   title: string
 }
+
+export type PracticeQuestion = {
+  id: number
+  question: string
+  exampleInput: string
+  shouldReturn: string
+}

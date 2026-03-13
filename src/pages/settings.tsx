@@ -1,20 +1,17 @@
-import { useCallback, useEffect, useState, memo } from 'react'
+import { memo, useCallback, useEffect, useState } from 'react'
+
+import { ChevronDownIcon } from 'lucide-react'
+
+import Header from '@/components/header'
+import { Card } from '@/components/ui/card'
+import { Label } from "@/components/ui/label"
+import { Button } from '@/components/ui/button'
 import { useAuth } from '@/components/providers/hooks'
 import { localStorageKey } from '@/components/providers/const'
-import Header from '@/components/header'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { ChevronDownIcon } from 'lucide-react'
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { capitalizeWords, getAfterChar, getStyles } from '@/global/functions'
-import { themes, backgroundColors, fonts, sidebarColors } from '@/global/constants'
+import { backgroundColors, fonts, sidebarColors, themes } from '@/global/constants'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 const initialState = { backgroundColor: '', sidebarColor: '', font: '', theme: ''}
 

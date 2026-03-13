@@ -1,39 +1,19 @@
 import { useCallback, useMemo, useState } from 'react'
-import {
-  type ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  type SortingState,
-  useReactTable,
-  type VisibilityState,
-} from '@tanstack/react-table'
-import { ChevronUp, ChevronDown, FunnelIcon, SaveIcon, XIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { JobsModal } from '@/components/modal/jobs-modal'
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+
+import { ChevronDown, ChevronUp, FunnelIcon, SaveIcon, XIcon } from 'lucide-react'
+
 import { Input } from '@/components/ui/input'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
 import { capitalizeWords } from '@/global/functions'
-import { type Job, months } from '../../global/types'
-import { createColumns, getStatusColor } from './columns'
-import { localStorageKey } from '../providers/const'
+import { JobsModal } from '@/components/modal/jobs-modal'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, type ColumnFiltersState, type SortingState, type VisibilityState, useReactTable } from '@tanstack/react-table'
+
 import { useAuth } from '../providers/hooks'
+import { localStorageKey } from '../providers/const'
+import { months, type Job } from '../../global/types'
+import { createColumns, getStatusColor } from './columns'
 
 type JobsTableProps = {
   lastWeeksJobs: Job[]

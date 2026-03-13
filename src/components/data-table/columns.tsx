@@ -1,17 +1,13 @@
-import { type ColumnDef } from '@tanstack/react-table'
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { type ColumnDef } from '@tanstack/react-table'
 import { ProgressBar } from '@/components/progress-bar'
 import { capitalizeWords, getProgress } from '@/global/functions'
-import { EventsModal } from '../modal/events-modal'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+
 import { JobsModal } from '../modal/jobs-modal'
+import { EventsModal } from '../modal/events-modal'
 import { type Job, type Status } from '../../global/types'
 
 export const getStatusColor = (status: Status, isDarkMode: boolean) => {

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
+
 import { useAuth } from './providers/hooks'
 
 const Header = ({ greeting, middle, title }: { greeting: string, middle: string, title: string }) => {

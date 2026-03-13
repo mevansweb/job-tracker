@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
 
-import { useAuth } from './providers/hooks'
-import { type ApiResult } from '@/global/types'
 import { getStyles } from '@/global/functions'
+import { type ApiResult } from '@/global/types'
+
+import { useAuth } from './providers/hooks'
 
 export default function Theme({ children }: { children: React.ReactNode }) {
     const { data, dispatch, existing, state } = useAuth()

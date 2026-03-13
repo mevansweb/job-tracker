@@ -1,5 +1,5 @@
+import type { Job, Note, Settings, Task } from '@/global/types'
 import { type Action } from '@/components/providers/auth-provider'
-import type { Job, Note, Task, Settings } from '@/global/types'
 
 export type EditJobsProps = {
   dispatch: (action: Action) => void

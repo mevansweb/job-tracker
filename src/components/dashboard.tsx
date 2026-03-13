@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react'
-import { Button } from '@/components/ui/button'
+
 import Header from '@/components/header'
+import { Button } from '@/components/ui/button'
+import { months, type Job } from '@/global/types'
 import { JobsTable } from '@/components/data-table/jobs-table'
-import { type Job, months } from '@/global/types'
+
 import { useAuth } from './providers/hooks'
 
 const groupJobsByMonthAndYear = (jobs: Job[]) => {

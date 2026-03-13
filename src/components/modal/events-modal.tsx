@@ -1,38 +1,20 @@
 import { useCallback, useMemo, useState } from 'react'
+
+import { ChevronDownIcon, X } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import { ChevronDownIcon, X } from 'lucide-react'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { capitalizeWords } from '@/global/functions'
-import type { Event, Job, Status } from '../../global/types'
-import { Status as Statuses } from '../../global/types'
-import { localStorageKey } from '../providers/const'
-import { useAuth } from '../providers/hooks'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+
 import { setJobs } from './shared'
+import { useAuth } from '../providers/hooks'
+import { localStorageKey } from '../providers/const'
+import { Status as Statuses } from '../../global/types'
+import type { Event, Job, Status } from '../../global/types'
 
 type Props = {
   job: Job
@@ -148,14 +130,6 @@ export function EventsModal({ job } : Props){
                           {Object.values(Statuses).map((s) => (
                             <SelectItem value={s}>{capitalizeWords(s.replace(/-/g, ' '))}</SelectItem>
                           ))}
-                          {/* <SelectItem value="waiting-for-response">Waiting for Response</SelectItem>
-                          <SelectItem value="recruiter-screening">Recruiter Screening</SelectItem>
-                          <SelectItem value="hiring-manager-screening">Hiring Manager Screening</SelectItem>
-                          <SelectItem value="panel-interview">Panel Interview</SelectItem>
-                          <SelectItem value="coding-assessment">Coding Assessment</SelectItem>
-                          <SelectItem value="waiting-for-next-steps">Waiting for Next Steps</SelectItem>
-                          <SelectItem value="rejected">Rejected</SelectItem>
-                          <SelectItem value="ghosted">Ghosted</SelectItem> */}
                         </SelectGroup>
                       </SelectContent>
                     </Select>

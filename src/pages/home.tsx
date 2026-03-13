@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
-import bcrypt from 'bcryptjs'
 
-import { validatePassword } from '@/functions/validation'
-import { Button } from '@/components/ui/button'
+import bcrypt from 'bcryptjs'
+import { v4 as uuidv4 } from 'uuid'
+
 import { Input } from '@/components/ui/input'
-import { Dashboard } from '@/components/dashboard'
+import { Button } from '@/components/ui/button'
 import type { ApiResult } from '@/global/types'
-import { localStorageKey } from '@/components/providers/const'
+import { Dashboard } from '@/components/dashboard'
 import { useAuth } from '@/components/providers/hooks'
+import { validatePassword } from '@/functions/validation'
+import { localStorageKey } from '@/components/providers/const'
 
 const salt = bcrypt.genSaltSync(10)
 

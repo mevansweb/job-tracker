@@ -1,15 +1,16 @@
 import { useCallback, useMemo, useState } from 'react'
-import { useAuth } from '@/components/providers/hooks'
 
 import { X } from 'lucide-react'
+
 import Header from '@/components/header'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { localStorageKey } from '@/components/providers/const'
 import { setNotes } from '@/components/modal/shared'
+import { useAuth } from '@/components/providers/hooks'
+import { localStorageKey } from '@/components/providers/const'
 import { frontendFrameworks, patterns, programmingLanguages, type Framework, type Note, type Step } from '@/global/types'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 const Assessments = () => {
   const { dispatch, existing, postData, state } = useAuth()

@@ -1,37 +1,19 @@
 import { useCallback, useMemo, useState } from 'react'
+
+import { ChevronDownIcon } from 'lucide-react'
+
+import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import { ChevronDownIcon } from 'lucide-react'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+
+import { setJobs } from './shared'
+import { useAuth } from '../providers/hooks'
 import { newJob } from '../../global/template'
 import type { Job } from '../../global/types'
 import { localStorageKey } from '../providers/const'
-import { useAuth } from '../providers/hooks'
-import { setJobs } from './shared'
 
 type Props = {
   job?: Job
