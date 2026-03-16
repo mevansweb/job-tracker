@@ -1,4 +1,4 @@
-import { Calendar, CodeXml, Edit, Home, Search, Settings } from 'lucide-react'
+import { Calendar, CodeXml, Edit, Home, School, Search, Settings } from 'lucide-react'
 
 import { getStyles } from '@/global/functions'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger } from '@/components/ui/sidebar'
@@ -36,6 +36,11 @@ const items = [
     title: 'Assessments',
     url: '/assessments',
     icon: Edit,
+  },
+  {
+    title: 'Test Prep Page',
+    url: '/test-prep',
+    icon: School
   }
 ]
 

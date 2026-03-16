@@ -224,4 +224,11 @@ export const createColumns = (getStatusColor: (status: Status, isDarkMode: boole
       <div className='text-left font-medium'>{row.getValue('contactPerson')}</div>
     ),
   },
+  {
+    accessorKey: 'notes',
+    header: 'Notes',
+    cell: ({ row }) => (
+      <div className='text-left font-medium'>{row.getValue('notes')}</div>
+    ),
+  },
 ]

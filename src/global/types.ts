@@ -19,7 +19,20 @@ export type ApiResult = {
   tasks?: Task[]
 }
 
-export const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+export const months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+]
 
 export const Status = {
   BehavioralAssessment: 'behavioral-assessment',
@@ -56,6 +69,7 @@ export type Job = {
   jobType: string
   linkToJobAccount: string
   linkToJobPosting: string
+  notes?: string
   phone: string
   position: string
   salaryRange: string
@@ -98,14 +112,57 @@ export type Step = {
   description: string
 }
 
-type ProgrammingLanguage = 'javascript' | 'python' | 'java' | 'c++' | 'ruby' | 'typescript' | 'c#' | 'php'
-export const programmingLanguages: ProgrammingLanguage[] = ['javascript', 'python', 'java', 'c++', 'ruby', 'typescript', 'c#', 'php']
+type ProgrammingLanguage =
+  | 'javascript'
+  | 'python'
+  | 'java'
+  | 'c++'
+  | 'ruby'
+  | 'typescript'
+  | 'c#'
+  | 'php'
+export const programmingLanguages: ProgrammingLanguage[] = [
+  'javascript',
+  'python',
+  'java',
+  'c++',
+  'ruby',
+  'typescript',
+  'c#',
+  'php',
+]
 
 type FrontendFramework = 'react' | 'angular' | 'vue' | 'svelte' | 'ember' | 'backbone'
-export const frontendFrameworks: FrontendFramework[] = ['react', 'angular', 'vue', 'svelte', 'ember', 'backbone']
+export const frontendFrameworks: FrontendFramework[] = [
+  'react',
+  'angular',
+  'vue',
+  'svelte',
+  'ember',
+  'backbone',
+]
 
-type Pattern = 'arrays' | 'binary-trees' | 'linked-lists' | 'sliding-window' | 'two-pointers' | 'fast-and-slow-pointers' | 'recursion' | 'sorting' | 'strings'
-export const patterns: Pattern[] = ['arrays', 'binary-trees', 'linked-lists', 'sliding-window', 'two-pointers', 'fast-and-slow-pointers', 'recursion', 'sorting', 'strings']
+type Pattern =
+  | 'arrays'
+  | 'binary-trees'
+  | 'linked-lists'
+  | 'sliding-window'
+  | 'two-pointers'
+  | 'fast-and-slow-pointers'
+  | 'recursion'
+  | 'sorting'
+  | 'strings'
+export const patterns: Pattern[] = [
+  'arrays',
+  'binary-trees',
+  'linked-lists',
+  'sliding-window',
+  'two-pointers',
+  'fast-and-slow-pointers',
+  'recursion',
+  'sorting',
+  'strings',
+]
 
 export type Framework = ProgrammingLanguage | FrontendFramework | Pattern
 
@@ -126,4 +183,5 @@ export type PracticeQuestion = {
   question: string
   exampleInput: string
   shouldReturn: string
+  solution: string
 }

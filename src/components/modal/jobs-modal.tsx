@@ -23,7 +23,7 @@ export function JobsModal({ job } : Props){
   const { dispatch, existing, postData, state } = useAuth()
   const jobs = useMemo(() => state.jobs ?? [], [state])
   const [editJob, setEditJob ] = useState<Job>(job ? job : newJob)
-  const { address, applicationDate, contactPerson, company, jobType, linkToJobAccount, linkToJobPosting, phone, position, salaryRange } = editJob
+  const { address, applicationDate, contactPerson, company, jobType, linkToJobAccount, linkToJobPosting, notes, phone, position, salaryRange } = editJob
   const [open, setOpen] = useState(false)
   const [date, setDate] = useState<Date | undefined>(applicationDate ? new Date(applicationDate) : undefined)
 
@@ -91,6 +91,9 @@ export function JobsModal({ job } : Props){
             </div>
             <div className="grid gap-3">
               <Input onChange={update} name="linkToJobAccount" placeholder="Link to Job Account (e.g. workday.com, greenhouse.io)" defaultValue={linkToJobAccount} />
+            </div>
+            <div className="grid gap-3">
+              <Input onChange={update} name="notes" placeholder="Notes/Additional Details" defaultValue={notes} />
             </div>
             <div className="flex justify-between">
               <Select name="jobType" defaultValue={jobType} onValueChange={(val) => {

@@ -6,7 +6,8 @@ import Search from './pages/search'
 import Practice from './pages/practice'
 import Settings from './pages/settings'
 import Layout from './components/layout'
-import Assessments from "./pages/assessments";
+import Assessments from './pages/assessments'
+import TestPrep from "./pages/test-prep"
 
 import './App.css'
 
@@ -21,6 +22,7 @@ function App() {
           <Route path="/search" element={<Layout><Search /></Layout>} />
           <Route path="/settings" element={<Layout><Settings /></Layout>} />
           <Route path="/tasks" element={<Layout><Tasks /></Layout>} />
+          <Route path="/test-prep" element={<Layout><TestPrep /></Layout>} />
         </Routes>
       </BrowserRouter>
     </>

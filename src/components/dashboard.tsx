@@ -57,7 +57,7 @@ export const Dashboard = () => {
         middle=""
         title="Dashboard" 
       />
-      <div className="flex align-center my-4 max-w-screen overflow-x-auto scrollbar-transparent">
+      <div className="flex flex-wrap align-center my-4 max-w-screen gap-2">
         {groupedByMonthAndYear && Object.keys(groupedByMonthAndYear).sort((a, b) => {
           const [monthA, yearA] = a.split('-').map(Number)
           const [monthB, yearB] = b.split('-').map(Number)
