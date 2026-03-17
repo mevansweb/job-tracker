@@ -31,21 +31,30 @@ const convertArray = (arr: string[]) => {
   return arr.map((str: string) => { return str.trim()}).filter((str) => str.length > 0)
 }
 
-const getCorrectAnswer = ({ input, question } : { input: InputType, question: PracticeQuestion }) => {
+const getFunctionOutput = (input: InputType, code: string, secondInput?: InputType) => {
+  let corrected = getProcessedInputs(input)
+  if (corrected && secondInput) {
+    let corrected2 = getProcessedInputs(secondInput)
+    const func = new Function('x', 'y', code)
+    return func(corrected, corrected2);
+  } else if (corrected) {
+    const func = new Function('x', code)
+    return func(corrected);
+  }
+}
+
+const notFinishedTyping = (input: InputType) => {
+  return typeof input === 'string' && (input.endsWith(',') || input.endsWith('-'))
+}
+
+const getCorrectAnswer = ({ input, question, secondInput } : { input: InputType, question: PracticeQuestion, secondInput?: InputType }) => {
   let expectedStr = question.shouldReturn
   const defaultInput = question.exampleInput
-
-  if (input && input !== defaultInput) {
+  if (input && !notFinishedTyping(input) && input !== defaultInput) {
     // recalculate the correct answer if inputs were changed
     const solutionCode = question.solution
     try {
-      let corrected: InputType = input
-      if (Array.isArray(input) && input.every(item => typeof item === 'string')) {
-        corrected = convertArray(input as string[])
-      }
-      const func = new Function('x', solutionCode)
-      const output = func(corrected);
-      return output
+      return getFunctionOutput(input, solutionCode, secondInput ?? '')
     } catch (err) {
       const error = err as Error
       toast.error("Error: " + error.message);
@@ -66,9 +75,13 @@ const getCorrectAnswer = ({ input, question } : { input: InputType, question: Pr
 }
 
 const getIsCorrect = ({ answer, correctAnswer } : { answer: InputType, correctAnswer: InputType}) => {
-  if (typeof answer === 'object' && typeof correctAnswer === 'string') {
-    const stringified = JSON.stringify(answer).replace(/"/g, "'")
-    return stringified === correctAnswer.replace(/\s+/g, "")
+  if (typeof answer === 'object') {
+    if (typeof correctAnswer === 'string') {
+      const stringified = JSON.stringify(answer).replace(/"/g, "'")
+      return stringified === correctAnswer.replace(/\s+/g, "")
+    } else if (typeof correctAnswer === 'object') {
+      return equal(correctAnswer, answer)
+    }
   } else if (Array.isArray(correctAnswer) && Array.isArray(answer)) {
     return equal(correctAnswer, answer)
   } else if (typeof correctAnswer === 'string' && typeof answer === 'string') {
@@ -81,10 +94,13 @@ const getIsCorrect = ({ answer, correctAnswer } : { answer: InputType, correctAn
 }
 
 const getProcessedInputs = (input: InputType) => {
-  if (typeof input === 'string' && input.includes(',') && !input.endsWith(',')) {
+  const notFinished = notFinishedTyping(input)
+  if (typeof input === 'string' && !notFinished && input.includes(',')) {
     const splitInput = input.split(',')
     const convertedArray = convertArray(splitInput)
     return convertedArray
+  } else if (notFinished) {
+    return input
   } else {
     return isNumeric(input) ? Number(input) : typeof input === 'string' ? input.trim() : input
   }
@@ -104,8 +120,8 @@ const Practice = () => {
   const [secondInput, setSecondInput] = useState<InputType>(defaultSecondInput)
 
   const correctAnswer = useMemo(() => {
-    return getCorrectAnswer({ input, question: questions[question] })
-  }, [input, question])
+    return getCorrectAnswer({ input, question: questions[question], secondInput })
+  }, [input, question, secondInput])
 
   const isCorrect = useMemo(() => {
     return getIsCorrect({ answer, correctAnswer })
@@ -123,17 +139,8 @@ const Practice = () => {
   const runFunction = useCallback(() => {
     if (code) {
       try {
-        let corrected = getProcessedInputs(input)
-        if (corrected && secondInput) {
-          let corrected2 = getProcessedInputs(secondInput)
-          const func = new Function('x', 'y', code)
-          const output = func(corrected, corrected2);
-          setAnswer(output);
-        } else if (corrected) {
-          const func = new Function('x', code)
-          const output = func(corrected);
-          setAnswer(output);
-        }
+        const output = getFunctionOutput(input, code, secondInput ?? '')
+        setAnswer(output);
       } catch (err) {
         const error = err as Error
         toast.error("Error: " + error.message);
@@ -156,6 +163,8 @@ const Practice = () => {
     setInput(firstInput)
     if (secondInput) {
       setSecondInput(secondInput)
+    } else {
+      setSecondInput('')
     }
     setAnswer('')
     setQuestion(goTo)
