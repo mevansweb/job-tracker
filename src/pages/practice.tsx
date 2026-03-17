@@ -8,8 +8,9 @@ import Header from '@/components/header'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { type PracticeQuestion } from '@/global/types'
+import { ErrorMessage } from '@/components/error-message'
+import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 
 import { problems1, problems2 } from './practice-questions'
 
@@ -47,7 +48,7 @@ const notFinishedTyping = (input: InputType) => {
   return typeof input === 'string' && (input.endsWith(',') || input.endsWith('-'))
 }
 
-const getCorrectAnswer = ({ input, question, secondInput } : { input: InputType, question: PracticeQuestion, secondInput?: InputType }) => {
+const getCorrectAnswer = ({ input, question, secondInput }: { input: InputType, question: PracticeQuestion, secondInput?: InputType }) => {
   let expectedStr = question.shouldReturn
   const defaultInput = question.exampleInput
   if (input && !notFinishedTyping(input) && input !== defaultInput) {
@@ -72,6 +73,20 @@ const getCorrectAnswer = ({ input, question, secondInput } : { input: InputType,
   } else {
     return expectedStr
   }
+}
+
+const hasRequiredInputs = ({ code, input, question, secondInput }: { code: string, input: InputType, question: PracticeQuestion, secondInput?: InputType }) => {
+  const missing: string[] = []
+  if (!code) {
+    missing.push('Your Code')
+  }
+  if (!input) {
+    missing.push('Your first function argument')
+  }
+  if (question.secondInput && !secondInput) {
+    missing.push('Your second function argument')
+  }
+  return missing
 }
 
 const getIsCorrect = ({ answer, correctAnswer } : { answer: InputType, correctAnswer: InputType}) => {
@@ -137,7 +152,8 @@ const Practice = () => {
   }, [setInput, setSecondInput])
 
   const runFunction = useCallback(() => {
-    if (code) {
+    const missing = hasRequiredInputs({ code, input, question: questions[question], secondInput })
+    if (missing.length === 0) {
       try {
         const output = getFunctionOutput(input, code, secondInput ?? '')
         setAnswer(output);
@@ -146,9 +162,9 @@ const Practice = () => {
         toast.error("Error: " + error.message);
       }
     } else {
-      toast.error("Error: Please enter your code.");
+      toast.error(<ErrorMessage errors={missing} />);
     }
-  }, [code, input, setAnswer])
+  }, [code, input, secondInput, setAnswer])
 
   const resetQuestion = useCallback((goTo: number, which: 'number' | 'group') => {
     let nextQ = questions[goTo]
@@ -280,7 +296,6 @@ const Practice = () => {
       </div>
     </div>
   )
-
 }
 
 export default Practice
