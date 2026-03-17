@@ -182,6 +182,7 @@ export type PracticeQuestion = {
   id: number
   question: string
   exampleInput: string
+  secondInput?: string
   shouldReturn: string
   solution: string
 }
