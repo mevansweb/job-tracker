@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { toast } from 'sonner'
 
@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { capitalizeWords } from '@/global/functions'
 import { useAuth } from '@/components/providers/hooks'
+
+type SearchType = 'company' | 'position'
 
 const MIN_QUERY_LENGTH = 3
 
@@ -76,21 +78,25 @@ const SearchResult = ({ job } : { job: Job }) => {
 const Search = () => {
   const { state } = useAuth()
   const { id, jobs } = state
-  const [query, setQuery] = useState('')
+  const [companyQuery, setCompanyQuery] = useState('')
+  const [positionQuery, setPositionQuery] = useState('')
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [searchResults, setSearchResults] = useState<Job[] | null>([])
   const [upcoming, setUpcoming] = useState<Job[] | null>([])
+
+  const noResultsText = useMemo(() => searchResults === null && companyQuery.trim().length >= MIN_QUERY_LENGTH ? `No results found for "{${companyQuery}}` : searchResults === null && positionQuery.trim().length >= MIN_QUERY_LENGTH ? `No results found for "{${positionQuery}}` : '', [companyQuery, positionQuery, searchResults])
 
   const getUpcomingEvents = useCallback(async () => {
     const filteredData = getJobsWithFutureEvents(jobs)
     setUpcoming(filteredData.length > 0 ? filteredData : null)
     setSearchResults([])
-    setQuery('')
+    setCompanyQuery('')
+    setPositionQuery('')
   }, [jobs])
 
-  const performSearch = useCallback(async (searchQuery: string) => {
+  const performSearch = useCallback(async (searchQuery: string, searchType: SearchType) => {
     try {
-      const url = `${SEARCH_URL}${id}/${encodeURIComponent(searchQuery)}`
+      const url = `${SEARCH_URL}${id}/${encodeURIComponent(searchQuery)}/${searchType}`
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -113,15 +119,20 @@ const Search = () => {
 
   const handleOnChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const newQuery = event.target.value
-    setQuery(newQuery)
-
+    const searchType = event.target.name as SearchType
+    if (searchType === 'company') {
+      setCompanyQuery(newQuery)
+    }
+    if (searchType === 'position') {
+      setPositionQuery(newQuery)
+    }
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
     }
 
     if (newQuery.trim().length >= MIN_QUERY_LENGTH) {
       timeoutRef.current = setTimeout(() => {
-        performSearch(newQuery)
+        performSearch(newQuery, searchType)
       }, 500)
     }
   }, [performSearch])
@@ -145,22 +156,32 @@ const Search = () => {
         <div className="flex flex-col my-4 ml-4">
         <h1 className="text-lg mb-2">Search</h1>
         <Input
-          type="text"
-          placeholder="Search for a job by company name..."
-          value={query}
-          onChange={handleOnChange}
           className="my-4 w-full"
+          name="company"
+          onChange={handleOnChange}
+          placeholder="Search for a job by company name..."
+          value={companyQuery} 
+          type="text"
+          />
+        <Input
+          className="my-4 w-full"
+          name="position"
+          onChange={handleOnChange}
+          placeholder="Search for a job by position name..."
+          value={positionQuery} 
+          type="text"
         />
         </div>
         <Button
+          className="ml-4"
           onClick={getUpcomingEvents}
         >Get Upcoming Events</Button>
       </div>
 
       <div className="flex flex-col w-200 mx-auto">
         {searchResults && searchResults.length > 0 || upcoming && upcoming.length > 0 ? (<h2 className="mt-4 text-lg font-semibold">Search Results:</h2>) : null}
-        {query ? (
-          <div className="text-sm text-gray-500 mt-8">Showing results for "{query}":</div>
+        {companyQuery || positionQuery ? (
+          <div className="text-sm text-gray-500 mt-8">Showing results for "{companyQuery ? companyQuery : positionQuery}":</div>
         ) : null}
         <div className="mt-2">
           {upcoming === null ? (
@@ -175,8 +196,8 @@ const Search = () => {
           {searchResults && searchResults.map((job) => (
             <SearchResult key={`search-results-job-${job.id}`} job={job} />
           ))}
-          {searchResults === null ? (
-            query.trim().length >= MIN_QUERY_LENGTH && <p className="light:text-gray-700 dark:text-gray-400">No results found for "{query}".</p>
+          {noResultsText ? (
+            < p className="light:text-gray-700 dark:text-gray-400">{noResultsText}</p>
           ) : null }
         </div>
       </div>

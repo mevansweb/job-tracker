@@ -61,7 +61,7 @@ export const Dashboard = () => {
         {groupedByMonthAndYear && Object.keys(groupedByMonthAndYear).sort((a, b) => {
           const [monthA, yearA] = a.split('-').map(Number)
           const [monthB, yearB] = b.split('-').map(Number)
-          return yearA === yearB ? monthA - monthB : yearA - yearB
+          return yearA === yearB ? monthB - monthA : yearB - yearA
         }).map((monthYear) => {
           const [monthPart, yearPart] = monthYear.split('-').map(Number)
           return (
