@@ -1,11 +1,11 @@
-import type { Job, Note, Settings, Task } from '@/global/types'
 import { type Action } from '@/components/providers/auth-provider'
+import type { Job, Note, Resume, Settings, Task } from '@/global/types'
 
 export type EditJobsProps = {
   dispatch: (action: Action) => void
   email: string
   jobs: Job[]
-  postData: (method: "POST" | "GET" | "PUT" | "DELETE", body: unknown) => Promise<void>
+  postData: (method: 'POST' | 'GET' | 'PUT' | 'DELETE', body: unknown) => Promise<void>
   setEditJob: (value: React.SetStateAction<Job>) => void
 }
 
@@ -13,16 +13,25 @@ export type EditNotesProps = {
   action: 'add' | 'edit' | 'delete'
   dispatch: (action: Action) => void
   email: string
-  postData: (method: "POST" | "GET" | "PUT" | "DELETE", body: unknown) => Promise<void>
+  postData: (method: 'POST' | 'GET' | 'PUT' | 'DELETE', body: unknown) => Promise<void>
   setEditNote: (value: React.SetStateAction<Note>) => void
   notes: Note[]
-} 
+}
+
+export type EditResumeProps = {
+  action: 'add' | 'edit' | 'delete'
+  dispatch: (action: Action) => void
+  email: string
+  postData: (method: 'POST' | 'GET' | 'PUT' | 'DELETE', body: unknown) => Promise<void>
+  setEditResume: (value: React.SetStateAction<Resume>) => void
+  resume: Resume
+}
 
 export type EditTasksProps = {
   action: 'add' | 'edit' | 'delete'
   dispatch: (action: Action) => void
   email: string
-  postData: (method: "POST" | "GET" | "PUT" | "DELETE", body: unknown) => Promise<void>
+  postData: (method: 'POST' | 'GET' | 'PUT' | 'DELETE', body: unknown) => Promise<void>
   setEditTask?: (value: React.SetStateAction<Task>) => void
   tasks: Task[]
 }
@@ -31,14 +40,19 @@ export type EditSettingsProps = {
   action: 'add' | 'edit' | 'delete'
   dispatch: (action: Action) => void
   email: string
-  postData: (method: "POST" | "GET" | "PUT" | "DELETE", body: unknown) => Promise<void>
+  postData: (method: 'POST' | 'GET' | 'PUT' | 'DELETE', body: unknown) => Promise<void>
   setEditSettings: (value: React.SetStateAction<unknown>) => void
   settings: Settings
 }
 
-export const setJobs = async ({ dispatch, email, jobs, postData, setEditJob } : EditJobsProps) => {
-  dispatch({ type: 'SET_JOBS', jobs: jobs.sort((a, b) => new Date(a.applicationDate).getTime() - new Date(b.applicationDate).getTime()) })
-  await postData('PUT', { email, jobs, form: 'update-jobs'})
+export const setJobs = async ({ dispatch, email, jobs, postData, setEditJob }: EditJobsProps) => {
+  dispatch({
+    type: 'SET_JOBS',
+    jobs: jobs.sort(
+      (a, b) => new Date(a.applicationDate).getTime() - new Date(b.applicationDate).getTime()
+    ),
+  })
+  await postData('PUT', { email, jobs, form: 'update-jobs' })
   setEditJob({
     address: '',
     applicationDate: '',
@@ -48,8 +62,8 @@ export const setJobs = async ({ dispatch, email, jobs, postData, setEditJob } : 
       {
         date: '',
         note: '',
-        status: 'waiting-for-response'
-      }
+        status: 'waiting-for-response',
+      },
     ],
     id: '',
     linkToJobAccount: '',
@@ -61,7 +75,14 @@ export const setJobs = async ({ dispatch, email, jobs, postData, setEditJob } : 
   })
 }
 
-export const setNotes = async ({ action, dispatch, email, notes, postData, setEditNote } : EditNotesProps) => {
+export const setNotes = async ({
+  action,
+  dispatch,
+  email,
+  notes,
+  postData,
+  setEditNote,
+}: EditNotesProps) => {
   dispatch({ type: 'SET_NOTES', notes })
   await postData('PUT', { email, notes, form: 'update-notes' })
   if (action === 'delete' || action === 'add') {
@@ -77,8 +98,48 @@ export const setNotes = async ({ action, dispatch, email, notes, postData, setEd
   }
 }
 
-export const setTasks = async ({ action, dispatch, email, tasks, postData, setEditTask } : EditTasksProps) => {
-  dispatch({ type: 'SET_TASKS', tasks: tasks.sort((a, b) => new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime()) })
+export const setResume = async ({
+  action,
+  dispatch,
+  email,
+  resume,
+  postData,
+  setEditResume,
+}: EditResumeProps) => {
+  dispatch({ type: 'SET_RESUME', resume })
+  await postData('PUT', { email, resume, form: 'update-resume' })
+  if (action === 'delete' || action === 'add') {
+    setEditResume({
+      coverLetter: {
+        companyName: '',
+        body: '',
+        position: '',
+      },
+      certifications: [],
+      education: [],
+      experience: [],
+      id: '',
+      summary: '',
+      skills: [],
+      lastUpdate: '',
+    })
+  }
+}
+
+export const setTasks = async ({
+  action,
+  dispatch,
+  email,
+  tasks,
+  postData,
+  setEditTask,
+}: EditTasksProps) => {
+  dispatch({
+    type: 'SET_TASKS',
+    tasks: tasks.sort(
+      (a, b) => new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime()
+    ),
+  })
   await postData('PUT', { email, tasks, form: 'update-tasks' })
   if ((action === 'delete' || action === 'add') && setEditTask) {
     setEditTask({
@@ -90,15 +151,22 @@ export const setTasks = async ({ action, dispatch, email, tasks, postData, setEd
           dueDate: '',
           note: '',
           id: '',
-          done: false
-        }
+          done: false,
+        },
       ],
-      status: 'to-do'
+      status: 'to-do',
     })
   }
 }
 
-export const setSettings = async ({ action, dispatch, email, settings, postData, setEditSettings } : EditSettingsProps) => {
+export const setSettings = async ({
+  action,
+  dispatch,
+  email,
+  settings,
+  postData,
+  setEditSettings,
+}: EditSettingsProps) => {
   dispatch({ type: 'SET_SETTINGS', settings })
   await postData('PUT', { email, settings, form: 'update-settings' })
   if (action === 'delete' || action === 'add') {
@@ -110,9 +178,9 @@ export const setSettings = async ({ action, dispatch, email, settings, postData,
         {
           dueDate: '',
           note: '',
-        }
+        },
       ],
-      status: 'to-do'
+      status: 'to-do',
     })
   }
 }

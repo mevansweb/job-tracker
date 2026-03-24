@@ -1,6 +1,6 @@
 import React, { useReducer } from 'react'
 
-import type { Job, Note, Settings, Task } from '@/global/types'
+import type { Job, Note, Resume, Settings, Task } from '@/global/types'
 
 import useApi from '../../hooks/useApi'
 import type { AuthProviderProps } from './types'
@@ -14,6 +14,7 @@ export type State = {
   loggedIn: boolean
   notes?: Note[]
   password: string
+  resume?: Resume
   settings?: Settings
   tasks: Task[]
   view?: string
@@ -27,6 +28,7 @@ export type Action =
   | ({ type: 'SET_LOGGED_IN' } & Pick<State, 'loggedIn'>)
   | ({ type: 'SET_NOTES' } & Pick<State, 'notes'>)
   | ({ type: 'SET_PASSWORD' } & Pick<State, 'password'>)
+  | ({ type: 'SET_RESUME' } & Pick<State, 'resume'>)
   | ({ type: 'SET_SETTINGS' } & Pick<State, 'settings'>)
   | ({ type: 'SET_TASKS' } & Pick<State, 'tasks'>)
   | ({ type: 'SET_VIEW' } & Pick<State, 'view'>)
@@ -40,6 +42,7 @@ const initialState: State = {
   loggedIn: false,  
   notes: [],
   password: '',
+  resume: undefined,
   settings: undefined,
   tasks: [],
   view: 'sign-in'
@@ -58,6 +61,7 @@ const reducer = (state: State, action: Action) => {
         loggedIn: action.loggedIn,
         notes: action.notes,
         password: action.password,
+        resume: action.resume,
         settings: action.settings,
         tasks: action.tasks,
         view: action.view
@@ -91,6 +95,11 @@ const reducer = (state: State, action: Action) => {
       return {
         ...state,
         notes: action.notes
+      }
+    case 'SET_RESUME':
+      return {
+        ...state,
+        resume: action.resume
       }
     case 'SET_SETTINGS':
       return {

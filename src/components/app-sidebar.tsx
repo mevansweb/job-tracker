@@ -1,4 +1,4 @@
-import { Calendar, CodeXml, Edit, Home, School, Search, Settings } from 'lucide-react'
+import { ClipboardCheck, ClipboardList, CodeXml, FilePenLine, Home, School, Search, Settings } from 'lucide-react'
 
 import { getStyles } from '@/global/functions'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger } from '@/components/ui/sidebar'
@@ -13,14 +13,19 @@ const items = [
     icon: Home,
   },
   {
-    title: 'Practice',
+    title: 'Resume',
+    url: '/resume',
+    icon: FilePenLine
+  },
+  {
+    title: 'Coding Practice',
     url: '/practice',
     icon: CodeXml,
   },
   {
     title: 'Tasks',
     url: '/tasks',
-    icon: Calendar,
+    icon: ClipboardCheck,
   },
   {
     title: 'Search',
@@ -35,7 +40,7 @@ const items = [
   {
     title: 'Assessments',
     url: '/assessments',
-    icon: Edit,
+    icon: ClipboardList,
   },
   {
     title: 'Test Prep Page',

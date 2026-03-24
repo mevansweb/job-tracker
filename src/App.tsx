@@ -2,12 +2,13 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Home from './pages/home'
 import Tasks from './pages/tasks'
+import Resume from './pages/resume'
 import Search from './pages/search'
 import Practice from './pages/practice'
 import Settings from './pages/settings'
 import Layout from './components/layout'
-import Assessments from './pages/assessments'
 import TestPrep from "./pages/test-prep"
+import Assessments from './pages/assessments'
 
 import './App.css'
 
@@ -23,6 +24,7 @@ function App() {
           <Route path="/settings" element={<Layout><Settings /></Layout>} />
           <Route path="/tasks" element={<Layout><Tasks /></Layout>} />
           <Route path="/test-prep" element={<Layout><TestPrep /></Layout>} />
+          <Route path="/resume" element={<Layout><Resume /></Layout>} />
         </Routes>
       </BrowserRouter>
     </>
