@@ -1,6 +1,6 @@
 import { memo, type SetStateAction, useCallback, useMemo, useState } from 'react'
 
-import { ChevronDownIcon, Edit, PlusIcon, X } from 'lucide-react'
+import { ChevronDownIcon, CirclePlus, Edit, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -105,7 +105,7 @@ const SubTask = memo(function SubTask({ calendarOpen, defaultDueDate, editingEve
         )}
         {mode === 'edit' ? (
           <div className={editingEvent === subtask.id ? 'mt-3.75' : ''}>
-            <Edit className="cursor-pointer w-4 relative left-1" 
+            <Edit className="cursor-pointer w-4 relative left-1 stroke-gray-500" 
               onClick={() => {
                 if (editingEvent === subtask.id) {
                   toggleEdit('')
@@ -119,21 +119,22 @@ const SubTask = memo(function SubTask({ calendarOpen, defaultDueDate, editingEve
                 setEditTask({ ...task, events: updatedEvents })
             }} />
           </div>
-        ) : (
-          <Button
-            className="mt-4 cursor-pointer"
-            disabled={!subtask.dueDate || !subtask.note}
-            variant="link"
-            onClick={() => {
-            if (!subtask.dueDate || !subtask.note) return
-            setEditTask((prev) => ({ ...prev, events: [...prev.events, subtask] }))
-            setSubTask({
-                dueDate: '',
-                done: false,
-                id: crypto.randomUUID(),
-                note: '',
-            })
-          }}><PlusIcon /></Button>
+      ) : (
+          <div className="mt-3.75">
+            <CirclePlus
+              className={`w-6 h-6 relative stroke-white ${subtask.note && subtask.dueDate ? 'cursor-pointer fill-green-500' : 'cursor-not-allowed fill-gray-500'}`}
+              onClick={() => {
+                if (!subtask.dueDate || !subtask.note) return
+                setEditTask((prev) => ({ ...prev, events: [...prev.events, subtask] }))
+                setSubTask({
+                    dueDate: '',
+                    done: false,
+                    id: crypto.randomUUID(),
+                    note: '',
+                })
+              }}
+              />
+            </div>
         )}
     </div>
   )
