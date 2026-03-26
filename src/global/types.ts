@@ -25,6 +25,13 @@ export type Certification = {
   name: string
 }
 
+export type CoverLetter = {
+  companyName: string
+  body: string
+  greeting: string
+  position: string
+}
+
 export type Education = {
   dateFrom: string
   dateTo: string
@@ -165,12 +172,8 @@ export const programmingLanguages: ProgrammingLanguage[] = [
 export type Framework = ProgrammingLanguage | FrontendFramework | Pattern
 
 export type Resume = {
-  coverLetter: {
-    companyName: string
-    body: string
-    position: string
-  }
-  certifications?: Certification[]
+  coverLetter: CoverLetter
+  certifications: Certification[]
   education: Education[]
   experience: Employer[]
   id: string

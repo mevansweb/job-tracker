@@ -111,8 +111,9 @@ export const setResume = async ({
   if (action === 'delete' || action === 'add') {
     setEditResume({
       coverLetter: {
-        companyName: '',
         body: '',
+        companyName: '',
+        greeting: '',
         position: '',
       },
       certifications: [],
