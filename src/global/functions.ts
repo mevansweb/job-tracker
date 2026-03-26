@@ -1,5 +1,5 @@
-import { Status } from '@/global/types'
 import { bgThemeVariants, fontVariants, sbThemeVariants } from '@/global/constants'
+import { Status } from '@/global/types'
 
 type StylesProps = {
   name: string
@@ -10,8 +10,15 @@ type StylesProps = {
 const colorSettings = ['backgroundColor', 'sidebarColor']
 const nonColorSettings = ['font']
 
-export function getStyles({theme, name, strKey} : StylesProps) {
-  const themeVariant = name === 'backgroundColor' ? bgThemeVariants : name === 'sidebarColor' ? sbThemeVariants : name === 'font' ? fontVariants : null
+export function getStyles({ theme, name, strKey }: StylesProps) {
+  const themeVariant =
+    name === 'backgroundColor'
+      ? bgThemeVariants
+      : name === 'sidebarColor'
+        ? sbThemeVariants
+        : name === 'font'
+          ? fontVariants
+          : null
   if (colorSettings.includes(name) && theme && themeVariant) {
     const themeKey = theme as keyof typeof themeVariant
     const colorKey = themeVariant[themeKey]
@@ -35,21 +42,21 @@ export function getStyles({theme, name, strKey} : StylesProps) {
 export function capitalizeWords(str: string): string {
   return str
     .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 }
 
 export function getAfterChar(str: string | string[], char: string | string[]) {
-    if (typeof str !== 'string' || typeof char !== 'string' || char.length === 0) {
-        return str
-    }
+  if (typeof str !== 'string' || typeof char !== 'string' || char.length === 0) {
+    return str
+  }
 
-    const index = str.indexOf(char)
-    if (index === -1) {
-        return str // Character not found, just return as is
-    }
+  const index = str.indexOf(char)
+  if (index === -1) {
+    return str // Character not found, just return as is
+  }
 
-    return str.slice(index + char.length)
+  return str.slice(index + char.length)
 }
 
 export function getProgress(status: Status) {
@@ -83,4 +90,13 @@ export function getProgress(status: Status) {
       return 100
     }
   }
+}
+
+type UnknownWithId = { id: string } & Record<string, unknown>
+
+export function spliceArray(item: UnknownWithId, arr: UnknownWithId[]) {
+  const pos = arr.map((e) => e.id).indexOf(item.id)
+  const arrCopy = arr.filter((j) => j.id !== item.id)
+  arrCopy.splice(pos, 0, item)
+  return arrCopy
 }
