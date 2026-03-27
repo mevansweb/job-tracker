@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Header from '@/components/header'
 import { Button } from '@/components/ui/button'
@@ -66,6 +66,21 @@ I am writing to express my interest in the ${position} position at your company.
     `
 }
 
+function hasPopulatedProperty(obj: unknown) {
+    // Validate input
+    if (obj === null || typeof obj !== 'object') {
+        throw new TypeError('Expected a non-null object')
+    }
+
+    // Iterate over own properties
+    return Object.values(obj).some(value => {
+        // Check for non-empty values
+        if (value === null || value === undefined) return false
+        if (typeof value === 'string' && value.trim() === '') return false
+        return true
+    })
+}
+
 const Section = ({ className = '', data, inputType, label, name, parentMode, placeholder, update, updateDate }: SectionProps & SingleProps) => {
   const [mode, setMode] = useState<Mode>('view')
   const isEmpty = useMemo(() => getIsEmpty(data), [data])
@@ -74,21 +89,23 @@ const Section = ({ className = '', data, inputType, label, name, parentMode, pla
   return (
     <Field className={className}>
       <FieldLabel htmlFor={name}>{label}</FieldLabel>
-        {mode === 'edit' || parentMode === 'edit' || isEmpty ? (
+        {mode === 'edit' || parentMode === 'edit' || parentMode === 'add' ||  isEmpty ? (
           <div className="flex gap-4">
             {inputType === 'input' ? (
               <Input
+                id={name}
                 name={name}
                 onChange={update}
                 placeholder={placeholder}
-                value={data}
+                defaultValue={data}
               />
             ) : inputType === 'textarea' ? (
               <Textarea
+                id={name}
                 name={name}
                 onChange={update}
                 placeholder={placeholder}
-                value={data}
+                defaultValue={data}
               />
               ) : inputType === 'calendar' && updateDate ? (
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
@@ -114,16 +131,6 @@ const Section = ({ className = '', data, inputType, label, name, parentMode, pla
                 </PopoverContent>
               </Popover>
             ) : null}
-            
-            {/* <Button
-              className="w-30"
-              onClick={() => {
-                setMode('view')
-              }}
-              variant="outline"
-            >
-              {isEmpty ? 'Add' : 'Save'}
-            </Button> */}
           </div>
         ) : (
         <>
@@ -147,35 +154,36 @@ const Section = ({ className = '', data, inputType, label, name, parentMode, pla
   )
 }
 
-const Experience = ({ className = '', data, label, name }: SectionProps & { data: Employer[] }) => {
+const Experience = ({ data }: SectionProps & { data: Employer[] }) => {
   let newId = crypto.randomUUID()
   const { state, dispatch, dispatchAPI } = useResume()
   const { experience } = state
-  console.log('exp', experience)
   const [employer, setEmployer] = useState<Employer>({ company: '', dateFrom: '', dateTo: '', description: '', id: newId, location: '',  position: ''})
   
   const [editing, setEditing] = useState<{ id: string;  mode: Mode}>({ id: newId, mode: undefined})
   const isEmpty = useMemo(() => getIsEmpty(data), [data])
+  console.log('employer', employer)
   
 
   const update = useCallback((event: TextUpdateEvent) => {
     const { name, value } = event.target
+    console.log(name, value)
     setEmployer((prevData) => ({
       ...prevData,
       [name]: value,
     }))
-  }, [])
+  }, [setEmployer])
 
   const updateDate = useCallback((d: Date, name: string) => {
     setEmployer((prevData) => ({
       ...prevData,
       [name]: d.toLocaleDateString(),
     }))
-  }, [])
+  }, [setEmployer])
 
    return (
-     <div className={`flex flex-col gap-4 ${className}`}>
-       <FieldLegend className="font-bold border-b pb-2">{label}</FieldLegend>
+     <div className="flex flex-col gap-4">
+       <FieldLegend className="font-bold border-b pb-2">Work History</FieldLegend>
        {experience.map((item) => (
           <div key={`job-history-section-${item.id}`}>
           <Section
@@ -200,7 +208,7 @@ const Experience = ({ className = '', data, label, name }: SectionProps & { data
            />
            <Section
             data={item.description}
-            inputType="input"
+            inputType="textarea"
             key={`job-desc-${item.id}`}
             label="Job Description"
             name="description"
@@ -275,7 +283,7 @@ const Experience = ({ className = '', data, label, name }: SectionProps & { data
        {isEmpty || editing.mode === 'add' ? (
          <>
          <Section
-            data=""
+            data={employer.position}
             inputType="input"
             key={`job-experience-${newId}`}
             label="Job Title"
@@ -285,7 +293,7 @@ const Experience = ({ className = '', data, label, name }: SectionProps & { data
             update={update}
            />
           <Section  
-            data=""
+            data={employer.company}
             inputType="input"
             key={`job-company-${newId}`}
             label="Employer"
@@ -295,8 +303,8 @@ const Experience = ({ className = '', data, label, name }: SectionProps & { data
             update={update}
            />
           <Section
-            data=""
-            inputType="input"
+            data={employer.description}
+            inputType="textarea"
             key={`job-desc-${newId}`}
             label="Job Description"
             name="description"
@@ -306,7 +314,7 @@ const Experience = ({ className = '', data, label, name }: SectionProps & { data
            />
            <div className="flex gap-4">
              <Section
-                data=""
+                data={employer.dateFrom}
                 inputType="calendar"
                 key={`job-dateFrom-empty`}
                 label="Start Date"
@@ -316,7 +324,7 @@ const Experience = ({ className = '', data, label, name }: SectionProps & { data
                 updateDate={updateDate}
               />
               <Section
-                data=""
+                data={employer.dateTo}
                 inputType="calendar"
                 key={`job-dateTo-empty`}
                 label="End Date"
@@ -350,7 +358,6 @@ const Experience = ({ className = '', data, label, name }: SectionProps & { data
 const CoverLetter = () => {
   const { state, dispatch, dispatchAPI } = useResume()
   const { coverLetter } = state
-  console.log('coverLetter', coverLetter)
   const [personalize, setPersonalize] = useState(false)
   const [mode, setMode] = useState<Mode>('view')
   
@@ -450,9 +457,15 @@ const CoverLetter = () => {
 }
 
 const ResumeBuilder = () => {
-  const { state, dispatch } = useResume()
+  const { authState, dispatch, dispatchAPI, state } = useResume()
   const { experience, summary } = state
-  //certifications, education, skills
+  const resumeStarted = useMemo(() => hasPopulatedProperty(state), [state])
+
+  useEffect(() => {
+    if (authState.resume === undefined && resumeStarted) {
+      dispatchAPI({ type: 'SET_RESUME', resume: {...state}})
+    }
+  }, [])
   
   return (
     <div className="p-4 flex flex-col">

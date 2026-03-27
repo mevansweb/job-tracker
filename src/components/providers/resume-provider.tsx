@@ -1,6 +1,6 @@
 import { type ReactNode, createContext, useContext, useReducer } from 'react'
 import { useAuth } from '@/components/providers/hooks'
-import { type Action } from '@/components/providers/auth-provider'
+import { type Action, type State as AuthState } from '@/components/providers/auth-provider'
 import { type Resume } from '@/global/types'
 
 type State = Resume
@@ -16,9 +16,10 @@ type ResumeAction =
   | ({ type: 'SET_SKILLS' } & Pick<State, 'skills'>)
 
 interface ResumeContextType {
-  state: State
+  authState: AuthState
   dispatch: React.ActionDispatch<[action: ResumeAction]>
   dispatchAPI: React.ActionDispatch<[action: Action]>
+  state: State
 }
 
 const initialResume: State = {
@@ -109,7 +110,7 @@ export const ResumeProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(reducer, resume ?? initialResume)
 
   return (
-    <ResumeContext.Provider value={{ state, dispatch, dispatchAPI }}>
+    <ResumeContext.Provider value={{ authState, dispatch, dispatchAPI, state }}>
       {children}
     </ResumeContext.Provider>
   )
