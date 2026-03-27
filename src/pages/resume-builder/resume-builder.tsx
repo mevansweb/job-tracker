@@ -1,17 +1,16 @@
 import { useCallback, useMemo, useState } from 'react'
 
 import Header from '@/components/header'
-import { useAuth } from '@/components/providers/hooks'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { Label } from '@/components/ui/label'
+import { Field, FieldDescription, FieldGroup, FieldSet, FieldLabel, FieldLegend } from '@/components/ui/field'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
-import type { Certification, CoverLetter, Education, Employer, Resume, Skill } from '@/global/types'
+import type { Certification, CoverLetter, Education, Employer, Skill } from '@/global/types'
 import { spliceArray } from '@/global/functions'
+import { useResume } from '@/components/providers/resume-provider'
 
 type Mode = 'add' | 'view' | 'edit' | undefined
 
@@ -19,25 +18,8 @@ type ArrData = Certification[] | Education[] | Employer[] | Skill[]
 
 type TextUpdateEvent = React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>
 
-const initialResume: Resume = {
-  coverLetter: {
-    body: '',
-    companyName: '',
-    greeting: '',
-    position: '',
-  },
-  certifications: [],
-  education: [],
-  experience: [],
-  id: '',
-  summary: '',
-  skills: [],
-  lastUpdate: '',
-}
-
 type SectionProps = {
   className?: string
-  
   label: string
   name: string
   parentMode?: Mode
@@ -76,15 +58,22 @@ const getIsEmpty = (data: string | CoverLetter | ArrData) => {
   return false
 }
 
+const getGreeting = ({ companyName, greeting, personalize, position } : { companyName: string, greeting: string, personalize: boolean, position: string }) => {
+  return personalize ? `Dear ${companyName} Hiring Manager,
+I am writing to express my interest in the ${position} position at ${companyName}.` : greeting ?
+        greeting : `Dear Hiring Manager,
+I am writing to express my interest in the ${position} position at your company.
+    `
+}
+
 const Section = ({ className = '', data, inputType, label, name, parentMode, placeholder, update, updateDate }: SectionProps & SingleProps) => {
   const [mode, setMode] = useState<Mode>('view')
   const isEmpty = useMemo(() => getIsEmpty(data), [data])
   const [calendarOpen, setCalendarOpen] = useState(false)
 
   return (
-    <div className={`flex flex-col gap-4 ${className}`}>
-      <Label className="text-lg" htmlFor={name}>{label}</Label>
-      <div className="">
+    <Field className={className}>
+      <FieldLabel htmlFor={name}>{label}</FieldLabel>
         {mode === 'edit' || parentMode === 'edit' || isEmpty ? (
           <div className="flex gap-4">
             {inputType === 'input' ? (
@@ -126,15 +115,15 @@ const Section = ({ className = '', data, inputType, label, name, parentMode, pla
               </Popover>
             ) : null}
             
-            <Button
-              className=""
+            {/* <Button
+              className="w-30"
               onClick={() => {
                 setMode('view')
               }}
               variant="outline"
             >
               {isEmpty ? 'Add' : 'Save'}
-            </Button>
+            </Button> */}
           </div>
         ) : (
         <>
@@ -142,7 +131,7 @@ const Section = ({ className = '', data, inputType, label, name, parentMode, pla
             <div className="flex flex-col">
               <div className="flex">
                 <Button
-                  className=""
+                  className="w-50"
                   onClick={() => setMode('edit')}
                   variant="outline"
                 >
@@ -154,14 +143,15 @@ const Section = ({ className = '', data, inputType, label, name, parentMode, pla
             ) : null }
          </>
         )}
-      </div>
-    </div>
+    </Field>
   )
 }
 
-const Experience = ({ className = '', data, label, name, updateObject }: SectionProps & { data: Employer[], updateObject: (name: string, data: Object ) => void }) => {
+const Experience = ({ className = '', data, label, name }: SectionProps & { data: Employer[] }) => {
   let newId = crypto.randomUUID()
-  const [experience, setExperience] = useState<Employer[]>(data)
+  const { state, dispatch, dispatchAPI } = useResume()
+  const { experience } = state
+  console.log('exp', experience)
   const [employer, setEmployer] = useState<Employer>({ company: '', dateFrom: '', dateTo: '', description: '', id: newId, location: '',  position: ''})
   
   const [editing, setEditing] = useState<{ id: string;  mode: Mode}>({ id: newId, mode: undefined})
@@ -184,13 +174,11 @@ const Experience = ({ className = '', data, label, name, updateObject }: Section
   }, [])
 
    return (
-    <div className={`flex flex-col gap-4 ${className}`}>
-      <Label className="text-lg" htmlFor={name}>{label}</Label>
-
+     <div className={`flex flex-col gap-4 ${className}`}>
+       <FieldLegend className="font-bold border-b pb-2">{label}</FieldLegend>
        {experience.map((item) => (
-          <>
+          <div key={`job-history-section-${item.id}`}>
           <Section
-            className="mt-6"
             data={item.position}
             inputType="input"
             key={`job-title-${item.id}`}
@@ -201,7 +189,6 @@ const Experience = ({ className = '', data, label, name, updateObject }: Section
             update={update}
            />
            <Section
-            className="mt-6"
             data={item.company}
             inputType="input"
             key={`job-company-${item.id}`}
@@ -212,7 +199,6 @@ const Experience = ({ className = '', data, label, name, updateObject }: Section
             update={update}
            />
            <Section
-            className="mt-6"
             data={item.description}
             inputType="input"
             key={`job-desc-${item.id}`}
@@ -222,65 +208,73 @@ const Experience = ({ className = '', data, label, name, updateObject }: Section
             placeholder="Job Description"
             update={update}
            />
-           <Section
-            className="mt-6"
-            data={item.dateFrom}
-            inputType="calendar"
-            key={`job-dateFrom-${item.id}`}
-            label="Start Date"
-            name="dateFrom"
-            parentMode={editing.id === item.id ? editing.mode : undefined}
-            placeholder="End Date"
-            updateDate={updateDate}
-           />
-           <Section
-            className="mt-6"
-            data={item.dateTo}
-            inputType="calendar"
-            key={`job-dateTo-${item.id}`}
-            label="End Date"
-            name="dateTo"
-            parentMode={editing.id === item.id ? editing.mode : undefined}
-            placeholder="End Date"
-            updateDate={updateDate}
-           />
+           <div className="flex gap-4">
+              <Section
+                data={item.dateFrom}
+                inputType="calendar"
+                key={`job-dateFrom-${item.id}`}
+                label="Start Date"
+                name="dateFrom"
+                parentMode={editing.id === item.id ? editing.mode : undefined}
+                placeholder="End Date"
+                updateDate={updateDate}
+              />
+              <Section
+                data={item.dateTo}
+                inputType="calendar"
+                key={`job-dateTo-${item.id}`}
+                label="End Date"
+                name="dateTo"
+                parentMode={editing.id === item.id ? editing.mode : undefined}
+                placeholder="End Date"
+                updateDate={updateDate}
+                />
+           </div>
            <Button
+             className="w-50"
              name="edit-experience"
              onClick={() => {
                setEditing({ id: item.id, mode: 'edit' })
                setEmployer(item)
              }}
+             variant="outline"
            >
              Edit
            </Button>
            <Button
+             className="w-50"
              name="save-experience"
              onClick={() => {
                setEditing({ id: newId, mode: 'add' })
                const arr = spliceArray(employer, experience)
-               setExperience(arr as Employer[])
-               updateObject(name, arr)
+               dispatch({ type: 'SET_EXPERIENCE', experience: arr as Employer[] })
+               dispatchAPI({ type: 'SET_RESUME', resume: { ...state, experience: arr as Employer[] }})
              }}
+             variant="outline"
            >
              Save
            </Button>
-          </>
+          </div>
        ))}
-       <Button
+       {!isEmpty ? (
+        <Button
+          className="w-50"
           name="add-new-work-experience"
           onClick={() => {
             setEditing({ id: crypto.randomUUID(), mode: 'add' })
             const arr = experience.concat(employer)
-            setExperience(arr as Employer[])
-            updateObject(name, arr)
-          }}
+            dispatch({ type: 'SET_EXPERIENCE', experience: arr as Employer[] })
+            dispatchAPI({ type: 'SET_RESUME', resume: { ...state, experience: arr as Employer[] }})
+         }}
+         variant="outline"
         >
           Add New
         </Button>
+       ) : null }
+       
        {isEmpty || editing.mode === 'add' ? (
          <>
          <Section
-            className="mt-6"
             data=""
             inputType="input"
             key={`job-experience-${newId}`}
@@ -290,8 +284,7 @@ const Experience = ({ className = '', data, label, name, updateObject }: Section
             placeholder="Job title"
             update={update}
            />
-          <Section
-            className="mt-6"
+          <Section  
             data=""
             inputType="input"
             key={`job-company-${newId}`}
@@ -301,8 +294,7 @@ const Experience = ({ className = '', data, label, name, updateObject }: Section
             placeholder="Employer"
             update={update}
            />
-         <Section
-            className="mt-6"
+          <Section
             data=""
             inputType="input"
             key={`job-desc-${newId}`}
@@ -312,195 +304,190 @@ const Experience = ({ className = '', data, label, name, updateObject }: Section
             placeholder="Job Description"
             update={update}
            />
-          <Section
-            className="mt-6"
-            data=""
-            inputType="calendar"
-            key={`job-dateFrom-empty`}
-            label="Start Date"
-            name="dateFrom"
-            parentMode="add"
-            placeholder="End Date"
-            updateDate={updateDate}
-          />
-          <Section
-            className="mt-6"
-            data=""
-            inputType="calendar"
-            key={`job-dateTo-empty`}
-            label="End Date"
-            name="dateTo"
-            parentMode="add"
-            placeholder="End Date"
-            updateDate={updateDate}
-           />
-           <Button
-             name="save-new-experience"
-             onClick={() => {
-               setEditing({ id: crypto.randomUUID(), mode: undefined })
-               const arr = experience.concat(employer)
-               setExperience(arr as Employer[])
-               updateObject(name, arr)
-             }}
-           >
-             Save
-           </Button>
+           <div className="flex gap-4">
+             <Section
+                data=""
+                inputType="calendar"
+                key={`job-dateFrom-empty`}
+                label="Start Date"
+                name="dateFrom"
+                parentMode="add"
+                placeholder="End Date"
+                updateDate={updateDate}
+              />
+              <Section
+                data=""
+                inputType="calendar"
+                key={`job-dateTo-empty`}
+                label="End Date"
+                name="dateTo"
+                parentMode="add"
+                placeholder="End Date"
+                updateDate={updateDate}
+              />
+           </div>
+           <div className="flex justify-end">
+             <Button
+                className="w-50"
+                name="save-new-experience"
+                onClick={() => {
+                  setEditing({ id: crypto.randomUUID(), mode: undefined })
+                  const arr = experience.concat(employer)
+                  dispatch({ type: 'SET_EXPERIENCE', experience: arr as Employer[] })
+                  dispatchAPI({ type: 'SET_RESUME', resume: { ...state, experience: arr as Employer[] }})
+                }}
+                variant="outline"
+              >
+                Save
+              </Button>
+           </div>
         </>
        ) : null}
     </div>
   )
 }
 
-const CoverLetter = ({ data, update }: { data: CoverLetter, update: (name: string, data: Object ) => void }) => {
-  const [coverLetter, setCoverLetter] = useState(data)
+const CoverLetter = () => {
+  const { state, dispatch, dispatchAPI } = useResume()
+  const { coverLetter } = state
+  console.log('coverLetter', coverLetter)
   const [personalize, setPersonalize] = useState(false)
   const [mode, setMode] = useState<Mode>('view')
   
   const { body, companyName, greeting, position } = coverLetter
   const isEmpty = useMemo(() => !position || !greeting || !body, [body, greeting, position])
-  const personalizedGreeting = useMemo(() => {
-    return personalize ? `Dear ${companyName} Hiring Manager,
-I am writing to express my interest in the ${position} position at ${companyName}.` : greeting ?
-        greeting : `Dear Hiring Manager,
-I am writing to express my interest in the ${position} position at your company.
-    `
-  }, [companyName, personalize, position])
+  const personalizedGreeting = useMemo(() => getGreeting({ companyName, greeting, personalize, position }), [companyName, personalize, position])
   
-  const localUpdate = useCallback((event: TextUpdateEvent) => {
+  const update = useCallback((event: TextUpdateEvent) => {
     const { name, value } = event.target
-    setCoverLetter((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }))
+    dispatch({ type: 'SET_COVERLETTER', coverLetter: { ...coverLetter, [name]: value }})
   }, [])
   
   return (
-    <div className={`flex ${mode === 'view' ? 'justify-between' : 'flex-col'}`}>
-      <Label className="text-lg my-4">Cover Letter</Label>
+    <>
+      <FieldLegend className="font-bold border-b pb-2">Cover Letter</FieldLegend>
+      <div className={`gap-4 flex ${mode === 'view' ? 'justify-between' : 'flex-col'}`}>
       {mode === 'add' || mode === 'edit' ? (
         <>
           <Section
-            className="mt-6"
             data={position}
             inputType="input"
             label="Job Title"
             name="position"
             placeholder="Job title"
-            update={localUpdate}
+            update={update}
           />
           <Section
-            className="mt-6"
             data={companyName}
             label="Company Name"
             name="companyName"
             inputType="input"
             placeholder="Personalize by adding the company name (optional)"
-            update={localUpdate}
+            update={update}
           />
-          <FieldGroup className="mt-4">
-            <Field orientation="horizontal">
-              <Checkbox
-                name="personalize"
-                onCheckedChange={(checked) => setPersonalize(checked === true)}
-                checked={personalize}
-              />
-              <FieldLabel htmlFor="personalize-cover-letter-body">
-                Check to add a personalized greeting to your cover letter body.
-              </FieldLabel>
-            </Field>
-          </FieldGroup>
+          <Field className="my-8" orientation="horizontal">
+            <Checkbox
+              checked={personalize}
+              disabled={!companyName || !position}
+              name="personalize"
+              onCheckedChange={(checked) => setPersonalize(checked === true)}
+            />
+            <FieldLabel htmlFor="personalize-cover-letter-body">
+              Check to add a personalized greeting to your cover letter body.
+            </FieldLabel>
+          </Field>
           <Section
-            className="mt-6"
             data={personalizedGreeting}
             label="Cover Letter Greeting"
             name="greeting"
             inputType="textarea"
             placeholder="Add a greeting"
-            update={localUpdate}
+            update={update}
           />
           <Section
-            className="mt-6"
             data={body}
             label="Cover Letter Body"
             name="body"
             inputType="textarea"
             placeholder="Personalize by adding the company name (optional)"
-            update={localUpdate}
+            update={update}
           />
-          <Button
-            name="save"
-            onClick={() => update('coverLetter', coverLetter)}
-          >
-            Save Cover Letter
-          </Button>
+          <div className="flex gap-4 justify-end">
+            <Button
+              className="w-50 mt-4"
+              name="save"
+              onClick={() => setMode('view')}
+              variant="outline"
+            >
+              Cancel
+            </Button>
+            <Button
+              className="w-50 mt-4"
+              name="save"
+              onClick={() => {
+                dispatch({ type: 'SET_COVERLETTER', coverLetter })
+                dispatchAPI({ type: 'SET_RESUME', resume: { ...state, coverLetter } })
+              } }
+              variant="outline"
+            >
+              Save Cover Letter
+            </Button>
+          </div>
         </>
-      ): (
-          <Button
-            name="edit"
-            onClick={() => setMode('edit')}
-            variant="outline"
-          >
-            {isEmpty ? 'Add Cover Letter' : 'Edit Cover Letter'}
-          </Button>
+      ) : (
+        <Button
+          className="w-50"
+          name="edit"
+          onClick={() => setMode('edit')}
+          variant="outline"
+        >
+          {isEmpty ? 'Add Cover Letter' : 'Edit Cover Letter'}
+        </Button>
       )}
-
-    </div>
-    
+      </div>
+    </>
   )
 }
 
-const Resume = () => {
-  const { state } = useAuth() //data, dispatch, error, existing, loading, postData, 
-  const [resume, setResume] = useState<Resume>(state.resume ?? initialResume)
-  const { coverLetter, certifications, education, experience, summary, skills } = resume
-  
-  const update = useCallback((event: TextUpdateEvent) => {
-    const { name, value } = event.target
-    setResume((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }))
-  }, [])
-  
-  const updateObj = useCallback((name: string, data: Object) => {
-    setResume((prevData) => ({
-      ...prevData,
-      [name]: data,
-    }))
-  }, [])
+const ResumeBuilder = () => {
+  const { state, dispatch } = useResume()
+  const { experience, summary } = state
+  //certifications, education, skills
   
   return (
     <div className="p-4 flex flex-col">
       <Header 
-        greeting="Enter your resume information here so you can easily copy and paste to your applications!" 
+        greeting="" 
         middle="" 
-        title="Resume Editor"
+        title=""
       />
-      <div className="w-9/10 mt-8 mx-auto space-y-12">
+      <div className="md:w-9/10 sm:w-9/8 lg:w-2/3 mt-8 mx-auto space-y-12">
         <div className="border border-gray-900/10 rounded-lg shadow-md p-8 mb-8 pb-12">
-          <Section
-            data={summary}
-            label="Summary"
-            inputType="textarea"
-            name="summary" 
-            placeholder="Professional Summary"
-            update={update}
-          />
-          <Experience
-            data={experience}
-            label="Work History"
-            name="experience"
-            placeholder="Add your work history"
-            updateObject={updateObj}
-          />
-          <CoverLetter
-            data={coverLetter}
-            update={updateObj}
-          />
+          <FieldLegend className="font-bold border-b pb-2 text-xl!">Resume Editor</FieldLegend>
+          <FieldSet>
+            <FieldDescription>Enter your resume information here so you can easily copy and paste to your applications!</FieldDescription>
+            <FieldGroup>
+              <Section
+                data={summary}
+                label="Summary"
+                inputType="textarea"
+                name="summary" 
+                placeholder="Professional Summary"
+                update={(event) => dispatch({ type: 'SET_SUMMARY', summary: event.target.value })}
+              />
+              <Experience
+                data={experience}
+                label="Work History"
+                name="experience"
+                placeholder="Add your work history"
+              />
+              <CoverLetter />
+            </FieldGroup>
+          </FieldSet>         
         </div>
       </div>
     </div>
   )
 }
 
-export default Resume
+export default ResumeBuilder

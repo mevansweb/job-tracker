@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Home from './pages/home'
 import Tasks from './pages/tasks'
-import Resume from './pages/resume'
+import ResumeHome from './pages/resume-builder/resume-home'
 import Search from './pages/search'
 import Practice from './pages/practice'
 import Settings from './pages/settings'
@@ -24,7 +24,7 @@ function App() {
           <Route path="/settings" element={<Layout><Settings /></Layout>} />
           <Route path="/tasks" element={<Layout><Tasks /></Layout>} />
           <Route path="/test-prep" element={<Layout><TestPrep /></Layout>} />
-          <Route path="/resume" element={<Layout><Resume /></Layout>} />
+          <Route path="/resume" element={<Layout><ResumeHome /></Layout>} />
         </Routes>
       </BrowserRouter>
     </>
