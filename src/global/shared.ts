@@ -23,7 +23,6 @@ export type EditResumeProps = {
   dispatch: (action: Action) => void
   email: string
   postData: (method: 'POST' | 'GET' | 'PUT' | 'DELETE', body: unknown) => Promise<void>
-  setEditResume: (value: React.SetStateAction<Resume>) => void
   resume: Resume
 }
 
@@ -98,33 +97,9 @@ export const setNotes = async ({
   }
 }
 
-export const setResume = async ({
-  action,
-  dispatch,
-  email,
-  resume,
-  postData,
-  setEditResume,
-}: EditResumeProps) => {
+export const setResume = async ({ action, dispatch, email, resume, postData }: EditResumeProps) => {
   dispatch({ type: 'SET_RESUME', resume })
   await postData('PUT', { email, resume, form: 'update-resume' })
-  if (action === 'delete' || action === 'add') {
-    setEditResume({
-      coverLetter: {
-        body: '',
-        companyName: '',
-        greeting: '',
-        position: '',
-      },
-      certifications: [],
-      education: [],
-      experience: [],
-      id: '',
-      summary: '',
-      skills: [],
-      lastUpdate: '',
-    })
-  }
 }
 
 export const setTasks = async ({

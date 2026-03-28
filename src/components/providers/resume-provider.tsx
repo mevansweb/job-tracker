@@ -18,7 +18,8 @@ type ResumeAction =
 interface ResumeContextType {
   authState: AuthState
   dispatch: React.ActionDispatch<[action: ResumeAction]>
-  dispatchAPI: React.ActionDispatch<[action: Action]>
+  dispatchAuth: React.ActionDispatch<[action: Action]>
+  postData: (method: 'POST' | 'GET' | 'PUT' | 'DELETE', body: unknown) => Promise<void>
   state: State
 }
 
@@ -105,12 +106,12 @@ export const useResume = (): ResumeContextType => {
 }
 
 export const ResumeProvider = ({ children }: { children: ReactNode }) => {
-  const { state: authState, dispatch: dispatchAPI } = useAuth()
+  const { state: authState, dispatch: dispatchAuth, postData } = useAuth()
   const { resume } = authState
   const [state, dispatch] = useReducer(reducer, resume ?? initialResume)
 
   return (
-    <ResumeContext.Provider value={{ authState, dispatch, dispatchAPI, state }}>
+    <ResumeContext.Provider value={{ authState, dispatch, dispatchAuth, postData, state }}>
       {children}
     </ResumeContext.Provider>
   )

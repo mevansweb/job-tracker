@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 
-import { setTasks } from './shared'
+import { setTasks } from '../../global/shared'
 import { useAuth } from '../providers/hooks'
 import { newTask } from '../../global/template'
 import { localStorageKey } from '../providers/const'

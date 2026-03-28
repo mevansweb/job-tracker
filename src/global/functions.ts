@@ -94,9 +94,39 @@ export function getProgress(status: Status) {
 
 type UnknownWithId = { id: string } & Record<string, unknown>
 
-export function spliceArray(item: UnknownWithId, arr: UnknownWithId[]) {
+export function spliceOrConcatArray(item: UnknownWithId, arr: UnknownWithId[]) {
   const pos = arr.map((e) => e.id).indexOf(item.id)
-  const arrCopy = arr.filter((j) => j.id !== item.id)
-  arrCopy.splice(pos, 0, item)
+  let arrCopy = arr
+  if (pos === -1) {
+    arrCopy = arr.concat(item)
+  } else {
+    arrCopy = arr.filter((j) => j.id !== item.id)
+    arrCopy.splice(pos, 0, item)
+  }
   return arrCopy
+}
+
+export function getIsEmpty(data: string | object) {
+  if (typeof data === 'string' && !data) {
+    return true
+  }
+  if (typeof data === 'object') {
+    if (Array.isArray(data) && data.length === 0) {
+      return true
+    } else {
+      return Object.values(data).every((value) => {
+        if (value === null || value === undefined || value === '') {
+          return true
+        }
+        if (Array.isArray(value) && value.length === 0) {
+          return true
+        }
+        if (typeof value === 'object' && Object.keys(value).length === 0) {
+          return true
+        }
+        return false
+      })
+    }
+  }
+  return false
 }
