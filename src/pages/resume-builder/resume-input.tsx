@@ -12,18 +12,20 @@ import type { Mode, TextUpdateEvent } from './types'
 type ResumeInputProps = {
   className?: string
   data: string
+  id?: string
   inputType: 'input' | 'textarea' | 'calendar'
   label: string
   name: string
   parentMode?: Mode
   placeholder: string
-  update?: (event: TextUpdateEvent) => void
-  updateDate?: (d: Date, name: string) => void
+  update?: (event: TextUpdateEvent, id?: string) => void
+  updateDate?: (d: Date, name: string, id?: string) => void
   save?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
-  saveById?:  (id?: string | undefined) => void
+  saveById?: (id?: string | undefined) => void
+  warning?: boolean
 }
 
-export const ResumeInput = ({ className = '', data, inputType, label, name, parentMode, placeholder, save, update, updateDate }: ResumeInputProps) => {
+export const ResumeInput = ({ className = '', data, id, inputType, label, name, parentMode, placeholder, save, update, updateDate, warning }: ResumeInputProps) => {
   const [mode, setMode] = useState<Mode>(parentMode)
   const isEmpty = useMemo(() => getIsEmpty(data), [data])
   const [calendarOpen, setCalendarOpen] = useState(false)
@@ -31,25 +33,28 @@ export const ResumeInput = ({ className = '', data, inputType, label, name, pare
   return (
     <Field className={className}>
       <FieldLabel htmlFor={name}>{label}</FieldLabel>
-        {mode === 'edit' || mode === 'add' || isEmpty ? (
-          <div className="flex gap-4">
+      {(mode === 'edit' || mode === 'add' || isEmpty) && inputType !== 'calendar' ? (
+        <div className="flex gap-4">
           {inputType === 'input' ? (
             <Input
+              aria-invalid={warning}
+              defaultValue={data}
               id={name}
               name={name}
-              onChange={update}
+              onChange={(event) => id && update ? update(event, id) : update ? update(event) : null}
               placeholder={placeholder}
-              defaultValue={data}
             />
           ) : inputType === 'textarea' ? (
             <Textarea
+              aria-invalid={warning}
+              defaultValue={data}
               id={name}
               name={name}
-              onChange={update}
+              onChange={(event) => id && update ? update(event, id) : update ? update(event) : null}
               placeholder={placeholder}
-              defaultValue={data}
             />
           ) : null}
+
           {['textarea', 'input'].includes(inputType) ? (
             <div className="flex flex-col gap-4 w-30">
               {data.length > 0 ? (
@@ -60,8 +65,8 @@ export const ResumeInput = ({ className = '', data, inputType, label, name, pare
                 >
                   Cancel
                 </Button>
-              ) : null }
-              
+              ) : null}
+                
               {save ? (
                 <Button
                   className="w-30"
@@ -69,49 +74,52 @@ export const ResumeInput = ({ className = '', data, inputType, label, name, pare
                   variant="outline"
                 >
                   Save
-                </Button> 
-              ) : null }
-              </div>
-          ) : null }
-          {inputType === 'calendar' && updateDate ? (
-            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="outline" id={name} className="w-23.75 flex text-muted-foreground font-normal justify-between">
-                  {data ? new Date(data).toLocaleDateString() : "From Date"}
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={data ? new Date(data) : new Date()}
-                  captionLayout="dropdown"
-                  defaultMonth={data ? new Date(data) : new Date()}
-                  onSelect={(d) => {
-                    if (d) {
-                      updateDate(d, name)
-                      setCalendarOpen(false)
-                    } 
-                  }}
-                  required={true}
-                />
-              </PopoverContent>
-            </Popover>
+              ) : null}
+            </div>
           ) : null}
-          </div>
-        ) : (
-        <>
-          <div className="flex justify-between">
-            {data}
+        </div>
+      ) : null}
+      {inputType === 'calendar' && updateDate ? (
+        <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+          <PopoverTrigger asChild>
             <Button
-              className="w-30"
-              onClick={() => setMode('edit')}
+              aria-invalid={warning}
+              className={`w-23.75 flex text-muted-foreground font-normal justify-between`}
+              id={name}
               variant="outline"
             >
-              Edit
-            </Button>  
-          </div>
-         </>
-        )}
+              {data ? new Date(data).toLocaleDateString() : "From Date"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+            <Calendar
+              captionLayout="dropdown"
+              defaultMonth={data ? new Date(data) : new Date()}
+              mode="single"
+              onSelect={(d) => {
+                if (d) {
+                  updateDate(d, name, id)
+                  setCalendarOpen(false)
+                } 
+              }}
+              required={true}
+              selected={data ? new Date(data) : new Date()}
+            />
+          </PopoverContent>
+        </Popover>
+      ) : mode !== 'add' && (inputType === 'input' || inputType === 'textarea') ? (
+        <div className="flex justify-between">
+          {data}
+          <Button
+            className="w-30"
+            onClick={() => setMode('edit')}
+            variant="outline"
+          >
+            Edit
+          </Button>  
+        </div>
+      ) : null}
     </Field>
   )
 }

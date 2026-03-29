@@ -1,7 +1,6 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { setResume } from '@/global/shared'
-import { getIsEmpty } from '@/global/functions'
 import { Button } from '@/components/ui/button'
 import type { Employer } from '@/global/types'
 import { spliceOrConcatArray } from '@/global/functions'
@@ -12,30 +11,45 @@ import { useResume } from '@/components/providers/resume-provider'
 
 import type { Mode, TextUpdateEvent } from './types'
 
-export const ResumeExperience = () => {
-  let newId = crypto.randomUUID()
-  const { authState, dispatch, dispatchAuth, postData, state } = useResume()
-  const { experience } = state
-  //console.log('authState resume', authState)
-  //console.log('experience', experience)
-  const [employer, setEmployer] = useState<Employer>({ company: '', dateFrom: '', dateTo: '', description: '', id: newId, location: '',  position: ''})
-  
-  const [editing, setEditing] = useState<{ id: string;  mode: Mode}>({ id: newId, mode: undefined})
-  const isEmpty = useMemo(() => getIsEmpty(experience), [experience])
-  const update = useCallback((event: TextUpdateEvent) => {
-    const { name, value } = event.target
-    setEmployer((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }))
-  }, [setEmployer])
+const editedEmployer = (experience: Employer[], employer: Employer, id: string) => {
+  let employerToUpdate = employer
+  if (id && id !== employer.id) {
+    const found = experience.find((exp) => exp.id === id)
+    if (found) {
+      employerToUpdate = found
+    }
+  }
+  return employerToUpdate
+}
 
-  const updateDate = useCallback((d: Date, name: string) => {
-    setEmployer((prevData) => ({
-      ...prevData,
+export const ResumeExperience = () => {
+  const[newId, setNewId] = useState<string>(crypto.randomUUID())
+  const { authState, dispatch, dispatchAuth, postData, state } = useResume()
+  const experience = state.experience.length > 0 ? state.experience : authState?.resume?.experience && authState?.resume?.experience.length > 0 ? authState.resume.experience : []
+  const [employer, setEmployer] = useState<Employer>({ company: '', dateFrom: '', dateTo: '', description: '', id: newId, location: '',  position: ''})
+  const [editing, setEditing] = useState<{ id: string;  mode: Mode}>({ id: newId, mode: undefined})
+
+  const update = useCallback((event: TextUpdateEvent, id?: string) => {
+    console.log('update experience', event.target.name, event.target.value, id)
+    const { name, value } = event.target
+    const edited = editedEmployer(experience, employer, id || '')
+    console.log('edited', edited)
+    console.log(editing)
+    setEmployer({
+      ...edited,
+      [name]: value,
+    })
+    //setEditing({ id: id || employer.id, mode: 'edit' }) 
+  }, [employer, setEmployer])
+
+  const updateDate = useCallback(async (d: Date, name: string, id?: string) => {
+    let edited = editedEmployer(experience, employer, id || '')
+    edited = {
+      ...edited,
       [name]: d.toLocaleDateString(),
-    }))
-  }, [setEmployer])
+    }
+    setEmployer({...edited })
+  }, [employer, experience, setEmployer])
 
   const saveById = useCallback(async (id?: string) => {
     const arr = spliceOrConcatArray(employer, experience)
@@ -43,140 +57,157 @@ export const ResumeExperience = () => {
     dispatchAuth({ type: 'SET_RESUME', resume: { ...state, experience: arr as Employer[] } })
     await setResume({ action: 'edit', dispatch: dispatchAuth, email: authState.email, resume: {...state, experience: arr as Employer[]}, postData })
     localStorage.setItem(localStorageKey, JSON.stringify({ ...authState, resume: { ...state, experience: arr as Employer[] } }))
-    // reset to empty
-    newId = crypto.randomUUID()
-    setEditing({ id: newId, mode: undefined })
-    setEmployer({ company: '', dateFrom: '', dateTo: '', description: '', id: newId, location: '',  position: ''})
+    setEditing({ id: id || employer.id, mode: 'view' })
   }, [dispatchAuth, state])
-    
+
+  const addNew = useCallback(() => {
+    const nextId = crypto.randomUUID()
+    setNewId(nextId)
+    setEditing({ id: nextId, mode: 'add' })
+    setEmployer({ company: '', dateFrom: '', dateTo: '', description: '', id: nextId, location: '', position: '' })
+  }, [employer, setEditing, setEmployer])
+
+  const deleteById = useCallback(async (id: string) => {
+    const arr = experience.filter((item) => item.id !== id)
+    dispatch({ type: 'SET_EXPERIENCE', experience: arr as Employer[] })
+    dispatchAuth({ type: 'SET_RESUME', resume: { ...state, experience: arr as Employer[] } })
+    await setResume({ action: 'edit', dispatch: dispatchAuth, email: authState.email, resume: {...state, experience: arr as Employer[]}, postData })
+    localStorage.setItem(localStorageKey, JSON.stringify({ ...authState, resume: { ...state, experience: arr as Employer[] } }))
+  }, [dispatchAuth, state])
 
    return (
      <div className="flex flex-col gap-4">
        <FieldLegend className="font-bold border-b pb-2">Work History</FieldLegend>
-       {experience.map((item) => (
-          <div key={`job-history-section-${item.id}`}>
+       {experience.map((item) => {
+         return (
+           <div key={`job-history-section-${item.id}`}>
+             <ResumeInput
+               data={employer.id === item.id ? employer.position : item.position}
+               inputType="input"
+               key={`job-title-${item.id}`}
+               label="Job Title"
+               name="position"
+               parentMode={editing.id === item.id ? editing.mode : undefined}
+               placeholder="Job title"
+               update={(event) => update(event, item.id)}
+               warning={employer.id === item.id ? employer.position.length > 0 : item.position.length > 0 ? false : true}
+             />
+             <ResumeInput
+               data={employer.id === item.id ? employer.company : item.company}
+               inputType="input"
+               key={`job-company-${item.id}`}
+               label="Employer"
+               name="company"
+               parentMode={editing.id === item.id ? editing.mode : undefined}
+               placeholder="Employer"
+               update={(event) => update(event, item.id)}
+               warning={employer.id === item.id ? employer.company.length > 0 : item.company.length > 0 ? false : true}
+             />
+             <ResumeInput
+               data={employer.id === item.id ? employer.description : item.description}
+               inputType="textarea"
+               key={`job-desc-${item.id}`}
+               label="Job Description"
+               name="description"
+               parentMode={editing.id === item.id ? editing.mode : undefined}
+               placeholder="Job Description"
+               update={(event) => update(event, item.id)}
+             />
+             <div className="flex justify-start gap-4 mt-8">
+               <ResumeInput
+                 className="w-40"
+                 data={employer.id === item.id ? employer.dateFrom : item.dateFrom}
+                 id={item.id}
+                 inputType="calendar"
+                 key={`job-dateFrom-${item.id}`}
+                 label="Start Date"
+                 name="dateFrom"
+                 parentMode={editing.id === item.id ? editing.mode : undefined}
+                 placeholder="End Date"
+                 updateDate={(d) => updateDate(d, 'dateFrom', item.id)}
+                 warning={employer.id === item.id ? employer.dateFrom.length > 0 : item.dateFrom.length > 0 ? false : true}
+               />
+               <ResumeInput
+                 className="w-40"
+                 data={employer.id === item.id ? employer.dateTo : item.dateTo}
+                 id={item.id}
+                 inputType="calendar"
+                 key={`job-dateTo-${item.id}`}
+                 label="End Date"
+                 name="dateTo"
+                 parentMode={editing.id === item.id ? editing.mode : undefined}
+                 placeholder="End Date"
+                 updateDate={(d) => updateDate(d, 'dateTo', item.id)}
+                 warning={employer.id === item.id ? employer.dateTo.length > 0 : item.dateTo.length > 0 ? false : true}
+               />
+             </div>
+             <div className="flex gap-4 justify-center mt-4">
+               {editing.mode !== 'add' ? (
+                 <Button
+                   className="w-40"
+                   name="add-new-work-experience"
+                   onClick={addNew}
+                   variant="outline"
+                 >
+                   Add New
+                 </Button>
+               ) : null}
+              <Button
+                 className="w-40"
+                 name="delete-experience"
+                 onClick={() => deleteById(item.id)}
+                 variant="outline"
+               >
+                 Delete
+               </Button>
+               <Button
+                 className="w-40"
+                 name="save-experience"
+                 onClick={() => saveById(item.id)}
+                 variant="outline"
+               >
+                 Save
+               </Button>
+             </div>
+           </div>
+         )
+       })}
+       
+       {editing.mode === 'add' ? (
+         <div className={experience.length > 0 ? 'border-t pt-8 flex flex-col gap-4' : ''}>
             <ResumeInput
-              data={item.position}
+              data={employer.position}
               inputType="input"
-              key={`job-title-${item.id}`}
+              key={`job-experience-${employer.id}`}
               label="Job Title"
               name="position"
-              parentMode={editing.id === item.id ? editing.mode : undefined}
+              parentMode="add"
               placeholder="Job title"
-              update={update}
+              update={(event) => update(event, employer.id)}
             />
-            <ResumeInput
-              data={item.company}
+            <ResumeInput  
+              data={employer.company}
               inputType="input"
-              key={`job-company-${item.id}`}
+              key={`job-company-${employer.id}`}
               label="Employer"
               name="company"
-              parentMode={editing.id === item.id ? editing.mode : undefined}
+              parentMode="add"
               placeholder="Employer"
-              update={update}
+              update={(event) => update(event, employer.id)}
             />
             <ResumeInput
-              data={item.description}
+              data={employer.description}
               inputType="textarea"
-              key={`job-desc-${item.id}`}
+              key={`job-desc-${employer.id}`}
               label="Job Description"
               name="description"
-              parentMode={editing.id === item.id ? editing.mode : undefined}
+              parentMode="add"
               placeholder="Job Description"
-              update={update}
+              update={(event) => update(event, employer.id)}
             />
-            <div className="flex gap-4">
-              <ResumeInput
-                data={item.dateFrom}
-                inputType="calendar"
-                key={`job-dateFrom-${item.id}`}
-                label="Start Date"
-                name="dateFrom"
-                parentMode={editing.id === item.id ? editing.mode : undefined}
-                placeholder="End Date"
-                updateDate={updateDate}
-              />
-              <ResumeInput
-                data={item.dateTo}
-                inputType="calendar"
-                key={`job-dateTo-${item.id}`}
-                label="End Date"
-                name="dateTo"
-                parentMode={editing.id === item.id ? editing.mode : undefined}
-                placeholder="End Date"
-                updateDate={updateDate}
-                />
-           </div>
-           <div className="flex gap-4 justify-end mt-4">
-            {/* <Button
-              className="w-50"
-              name="edit-experience"
-              onClick={() => {
-                setEditing({ id: item.id, mode: 'edit' })
-                setEmployer(item)
-              }}
-              variant="outline"
-            >
-              Edit
-            </Button> */}
-            <Button
-              className="w-50"
-              name="save-experience"
-              onClick={() => saveById(item.id)}
-              variant="outline"
-            >
-              Save
-             </Button>
-            </div>
-          </div>
-       ))}
-       {!isEmpty ? (
-        <Button
-          className="w-50"
-          name="add-new-work-experience"
-           onClick={() => {
-            setEditing({ id: crypto.randomUUID(), mode: 'add'})
-          }}
-          variant="outline"
-        >
-          Add New
-        </Button>
-       ) : null }
-       
-       {isEmpty || editing.mode === 'add' ? (
-         <>
-         <ResumeInput
-            data={employer.position}
-            inputType="input"
-            key={`job-experience-${newId}`}
-            label="Job Title"
-            name="position"
-            parentMode="add"
-            placeholder="Job title"
-            update={update}
-           />
-          <ResumeInput  
-            data={employer.company}
-            inputType="input"
-            key={`job-company-${newId}`}
-            label="Employer"
-            name="company"
-            parentMode="add"
-            placeholder="Employer"
-            update={update}
-           />
-          <ResumeInput
-            data={employer.description}
-            inputType="textarea"
-            key={`job-desc-${newId}`}
-            label="Job Description"
-            name="description"
-            parentMode="add"
-            placeholder="Job Description"
-            update={update}
-           />
            <div className="flex gap-4">
              <ResumeInput
+                className="w-40"
                 data={employer.dateFrom}
                 inputType="calendar"
                 key={`job-dateFrom-empty`}
@@ -184,9 +215,10 @@ export const ResumeExperience = () => {
                 name="dateFrom"
                 parentMode="add"
                 placeholder="End Date"
-                updateDate={updateDate}
+                updateDate={(d) => updateDate(d, 'dateFrom', employer.id)}
               />
-              <ResumeInput
+             <ResumeInput
+                className="w-40"
                 data={employer.dateTo}
                 inputType="calendar"
                 key={`job-dateTo-empty`}
@@ -194,12 +226,12 @@ export const ResumeExperience = () => {
                 name="dateTo"
                 parentMode="add"
                 placeholder="End Date"
-                updateDate={updateDate}
+                updateDate={(d) => updateDate(d, 'dateTo', employer.id)}
               />
            </div>
-           <div className="flex justify-end">
+           <div className="flex justify-center mt-4">
              <Button
-                className="w-50"
+                className="w-40"
                 name="save-new-experience"
                 onClick={() => saveById(employer.id)}
                 variant="outline"
@@ -207,7 +239,7 @@ export const ResumeExperience = () => {
                 Save
               </Button>
            </div>
-        </>
+        </div>
        ) : null}
     </div>
   )

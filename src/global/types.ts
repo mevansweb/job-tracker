@@ -14,6 +14,7 @@ export type ApiResult = {
   _id: string
   jobs?: Job[]
   notes?: Note[]
+  resume?: Resume
   salt: string
   settings?: Settings
   tasks?: Task[]
@@ -177,14 +178,14 @@ export type Resume = {
   education: Education[]
   experience: Employer[]
   id: string
+  lastUpdate: string
   summary: string
   skills: Skill[]
-  lastUpdate: string
 }
 
 export type Settings = {
-  font: string
   backgroundColor: string
+  font: string
   sidebarColor: string
   theme: string
 }

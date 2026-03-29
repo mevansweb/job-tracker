@@ -6,7 +6,7 @@ import { ResumeCoverLetter } from './resume-coverletter'
 import { ResumeExperience } from './resume-experience'
 import Header from '@/components/header'
 import { setResume } from '@/global/shared'
-import { localStorageKey } from '@/components/providers/const'
+import { emptyState, localStorageKey } from '@/components/providers/const'
 import { useResume } from '@/components/providers/resume-provider'
 import { ResumeInput } from '@/pages/resume-builder/resume-input'
 import { FieldDescription, FieldGroup, FieldLegend, FieldSet } from '@/components/ui/field'
@@ -19,8 +19,10 @@ const ResumeBuilder = () => {
   useEffect(() => {
     if (authState.resume === undefined && !isEqual) {
       dispatchAuth({ type: 'SET_RESUME', resume: {...state}})
+    } else if (authState.resume && equal(emptyState, state)) {
+      dispatch({ type: 'SET_ALL_DATA', ...authState.resume })
     }
-  }, [authState.resume, isEqual])
+  }, [authState.resume, emptyState, isEqual, state])
 
   const save = useCallback(async () => {
     dispatchAuth({ type: 'SET_RESUME', resume: { ...state } })

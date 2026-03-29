@@ -1,8 +1,9 @@
 import { type ReactNode } from 'react'
 
-import { type ApiResult } from '../../global/types'
+import type { ApiResult, Resume } from '../../global/types'
 import { type Action, type State } from '../providers/auth-provider'
 
+export type ResumeState = Resume
 
 export interface AuthContextType {
   data: ApiResult | null
@@ -10,8 +11,8 @@ export interface AuthContextType {
   error: string | null
   existing: ApiResult | null
   loading: boolean
-  logout: ( email: string ) => void
-  postData: (method: "POST" | "GET" | "PUT" | "DELETE", body: unknown) => Promise<void>
+  logout: (email: string) => void
+  postData: (method: 'POST' | 'GET' | 'PUT' | 'DELETE', body: unknown) => Promise<void>
   state: State
 }
 

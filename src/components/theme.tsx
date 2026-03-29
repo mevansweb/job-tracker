@@ -20,7 +20,20 @@ export default function Theme({ children }: { children: React.ReactNode }) {
     useEffect(() => {
       if (existing && existing.id && state.id === '' && data === null) {
           const user = existing as ApiResult
-          dispatch({ type: 'SET_ALL_DATA', email: user.email, error: '', id: user.id ? user.id : user._id ? user._id : '', loggedIn: true, password: user.hashedPassword, jobs: user?.jobs || [], notes: user?.notes || [], tasks: user?.tasks || [], settings: user.settings, view: 'sign-in' })
+        dispatch(
+          {
+            type: 'SET_ALL_DATA',
+            email: user.email, error: '',
+            id: user.id ? user.id : user._id ? user._id : '',
+            loggedIn: true,
+            jobs: user?.jobs || [],
+            notes: user?.notes || [],
+            password: user.hashedPassword,
+            resume: user.resume,
+            settings: user.settings,
+            tasks: user?.tasks || [],
+            view: 'sign-in'
+          })
       }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])  

@@ -130,3 +130,48 @@ export function getIsEmpty(data: string | object) {
   }
   return false
 }
+
+export function getEmptyRequiredFields<T extends Record<string, any>>(
+  obj: T,
+  requiredFields: (keyof T)[]
+): (keyof T)[] {
+  const emptyFields: (keyof T)[] = []
+
+  for (const field of requiredFields) {
+    const value = obj[field]
+
+    // Check for null, empty string, or empty array
+    if (
+      value === null ||
+      (typeof value === 'string' && value.trim() === '') ||
+      (Array.isArray(value) && value.length === 0)
+    ) {
+      emptyFields.push(field)
+    }
+  }
+
+  return emptyFields
+}
+
+export function arePropsEmpty<T extends object>(obj: T, keys: (keyof T)[]): boolean {
+  if (obj == null || typeof obj !== 'object') {
+    throw new Error('Invalid object provided.')
+  }
+
+  return keys.every((key) => {
+    const value = obj[key]
+
+    // Empty string check
+    if (typeof value === 'string') {
+      return value.trim() === ''
+    }
+
+    // Empty array check
+    if (Array.isArray(value)) {
+      return value.length === 0
+    }
+
+    // If property is neither string nor array, treat as not empty
+    return false
+  })
+}
