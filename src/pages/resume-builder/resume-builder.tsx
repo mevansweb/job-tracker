@@ -44,9 +44,10 @@ const ResumeBuilder = () => {
             <FieldDescription>Enter your resume information here so you can easily copy and paste to your applications!</FieldDescription>
             <FieldGroup>
               <ResumeInput
+                className="mt-0!"
                 data={summary}
-                label="Summary"
                 inputType="textarea"
+                label="Summary"
                 name="summary"
                 parentMode="view"
                 placeholder="Professional Summary"

@@ -1,5 +1,7 @@
 import { useCallback, useState } from 'react'
 
+import equal from 'fast-deep-equal/es6/react'
+
 import { setResume } from '@/global/shared'
 import { Button } from '@/components/ui/button'
 import type { Employer } from '@/global/types'
@@ -22,24 +24,33 @@ const editedEmployer = (experience: Employer[], employer: Employer, id: string) 
   return employerToUpdate
 }
 
+function disableSave(localCopy: Employer[], apiCopy: Employer[], id: string) {
+  const local = localCopy.find((item) => item.id === id)
+  const original = apiCopy.find((item) => item.id === id)
+  console.log('local', local)
+  console.log('original', original)
+  console.log('is equal', equal(local, original))
+  if (!original || !local) return false // should not disable if either copy is missing, user may have added or deleted an experience and should be allowed to save
+  return equal(local, original)
+}
+
 export const ResumeExperience = () => {
   const[newId, setNewId] = useState<string>(crypto.randomUUID())
   const { authState, dispatch, dispatchAuth, postData, state } = useResume()
   const experience = state.experience.length > 0 ? state.experience : authState?.resume?.experience && authState?.resume?.experience.length > 0 ? authState.resume.experience : []
   const [employer, setEmployer] = useState<Employer>({ company: '', dateFrom: '', dateTo: '', description: '', id: newId, location: '',  position: ''})
-  const [editing, setEditing] = useState<{ id: string;  mode: Mode}>({ id: newId, mode: undefined})
+  const [editing, setEditing] = useState<{ id: string; mode: Mode }>({ id: newId, mode: undefined })
 
   const update = useCallback((event: TextUpdateEvent, id?: string) => {
-    console.log('update experience', event.target.name, event.target.value, id)
     const { name, value } = event.target
     const edited = editedEmployer(experience, employer, id || '')
-    console.log('edited', edited)
-    console.log(editing)
-    setEmployer({
+    const updated = {
       ...edited,
       [name]: value,
-    })
-    //setEditing({ id: id || employer.id, mode: 'edit' }) 
+    }
+    setEmployer(updated)
+    const arr = spliceOrConcatArray(updated, experience)
+    dispatch({ type: 'SET_EXPERIENCE', experience: arr as Employer[] })
   }, [employer, setEmployer])
 
   const updateDate = useCallback(async (d: Date, name: string, id?: string) => {
@@ -75,13 +86,17 @@ export const ResumeExperience = () => {
     localStorage.setItem(localStorageKey, JSON.stringify({ ...authState, resume: { ...state, experience: arr as Employer[] } }))
   }, [dispatchAuth, state])
 
+  console.log('state experience', experience)
+  console.log('authState experience', authState?.resume?.experience)
+
    return (
      <div className="flex flex-col gap-4">
        <FieldLegend className="font-bold border-b pb-2">Work History</FieldLegend>
-       {experience.map((item) => {
+       {experience.map((item, i) => {
          return (
            <div key={`job-history-section-${item.id}`}>
              <ResumeInput
+               className={i === 0 ? 'mt-0!' : ''}
                data={employer.id === item.id ? employer.position : item.position}
                inputType="input"
                key={`job-title-${item.id}`}
@@ -90,7 +105,7 @@ export const ResumeExperience = () => {
                parentMode={editing.id === item.id ? editing.mode : undefined}
                placeholder="Job title"
                update={(event) => update(event, item.id)}
-               warning={employer.id === item.id ? employer.position.length > 0 : item.position.length > 0 ? false : true}
+               warning={employer.id === item.id ? employer.position.length === 0 : item.position.length === 0 ? false : true}
              />
              <ResumeInput
                data={employer.id === item.id ? employer.company : item.company}
@@ -101,7 +116,7 @@ export const ResumeExperience = () => {
                parentMode={editing.id === item.id ? editing.mode : undefined}
                placeholder="Employer"
                update={(event) => update(event, item.id)}
-               warning={employer.id === item.id ? employer.company.length > 0 : item.company.length > 0 ? false : true}
+               warning={employer.id === item.id ? employer.company.length === 0 : item.company.length === 0 ? true : false}
              />
              <ResumeInput
                data={employer.id === item.id ? employer.description : item.description}
@@ -113,7 +128,7 @@ export const ResumeExperience = () => {
                placeholder="Job Description"
                update={(event) => update(event, item.id)}
              />
-             <div className="flex justify-start gap-4 mt-8">
+             <div className="flex justify-start gap-4">
                <ResumeInput
                  className="w-40"
                  data={employer.id === item.id ? employer.dateFrom : item.dateFrom}
@@ -125,7 +140,7 @@ export const ResumeExperience = () => {
                  parentMode={editing.id === item.id ? editing.mode : undefined}
                  placeholder="End Date"
                  updateDate={(d) => updateDate(d, 'dateFrom', item.id)}
-                 warning={employer.id === item.id ? employer.dateFrom.length > 0 : item.dateFrom.length > 0 ? false : true}
+                 warning={employer.id === item.id ? employer.dateFrom.length === 0 : item.dateFrom.length === 0 ? true : false}
                />
                <ResumeInput
                  className="w-40"
@@ -138,20 +153,10 @@ export const ResumeExperience = () => {
                  parentMode={editing.id === item.id ? editing.mode : undefined}
                  placeholder="End Date"
                  updateDate={(d) => updateDate(d, 'dateTo', item.id)}
-                 warning={employer.id === item.id ? employer.dateTo.length > 0 : item.dateTo.length > 0 ? false : true}
+                 warning={employer.id === item.id ? employer.dateTo.length === 0 : item.dateTo.length === 0 ? true : false}
                />
              </div>
-             <div className="flex gap-4 justify-center mt-4">
-               {editing.mode !== 'add' ? (
-                 <Button
-                   className="w-40"
-                   name="add-new-work-experience"
-                   onClick={addNew}
-                   variant="outline"
-                 >
-                   Add New
-                 </Button>
-               ) : null}
+             <div className="flex gap-4 justify-end mt-4 border-b pb-4">
               <Button
                  className="w-40"
                  name="delete-experience"
@@ -162,6 +167,7 @@ export const ResumeExperience = () => {
                </Button>
                <Button
                  className="w-40"
+                 disabled={disableSave(state.experience, authState?.resume?.experience || [], item.id)}
                  name="save-experience"
                  onClick={() => saveById(item.id)}
                  variant="outline"
@@ -172,6 +178,16 @@ export const ResumeExperience = () => {
            </div>
          )
        })}
+       {editing.mode !== 'add' ? (
+          <Button
+            className="w-40"
+            name="add-new-work-experience"
+            onClick={addNew}
+            variant="outline"
+          >
+            Add New
+         </Button>
+        ) : null}
        
        {editing.mode === 'add' ? (
          <div className={experience.length > 0 ? 'border-t pt-8 flex flex-col gap-4' : ''}>
@@ -240,7 +256,7 @@ export const ResumeExperience = () => {
               </Button>
            </div>
         </div>
-       ) : null}
+       ) : null }
     </div>
   )
 }
