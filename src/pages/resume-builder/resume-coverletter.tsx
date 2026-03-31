@@ -32,6 +32,20 @@ export const ResumeCoverLetter = () => {
     dispatch({ type: 'SET_COVERLETTER', coverLetter: { ...coverLetter, [name]: value }})
   }, [])
 
+  const setButtonAction = useCallback((mode: Mode, _id: string, value?: string) => {
+    switch (mode) {
+      case 'copy':
+        navigator.clipboard.writeText(value || '')
+        break
+      case 'save':
+        dispatch({ type: 'SET_COVERLETTER', coverLetter })
+        dispatchAuth({ type: 'SET_RESUME', resume: { ...state, coverLetter } })
+        break
+      default:
+        break
+    }
+  }, [dispatch, dispatchAuth, state, coverLetter])
+  
   return (
     <>
       <FieldLegend className="font-bold border-b pb-2">Cover Letter</FieldLegend>
@@ -40,18 +54,22 @@ export const ResumeCoverLetter = () => {
         <>
           <ResumeInput
             data={position}
+            id={state.id}
             inputType="input"
             label="Job Title"
             name="position"
             placeholder="Job title"
+            setButtonAction={setButtonAction}
             update={update}
           />
           <ResumeInput
             data={companyName}
+            id={state.id}
             label="Company Name"
             name="companyName"
             inputType="input"
             placeholder="Personalize by adding the company name (optional)"
+            setButtonAction={setButtonAction}
             update={update}
           />
           <Field className="my-8" orientation="horizontal">
@@ -67,18 +85,22 @@ export const ResumeCoverLetter = () => {
           </Field>
           <ResumeInput
             data={personalizedGreeting}
+            id={state.id}
             label="Cover Letter Greeting"
             name="greeting"
             inputType="textarea"
             placeholder="Add a greeting"
+            setButtonAction={setButtonAction}
             update={update}
           />
           <ResumeInput
             data={body}
+            id={state.id}
             label="Cover Letter Body"
             name="body"
             inputType="textarea"
             placeholder="Personalize by adding the company name (optional)"
+            setButtonAction={setButtonAction}
             update={update}
           />
           <div className="flex gap-4 justify-end">

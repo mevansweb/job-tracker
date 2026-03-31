@@ -1,9 +1,21 @@
 import { type ReactNode } from 'react'
 
-import type { ApiResult, Resume } from '../../global/types'
-import { type Action, type State } from '../providers/auth-provider'
+import type {
+  ApiResult,
+  Certification,
+  Education,
+  Employer,
+  Resume,
+  Skill,
+} from '../../global/types'
+import type { Action, State } from '../providers/auth-provider'
 
-export type ResumeState = Resume
+export type ResumeState = Resume & {
+  college: Education
+  employer: Employer
+  skill: Skill
+  certification: Certification
+}
 
 export interface AuthContextType {
   data: ApiResult | null

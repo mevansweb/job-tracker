@@ -1,4 +1,4 @@
-export type Mode = 'add' | 'view' | 'edit' | undefined
+export type Mode = 'add' | 'copy' | 'view' | 'edit' | 'save' | 'undo' | undefined
 
 export type TextUpdateEvent =
   | React.ChangeEvent<HTMLInputElement>
