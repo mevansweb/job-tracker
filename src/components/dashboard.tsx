@@ -3,10 +3,8 @@ import { useMemo, useState } from 'react'
 import { JobsTable } from '@/components/data-table/jobs-table'
 import Header from '@/components/header'
 import { useAuth } from '@/components/providers/hooks'
-
-import { type Job, months } from '@/global/types'
-
 import { Button } from '@/components/ui/button'
+import { type Job, months } from '@/global/types'
 
 const groupJobsByMonthAndYear = (jobs: Job[]) => {
   const grouped: { [key: string]: Job[] } = {}

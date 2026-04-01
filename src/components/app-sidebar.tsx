@@ -1,4 +1,3 @@
-import { useAuth } from '@/components/providers/hooks'
 import {
   ClipboardCheck,
   ClipboardList,
@@ -10,8 +9,7 @@ import {
   Settings,
 } from 'lucide-react'
 
-import { getStyles } from '@/global/functions'
-
+import { useAuth } from '@/components/providers/hooks'
 import {
   Sidebar,
   SidebarContent,
@@ -24,6 +22,7 @@ import {
   SidebarMenuItem,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
+import { getStyles } from '@/global/functions'
 
 // Menu items.
 const items = [

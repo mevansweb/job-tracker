@@ -1,25 +1,39 @@
 import { useCallback, useMemo, useState } from 'react'
 
-import equal from 'fast-deep-equal/es6/react'
-import { toast } from 'sonner'
 import { BookCopy } from 'lucide-react'
 
-import { setResume } from '@/global/shared'
+import equal from 'fast-deep-equal/es6/react'
+import { toast } from 'sonner'
+
+import { localStorageKey } from '@/components/providers/const'
+import { useResume } from '@/components/providers/resume-provider'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { FieldLegend } from '@/components/ui/field'
 import { Field, FieldLabel } from '@/components/ui/field'
+import { setResume } from '@/global/shared'
+import type { CoverLetter } from '@/global/types'
 import { ResumeInput } from '@/pages/resume-builder/input'
-import { useResume } from '@/components/providers/resume-provider'
 
 import type { Mode, TextUpdateEvent } from './types'
-import type { CoverLetter } from '@/global/types'
-import { localStorageKey } from '@/components/providers/const'
 
-const getGreeting = ({ companyName, greeting, personalize, position } : { companyName: string, greeting: string, personalize: boolean, position: string }) => {
-  return personalize ? `Dear ${companyName} Hiring Manager,
-I am writing to express my interest in the ${position} position at ${companyName}.` : greeting ?
-        greeting.replace('{position}', position).replace('{company}', companyName) : `Dear Hiring Manager,
+const getGreeting = ({
+  companyName,
+  greeting,
+  personalize,
+  position,
+}: {
+  companyName: string
+  greeting: string
+  personalize: boolean
+  position: string
+}) => {
+  return personalize
+    ? `Dear ${companyName} Hiring Manager,
+I am writing to express my interest in the ${position} position at ${companyName}.`
+    : greeting
+      ? greeting.replace('{position}', position).replace('{company}', companyName)
+      : `Dear Hiring Manager,
 I am writing to express my interest in the ${position} position at your company.`
 }
 
@@ -35,49 +49,69 @@ export const ResumeCoverLetter = () => {
   const { coverLetter } = state
   const { body, companyName, greeting, position } = coverLetter
 
-  const [personalize, setPersonalize] = useState(greeting ? greeting.includes('{company}') && greeting.includes('{position}') : false)
-  const personalizedGreeting = useMemo(() => getGreeting({ companyName, greeting, personalize, position }), [companyName, personalize, position])
+  const [personalize, setPersonalize] = useState(
+    greeting ? greeting.includes('{company}') && greeting.includes('{position}') : false
+  )
+  const personalizedGreeting = useMemo(
+    () => getGreeting({ companyName, greeting, personalize, position }),
+    [companyName, personalize, position]
+  )
   const coverLetterText = useMemo(() => {
     return `${personalizedGreeting}
 
 ${body}`
-   }, [personalizedGreeting, body])
-  
-  const update = useCallback((event: TextUpdateEvent) => {
-    const { name, value } = event.target
-    dispatch({ type: 'SET_COVERLETTER', coverLetter: { ...coverLetter, [name]: value } })
-  }, [dispatch, coverLetter])
+  }, [personalizedGreeting, body])
 
-  const setButtonAction = useCallback((mode: Mode, _id: string, value?: string) => {
-    switch (mode) {
-      case 'copy':
-        navigator.clipboard.writeText(value || '')
-        break
-      case 'save':
-        dispatch({ type: 'SET_COVERLETTER', coverLetter })
-        dispatchAuth({ type: 'SET_RESUME', resume: { ...state, coverLetter } })
-        break
-      default:
-        break
-    }
-  }, [dispatch, dispatchAuth, state, coverLetter])
+  const update = useCallback(
+    (event: TextUpdateEvent) => {
+      const { name, value } = event.target
+      dispatch({ type: 'SET_COVERLETTER', coverLetter: { ...coverLetter, [name]: value } })
+    },
+    [dispatch, coverLetter]
+  )
+
+  const setButtonAction = useCallback(
+    (mode: Mode, _id: string, value?: string) => {
+      switch (mode) {
+        case 'copy':
+          navigator.clipboard.writeText(value || '')
+          break
+        case 'save':
+          dispatch({ type: 'SET_COVERLETTER', coverLetter })
+          dispatchAuth({ type: 'SET_RESUME', resume: { ...state, coverLetter } })
+          break
+        default:
+          break
+      }
+    },
+    [dispatch, dispatchAuth, state, coverLetter]
+  )
 
   const save = useCallback(async () => {
     try {
       dispatch({ type: 'SET_COVERLETTER', coverLetter })
       dispatchAuth({ type: 'SET_RESUME', resume: { ...state, coverLetter } })
-      await setResume({ action: 'edit', dispatch: dispatchAuth, email: authState.email, resume: {...state, coverLetter}, postData })
-      localStorage.setItem(localStorageKey, JSON.stringify({ ...authState, resume: { ...state, coverLetter } }))
+      await setResume({
+        action: 'edit',
+        dispatch: dispatchAuth,
+        email: authState.email,
+        resume: { ...state, coverLetter },
+        postData,
+      })
+      localStorage.setItem(
+        localStorageKey,
+        JSON.stringify({ ...authState, resume: { ...state, coverLetter } })
+      )
       toast.success('Saved successfully')
     } catch (error) {
       toast.error('Failed to save cover letter')
     }
   }, [dispatch, dispatchAuth, state, coverLetter])
-  
+
   return (
     <div className="mt-4">
-      <FieldLegend className="font-bold border-b pb-2">Cover Letter</FieldLegend>
-      <div className="gap-4 flex flex-col">
+      <FieldLegend className="border-b pb-2 font-bold">Cover Letter</FieldLegend>
+      <div className="flex flex-col gap-4">
         <ResumeInput
           data={position}
           id={state.id}
@@ -108,7 +142,7 @@ ${body}`
           placeholder="Example: Dear {company} Hiring Manager, I am writing to express my interest in the {position} position at {company}."
           setButtonAction={setButtonAction}
           update={update}
-          />
+        />
         <Field className="mt-4" orientation="horizontal">
           <Checkbox
             checked={personalize}
@@ -130,18 +164,18 @@ ${body}`
           setButtonAction={setButtonAction}
           update={update}
         />
-        <div className="flex gap-4 justify-end">
+        <div className="flex justify-end gap-4">
           <Button
-            className="w-50 mt-4 cursor-pointer"
+            className="mt-4 w-50 cursor-pointer"
             name="save"
             onClick={() => setButtonAction('copy', state.id, coverLetterText)}
             variant="outline"
           >
-            <BookCopy data-icon="inline-start" className="w-4 h-4 mr-2" />
+            <BookCopy data-icon="inline-start" className="mr-2 h-4 w-4" />
             Copy Letter
           </Button>
           <Button
-            className="w-50 mt-4 cursor-pointer disabled:cursor-not-allowed"
+            className="mt-4 w-50 cursor-pointer disabled:cursor-not-allowed"
             disabled={disableSave(coverLetter, authState.resume?.coverLetter as CoverLetter)}
             name="save"
             onClick={save}

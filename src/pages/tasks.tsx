@@ -3,35 +3,46 @@ import { useCallback, useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 
 import Header from '@/components/header'
+import { TasksModal } from '@/components/modal/tasks-modal'
+import { localStorageKey } from '@/components/providers/const'
+import { useAuth } from '@/components/providers/hooks'
 import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { setTasks } from '@/global/shared'
-import { useAuth } from '@/components/providers/hooks'
 import type { Task, TaskEvent } from '@/global/types'
-import { TasksModal } from '@/components/modal/tasks-modal'
-import { localStorageKey } from '@/components/providers/const'
 
 const Tasks = () => {
   const { data, dispatch, error, existing, loading, postData, state } = useAuth()
   const allTasks = useMemo(() => state.tasks || [], [state.tasks])
 
-  const handleChange = useCallback(async ({ checked, task, subtask } : { checked: boolean, task: Task, subtask: TaskEvent }) => {
-    const saveEmail: string = state.email
-    if (saveEmail) {
-      let updatedTasks = allTasks
-      const updatedSubtask = { ...subtask, done: checked }
-      let pos = task.events.map((e) => e.id).indexOf(subtask.id)
-      const updatedEvents = task.events.filter((j) => j.id !== subtask.id)
-      updatedEvents.splice(pos, 0, updatedSubtask)
-      const updatedTask = { ...task, events: updatedEvents }
-      pos = allTasks.map((e) => e.id).indexOf(task.id)
-      updatedTasks = updatedTasks.filter((j) => j.id !== task.id)
-      updatedTasks.splice(pos, 0, updatedTask)
-      await setTasks({ action: 'edit', dispatch, email: saveEmail, tasks: updatedTasks, postData })
-      localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, tasks: updatedTasks || []}))
-    }
-    
-  }, [dispatch, existing, postData, state.email, allTasks])
+  const handleChange = useCallback(
+    async ({ checked, task, subtask }: { checked: boolean; task: Task; subtask: TaskEvent }) => {
+      const saveEmail: string = state.email
+      if (saveEmail) {
+        let updatedTasks = allTasks
+        const updatedSubtask = { ...subtask, done: checked }
+        let pos = task.events.map((e) => e.id).indexOf(subtask.id)
+        const updatedEvents = task.events.filter((j) => j.id !== subtask.id)
+        updatedEvents.splice(pos, 0, updatedSubtask)
+        const updatedTask = { ...task, events: updatedEvents }
+        pos = allTasks.map((e) => e.id).indexOf(task.id)
+        updatedTasks = updatedTasks.filter((j) => j.id !== task.id)
+        updatedTasks.splice(pos, 0, updatedTask)
+        await setTasks({
+          action: 'edit',
+          dispatch,
+          email: saveEmail,
+          tasks: updatedTasks,
+          postData,
+        })
+        localStorage.setItem(
+          localStorageKey,
+          JSON.stringify({ ...existing, tasks: updatedTasks || [] })
+        )
+      }
+    },
+    [dispatch, existing, postData, state.email, allTasks]
+  )
 
   useEffect(() => {
     if (!loading && data) {
@@ -41,40 +52,45 @@ const Tasks = () => {
     }
   }, [data, error, loading])
 
-  return (  
-    <div className="p-4 flex flex-col">
-      <Header 
-        greeting="Log your job training/career development tasks." 
-        middle="" 
-        title="Tasks"
-      />
-      <div className="mx-auto my-4"><TasksModal /></div>
-      <div className="flex align-center my-4 justify-center w-220 mx-auto">
+  return (
+    <div className="flex flex-col p-4">
+      <Header greeting="Log your job training/career development tasks." middle="" title="Tasks" />
+      <div className="mx-auto my-4">
+        <TasksModal />
+      </div>
+      <div className="align-center mx-auto my-4 flex w-220 justify-center">
         {allTasks && allTasks.length > 0 ? (
           <div className="w-full">
             {allTasks.map((task) => (
               <Card key={`${task.id}-card`} className="mb-4 p-4">
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between">
                   <div className="w-2/3">
                     <h3 className="text-lg font-semibold">{task.description}</h3>
                     <p className="text-sm text-gray-500">Status: {task.status}</p>
                     {task.events && task.events.length > 0 ? (
                       <div className="mt-2">
                         <p className="text-sm font-light italic">Sub-Tasks:</p>
-                        <ul className="list-disc list-inside text-sm light:text-gray-700 dark:text-gray-400">
+                        <ul className="light:text-gray-700 list-inside list-disc text-sm dark:text-gray-400">
                           {task.events.map((event, index) => (
                             <li className="flex justify-between" key={`${task.id}-event-${index}`}>
-                              <div>{event.dueDate ? `${new Date(event.dueDate).toLocaleDateString()}: ` : ''}{event.note}</div>
-                              <Checkbox 
-                                checked={event.done} 
+                              <div>
+                                {event.dueDate
+                                  ? `${new Date(event.dueDate).toLocaleDateString()}: `
+                                  : ''}
+                                {event.note}
+                              </div>
+                              <Checkbox
+                                checked={event.done}
                                 className="ml-4"
-                                onCheckedChange={(checked) => handleChange({checked: checked === true, task, subtask: event})}
+                                onCheckedChange={(checked) =>
+                                  handleChange({ checked: checked === true, task, subtask: event })
+                                }
                               />
                             </li>
                           ))}
                         </ul>
                       </div>
-                    ) : null }
+                    ) : null}
                   </div>
                   <TasksModal key={`${task.id}-modal`} task={task} />
                 </div>
@@ -82,7 +98,9 @@ const Tasks = () => {
             ))}
           </div>
         ) : (
-          <p className="light:text-gray-700 dark:text-gray-400">No tasks found. Use the button above to add your first task.</p>
+          <p className="light:text-gray-700 dark:text-gray-400">
+            No tasks found. Use the button above to add your first task.
+          </p>
         )}
       </div>
     </div>

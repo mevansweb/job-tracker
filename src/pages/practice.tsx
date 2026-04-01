@@ -1,25 +1,26 @@
 import { useCallback, useMemo, useState } from 'react'
 
-import { toast } from 'sonner'
-import equal from 'fast-deep-equal'
 import { CircleChevronLeft, CircleChevronRight, Eye } from 'lucide-react'
 
+import equal from 'fast-deep-equal'
+import { toast } from 'sonner'
+
+import { ErrorMessage } from '@/components/error-message'
 import Header from '@/components/header'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { type PracticeQuestion } from '@/global/types'
-import { ErrorMessage } from '@/components/error-message'
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 
 import { problems1, problems2 } from './practice-questions'
 
 type InputType = string[] | number[] | string | number | object[]
 
-const isNumeric = (str: InputType ) => {
-  if (typeof str !== 'string') return false;
-  if (str.trim() === '') return false;
-  return !isNaN(Number(str)) && isFinite(Number(str));
+const isNumeric = (str: InputType) => {
+  if (typeof str !== 'string') return false
+  if (str.trim() === '') return false
+  return !isNaN(Number(str)) && isFinite(Number(str))
 }
 
 const convertArray = (arr: string[]) => {
@@ -29,7 +30,11 @@ const convertArray = (arr: string[]) => {
   if (isAllNumbers) {
     return arr.map(Number)
   }
-  return arr.map((str: string) => { return str.trim()}).filter((str) => str.length > 0)
+  return arr
+    .map((str: string) => {
+      return str.trim()
+    })
+    .filter((str) => str.length > 0)
 }
 
 const getFunctionOutput = (input: InputType, code: string, secondInput?: InputType) => {
@@ -37,10 +42,10 @@ const getFunctionOutput = (input: InputType, code: string, secondInput?: InputTy
   if (corrected && secondInput) {
     let corrected2 = getProcessedInputs(secondInput)
     const func = new Function('x', 'y', code)
-    return func(corrected, corrected2);
+    return func(corrected, corrected2)
   } else if (corrected) {
     const func = new Function('x', code)
-    return func(corrected);
+    return func(corrected)
   }
 }
 
@@ -48,7 +53,15 @@ const notFinishedTyping = (input: InputType) => {
   return typeof input === 'string' && (input.endsWith(',') || input.endsWith('-'))
 }
 
-const getCorrectAnswer = ({ input, question, secondInput }: { input: InputType, question: PracticeQuestion, secondInput?: InputType }) => {
+const getCorrectAnswer = ({
+  input,
+  question,
+  secondInput,
+}: {
+  input: InputType
+  question: PracticeQuestion
+  secondInput?: InputType
+}) => {
   let expectedStr = question.shouldReturn
   const defaultInput = question.exampleInput
   if (input && !notFinishedTyping(input) && input !== defaultInput) {
@@ -58,7 +71,7 @@ const getCorrectAnswer = ({ input, question, secondInput }: { input: InputType, 
       return getFunctionOutput(input, solutionCode, secondInput ?? '')
     } catch (err) {
       const error = err as Error
-      toast.error("Error: " + error.message);
+      toast.error('Error: ' + error.message)
     }
   }
   // otherwise get correct answer from defaults
@@ -75,7 +88,17 @@ const getCorrectAnswer = ({ input, question, secondInput }: { input: InputType, 
   }
 }
 
-const hasRequiredInputs = ({ code, input, question, secondInput }: { code: string, input: InputType, question: PracticeQuestion, secondInput?: InputType }) => {
+const hasRequiredInputs = ({
+  code,
+  input,
+  question,
+  secondInput,
+}: {
+  code: string
+  input: InputType
+  question: PracticeQuestion
+  secondInput?: InputType
+}) => {
   const missing: string[] = []
   if (!code) {
     missing.push('Your Code')
@@ -89,11 +112,17 @@ const hasRequiredInputs = ({ code, input, question, secondInput }: { code: strin
   return missing
 }
 
-const getIsCorrect = ({ answer, correctAnswer } : { answer: InputType, correctAnswer: InputType}) => {
+const getIsCorrect = ({
+  answer,
+  correctAnswer,
+}: {
+  answer: InputType
+  correctAnswer: InputType
+}) => {
   if (typeof answer === 'object') {
     if (typeof correctAnswer === 'string') {
       const stringified = JSON.stringify(answer).replace(/"/g, "'")
-      return stringified === correctAnswer.replace(/\s+/g, "")
+      return stringified === correctAnswer.replace(/\s+/g, '')
     } else if (typeof correctAnswer === 'object') {
       return equal(correctAnswer, answer)
     }
@@ -126,10 +155,16 @@ const Practice = () => {
   const [answer, setAnswer] = useState<InputType>('')
   const [question, setQuestion] = useState<number>(0)
   const [group, setGroup] = useState(0)
-  const questions = useMemo(() => group === 1 ? problems2 : problems1, [group])
-  
-  const defaultInput = useMemo(() => getProcessedInputs(questions[question].exampleInput), [questions])
-  const defaultSecondInput = useMemo(() => getProcessedInputs(questions[question].secondInput ?? ''), [questions])
+  const questions = useMemo(() => (group === 1 ? problems2 : problems1), [group])
+
+  const defaultInput = useMemo(
+    () => getProcessedInputs(questions[question].exampleInput),
+    [questions]
+  )
+  const defaultSecondInput = useMemo(
+    () => getProcessedInputs(questions[question].secondInput ?? ''),
+    [questions]
+  )
 
   const [input, setInput] = useState<InputType>(defaultInput)
   const [secondInput, setSecondInput] = useState<InputType>(defaultSecondInput)
@@ -142,58 +177,60 @@ const Practice = () => {
     return getIsCorrect({ answer, correctAnswer })
   }, [correctAnswer, answer])
 
-  const processInput = useCallback((name: string, inputText: string) => {
-    const processedInput = getProcessedInputs(inputText)
-    if (name === 'firstInput') {
-      setInput(processedInput)
-    } else if (name === 'secondInput') {
-      setSecondInput(processedInput)
-    }
-  }, [setInput, setSecondInput])
+  const processInput = useCallback(
+    (name: string, inputText: string) => {
+      const processedInput = getProcessedInputs(inputText)
+      if (name === 'firstInput') {
+        setInput(processedInput)
+      } else if (name === 'secondInput') {
+        setSecondInput(processedInput)
+      }
+    },
+    [setInput, setSecondInput]
+  )
 
   const runFunction = useCallback(() => {
     const missing = hasRequiredInputs({ code, input, question: questions[question], secondInput })
     if (missing.length === 0) {
       try {
         const output = getFunctionOutput(input, code, secondInput ?? '')
-        setAnswer(output);
+        setAnswer(output)
       } catch (err) {
         const error = err as Error
-        toast.error("Error: " + error.message);
+        toast.error('Error: ' + error.message)
       }
     } else {
-      toast.error(<ErrorMessage errors={missing} />);
+      toast.error(<ErrorMessage errors={missing} />)
     }
   }, [code, input, secondInput, setAnswer])
 
-  const resetQuestion = useCallback((goTo: number, which: 'number' | 'group') => {
-    let nextQ = questions[goTo]
-    
-    if (which === 'group') {
-      setGroup((prev) => prev === 0 ? 1 : 0)
-      nextQ = group === 0 ? problems2[goTo] : problems1[goTo]
-    }
-    const firstInput = nextQ.exampleInput
-    const secondInput = nextQ.secondInput
-    setCode('')
-    setInput(firstInput)
-    if (secondInput) {
-      setSecondInput(secondInput)
-    } else {
-      setSecondInput('')
-    }
-    setAnswer('')
-    setQuestion(goTo)
-  }, [questions, group])
-  
+  const resetQuestion = useCallback(
+    (goTo: number, which: 'number' | 'group') => {
+      let nextQ = questions[goTo]
+
+      if (which === 'group') {
+        setGroup((prev) => (prev === 0 ? 1 : 0))
+        nextQ = group === 0 ? problems2[goTo] : problems1[goTo]
+      }
+      const firstInput = nextQ.exampleInput
+      const secondInput = nextQ.secondInput
+      setCode('')
+      setInput(firstInput)
+      if (secondInput) {
+        setSecondInput(secondInput)
+      } else {
+        setSecondInput('')
+      }
+      setAnswer('')
+      setQuestion(goTo)
+    },
+    [questions, group]
+  )
+
   return (
-    <div className="p-4 flex flex-col">
-      <Header
-        greeting="Practice Questions and solutions."
-        middle=""
-        title="Practice Page"
-      />
-      <div className="flex flex-col gap-8 mx-auto w-200">
+    <div className="flex flex-col p-4">
+      <Header greeting="Practice Questions and solutions." middle="" title="Practice Page" />
+      <div className="mx-auto flex w-200 flex-col gap-8">
         <Field>
           <FieldLabel htmlFor="textarea-message">Question #{question + 1}:</FieldLabel>
           <FieldDescription>{questions[question].question}</FieldDescription>
@@ -202,10 +239,13 @@ const Practice = () => {
         </Field>
         <Field>
           <FieldLabel htmlFor="textarea-message">Your Code:</FieldLabel>
-          <FieldDescription>Enter the body of your function below (without the outer function), assuming that x is the function's argument.</FieldDescription>
+          <FieldDescription>
+            Enter the body of your function below (without the outer function), assuming that x is
+            the function's argument.
+          </FieldDescription>
           <Textarea
             tabIndex={-1}
-            className="font-mono h-80"
+            className="h-80 font-mono"
             id="text-area-code"
             onChange={(e) => setCode(e.target.value)}
             placeholder="Enter your code here"
@@ -215,36 +255,49 @@ const Practice = () => {
         </Field>
         <Field>
           <FieldLabel htmlFor="textarea-message">Your function argument(s):</FieldLabel>
-          <FieldDescription>Enter your function's input below (e.g. numbers or strings separated by commas for an array, or a string).</FieldDescription>
+          <FieldDescription>
+            Enter your function's input below (e.g. numbers or strings separated by commas for an
+            array, or a string).
+          </FieldDescription>
           <Input
             name="firstInput"
             onChange={(e) => processInput(e.target.name, e.target.value)}
             value={Array.isArray(input) ? input.join(',') : input}
           />
           {questions[question].secondInput ? (
-          <>
-            <FieldDescription>Enter your function's second input below (e.g. numbers or strings separated by commas for an array, or a string).</FieldDescription>
-            <Input
-              name="secondInput"
-              onChange={(e) => processInput(e.target.name, e.target.value)}
-              value={Array.isArray(secondInput) ? secondInput.join(',') : secondInput}
-            />
-          </>
-          ) : null }
+            <>
+              <FieldDescription>
+                Enter your function's second input below (e.g. numbers or strings separated by
+                commas for an array, or a string).
+              </FieldDescription>
+              <Input
+                name="secondInput"
+                onChange={(e) => processInput(e.target.name, e.target.value)}
+                value={Array.isArray(secondInput) ? secondInput.join(',') : secondInput}
+              />
+            </>
+          ) : null}
         </Field>
         {answer ? (
           <Field>
-            <FieldLabel htmlFor="textarea-message">Your function's return value: {isCorrect ? ( <span className="font-bold text-green-500">Correct!</span>): null }</FieldLabel>
-            <code 
-              className={`${isCorrect? 'light:bg-green-100 dark:bg-green-900' : 'light:bg-red-100 dark:bg-red-900'} border border-gray-200 p-2 rounded-lg`}
+            <FieldLabel htmlFor="textarea-message">
+              Your function's return value:{' '}
+              {isCorrect ? <span className="font-bold text-green-500">Correct!</span> : null}
+            </FieldLabel>
+            <code
+              className={`${isCorrect ? 'light:bg-green-100 dark:bg-green-900' : 'light:bg-red-100 dark:bg-red-900'} rounded-lg border border-gray-200 p-2`}
             >
-              {Array.isArray(answer) ? answer.join(',') : typeof answer === 'object' ? JSON.stringify(answer).replace(/"/g, "'") : String(answer)}
+              {Array.isArray(answer)
+                ? answer.join(',')
+                : typeof answer === 'object'
+                  ? JSON.stringify(answer).replace(/"/g, "'")
+                  : String(answer)}
             </code>
           </Field>
-          ) : null}
+        ) : null}
         <div className="flex justify-end gap-4">
           <Button
-            className="w-44 light:bg-amber-500 dark:bg-amber-400"
+            className="light:bg-amber-500 w-44 dark:bg-amber-400"
             id="showSolution"
             onClick={() => {
               setCode(questions[question].solution)
@@ -254,7 +307,7 @@ const Practice = () => {
             <Eye />
           </Button>
           <Button
-            className="w-40 light:bg-sky-500 dark:bg-sky-400"
+            className="light:bg-sky-500 w-40 dark:bg-sky-400"
             id="changeGroup"
             onClick={() => {
               resetQuestion(0, 'group')
@@ -264,7 +317,7 @@ const Practice = () => {
             <CircleChevronRight />
           </Button>
           <Button
-            className="w-30 light:bg-gray-500 dark:bg-gray-400"
+            className="light:bg-gray-500 w-30 dark:bg-gray-400"
             id="prevQuestion"
             onClick={() => {
               const next = question - 1 > -1 ? question - 1 : questions.length - 1
@@ -275,7 +328,7 @@ const Practice = () => {
             Previous
           </Button>
           <Button
-            className="w-30 light:bg-gray-500 dark:bg-gray-400"
+            className="light:bg-gray-500 w-30 dark:bg-gray-400"
             id="nextQuestion"
             onClick={() => {
               const next = question + 1 < questions.length ? question + 1 : 0
@@ -285,10 +338,7 @@ const Practice = () => {
             Next
             <CircleChevronRight />
           </Button>
-          <Button 
-            className="w-40" 
-            onClick={runFunction}
-          >
+          <Button className="w-40" onClick={runFunction}>
             Run Code
             <CircleChevronRight />
           </Button>

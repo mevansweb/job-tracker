@@ -1,9 +1,8 @@
-import { type ColumnDef } from '@tanstack/react-table'
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
 
-import { capitalizeWords, getProgress } from '@/global/functions'
-import { type Job, type Status } from '@/global/types'
+import { type ColumnDef } from '@tanstack/react-table'
 
+import { ProgressBar } from '@/components/progress-bar'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -12,8 +11,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-
-import { ProgressBar } from '@/components/progress-bar'
+import { capitalizeWords, getProgress } from '@/global/functions'
+import { type Job, type Status } from '@/global/types'
 
 import { EventsModal } from '../modal/events-modal'
 import { JobsModal } from '../modal/jobs-modal'

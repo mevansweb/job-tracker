@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 
 import { useAuth } from '@/components/providers/hooks'
-
 import { getStyles } from '@/global/functions'
 import { type ApiResult } from '@/global/types'
 

@@ -3,12 +3,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import Header from '@/components/header'
-import type { Job } from '@/global/types'
+import { useAuth } from '@/components/providers/hooks'
+import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { capitalizeWords } from '@/global/functions'
-import { useAuth } from '@/components/providers/hooks'
+import type { Job } from '@/global/types'
 
 type SearchType = 'company' | 'position'
 
@@ -18,60 +18,77 @@ const SEARCH_URL = 'http://localhost:8080/api/data/search/'
 
 const getJobsWithFutureEvents = (jobs: Job[]) => {
   // Get today's date without time (midnight)
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
 
   // Filter logic
   const filteredData = jobs
-    .map(job => {
+    .map((job) => {
       // Keep only events with date > today
       const filteredDates = job.events.filter((event) => {
-        const date = new Date(event.date);
-        return !isNaN(date.getTime()) && date >= today;
-      });
+        const date = new Date(event.date)
+        return !isNaN(date.getTime()) && date >= today
+      })
 
       // Return job only if it has future events
-      return filteredDates.length > 0
-        ? { ...job, events: filteredDates }
-        : null;
+      return filteredDates.length > 0 ? { ...job, events: filteredDates } : null
     })
-    .filter((job): job is Job => job !== null); // Remove null entries
-  
+    .filter((job): job is Job => job !== null) // Remove null entries
+
   return filteredData
 }
 
-const SearchResult = ({ job } : { job: Job }) => {
+const SearchResult = ({ job }: { job: Job }) => {
   return (
-    <Card className="p-4 my-4">
+    <Card className="my-4 p-4">
       <div key={job.id} className="mb-2">
-        <strong>{job.position}</strong> at {job.company} (Applied on: {new Date(job.applicationDate).toLocaleDateString()})
-        {job.linkToJobPosting ? <span> - <a href={job.linkToJobPosting} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">View Posting</a></span> : null}
-        {job.address ? <p className="font-light text-sm">{job.address}</p> : null}
-        {job.phone ? <p className="font-light text-sm">{job.phone}</p> : null}
+        <strong>{job.position}</strong> at {job.company} (Applied on:{' '}
+        {new Date(job.applicationDate).toLocaleDateString()})
+        {job.linkToJobPosting ? (
+          <span>
+            {' '}
+            -{' '}
+            <a
+              href={job.linkToJobPosting}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 underline"
+            >
+              View Posting
+            </a>
+          </span>
+        ) : null}
+        {job.address ? <p className="text-sm font-light">{job.address}</p> : null}
+        {job.phone ? <p className="text-sm font-light">{job.phone}</p> : null}
       </div>
-        <div className="text-sm light:text-gray-700 dark:text-gray-400">
+      <div className="light:text-gray-700 text-sm dark:text-gray-400">
         {job.events && job.events.length > 0 ? (
           <div>
             <p className="text-sm font-light italic">Events:</p>
-            <ul className="list-disc list-inside text-sm light:text-gray-700 dark:text-gray-400">
+            <ul className="light:text-gray-700 list-inside list-disc text-sm dark:text-gray-400">
               {job.events.map((event, index) => {
                 if (event.status === 'waiting-for-response') {
                   return (
-                    <li key={`${job.id}-event-${index}`}>{job.applicationDate ? `${new Date(job.applicationDate).toLocaleDateString()}: ` : ''}Application Sent.</li>
+                    <li key={`${job.id}-event-${index}`}>
+                      {job.applicationDate
+                        ? `${new Date(job.applicationDate).toLocaleDateString()}: `
+                        : ''}
+                      Application Sent.
+                    </li>
                   )
                 } else {
                   return (
-                    <li key={`${job.id}-event-${index}`}>{event.date ? `${new Date(event.date).toLocaleDateString()}: ` : ''}
-                      {capitalizeWords(event.status.replace(/-/g, ' '))} {event.note ? `- ${event.note}` : ''}
+                    <li key={`${job.id}-event-${index}`}>
+                      {event.date ? `${new Date(event.date).toLocaleDateString()}: ` : ''}
+                      {capitalizeWords(event.status.replace(/-/g, ' '))}{' '}
+                      {event.note ? `- ${event.note}` : ''}
                     </li>
                   )
                 }
               })}
             </ul>
           </div>
-        ) : (
-          null
-        )}
+        ) : null}
       </div>
     </Card>
   )
@@ -86,7 +103,15 @@ const Search = () => {
   const [searchResults, setSearchResults] = useState<Job[] | null>([])
   const [upcoming, setUpcoming] = useState<Job[] | null>([])
 
-  const noResultsText = useMemo(() => searchResults === null && companyQuery.trim().length >= MIN_QUERY_LENGTH ? `No results found for "{${companyQuery}}` : searchResults === null && positionQuery.trim().length >= MIN_QUERY_LENGTH ? `No results found for "{${positionQuery}}` : '', [companyQuery, positionQuery, searchResults])
+  const noResultsText = useMemo(
+    () =>
+      searchResults === null && companyQuery.trim().length >= MIN_QUERY_LENGTH
+        ? `No results found for "{${companyQuery}}`
+        : searchResults === null && positionQuery.trim().length >= MIN_QUERY_LENGTH
+          ? `No results found for "{${positionQuery}}`
+          : '',
+    [companyQuery, positionQuery, searchResults]
+  )
 
   const getUpcomingEvents = useCallback(async () => {
     const filteredData = getJobsWithFutureEvents(jobs)
@@ -96,48 +121,54 @@ const Search = () => {
     setPositionQuery('')
   }, [jobs])
 
-  const performSearch = useCallback(async (searchQuery: string, searchType: SearchType) => {
-    try {
-      const url = `${SEARCH_URL}${id}/${encodeURIComponent(searchQuery)}/${searchType}`
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          "Content-Type": "application/json",
-        }
-      });
+  const performSearch = useCallback(
+    async (searchQuery: string, searchType: SearchType) => {
+      try {
+        const url = `${SEARCH_URL}${id}/${encodeURIComponent(searchQuery)}/${searchType}`
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
 
-      if (!response.ok) {
-        toast.error(`Error: ${response.statusText}`)
+        if (!response.ok) {
+          toast.error(`Error: ${response.statusText}`)
+        }
+
+        const result = await response.json()
+        setSearchResults(result.length > 0 ? result : null)
+        setUpcoming([])
+      } catch (err) {
+        const error = err as Error
+        toast.error(`'Search error: ${error.message}`)
+      }
+    },
+    [id]
+  )
+
+  const handleOnChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newQuery = event.target.value
+      const searchType = event.target.name as SearchType
+      if (searchType === 'company') {
+        setCompanyQuery(newQuery)
+      }
+      if (searchType === 'position') {
+        setPositionQuery(newQuery)
+      }
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
       }
 
-      const result = await response.json()
-      setSearchResults(result.length > 0 ? result : null)
-      setUpcoming([])
-    } catch (err) {
-      const error = err as Error
-      toast.error(`'Search error: ${error.message}`)
-    }
-  }, [id])
-
-  const handleOnChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const newQuery = event.target.value
-    const searchType = event.target.name as SearchType
-    if (searchType === 'company') {
-      setCompanyQuery(newQuery)
-    }
-    if (searchType === 'position') {
-      setPositionQuery(newQuery)
-    }
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-    }
-
-    if (newQuery.trim().length >= MIN_QUERY_LENGTH) {
-      timeoutRef.current = setTimeout(() => {
-        performSearch(newQuery, searchType)
-      }, 500)
-    }
-  }, [performSearch])
+      if (newQuery.trim().length >= MIN_QUERY_LENGTH) {
+        timeoutRef.current = setTimeout(() => {
+          performSearch(newQuery, searchType)
+        }, 500)
+      }
+    },
+    [performSearch]
+  )
 
   useEffect(() => {
     return () => {
@@ -148,59 +179,58 @@ const Search = () => {
   }, [])
 
   return (
-    <div className="p-4 flex flex-col">
-      <Header 
-        greeting="Search for a job that you have applied for." 
-        middle="" 
-        title="Search"
-      />
-      <div className="w-200 mx-auto border border-input rounded-xl shadow p-10 mt-8">
-        <div className="flex flex-col my-4 ml-4">
-        <h1 className="text-lg mb-2">Search</h1>
-        <Input
-          className="my-4 w-full"
-          name="company"
-          onChange={handleOnChange}
-          placeholder="Search for a job by company name..."
-          value={companyQuery} 
-          type="text"
+    <div className="flex flex-col p-4">
+      <Header greeting="Search for a job that you have applied for." middle="" title="Search" />
+      <div className="border-input mx-auto mt-8 w-200 rounded-xl border p-10 shadow">
+        <div className="my-4 ml-4 flex flex-col">
+          <h1 className="mb-2 text-lg">Search</h1>
+          <Input
+            className="my-4 w-full"
+            name="company"
+            onChange={handleOnChange}
+            placeholder="Search for a job by company name..."
+            value={companyQuery}
+            type="text"
           />
-        <Input
-          className="my-4 w-full"
-          name="position"
-          onChange={handleOnChange}
-          placeholder="Search for a job by position name..."
-          value={positionQuery} 
-          type="text"
-        />
+          <Input
+            className="my-4 w-full"
+            name="position"
+            onChange={handleOnChange}
+            placeholder="Search for a job by position name..."
+            value={positionQuery}
+            type="text"
+          />
         </div>
-        <Button
-          className="ml-4"
-          onClick={getUpcomingEvents}
-        >Get Upcoming Events</Button>
+        <Button className="ml-4" onClick={getUpcomingEvents}>
+          Get Upcoming Events
+        </Button>
       </div>
 
-      <div className="flex flex-col w-200 mx-auto">
-        {searchResults && searchResults.length > 0 || upcoming && upcoming.length > 0 ? (<h2 className="mt-4 text-lg font-semibold">Search Results:</h2>) : null}
+      <div className="mx-auto flex w-200 flex-col">
+        {(searchResults && searchResults.length > 0) || (upcoming && upcoming.length > 0) ? (
+          <h2 className="mt-4 text-lg font-semibold">Search Results:</h2>
+        ) : null}
         {companyQuery || positionQuery ? (
-          <div className="text-sm text-gray-500 mt-8">Showing results for "{companyQuery ? companyQuery : positionQuery}":</div>
+          <div className="mt-8 text-sm text-gray-500">
+            Showing results for "{companyQuery ? companyQuery : positionQuery}":
+          </div>
         ) : null}
         <div className="mt-2">
           {upcoming === null ? (
             <p className="light:text-gray-700 dark:text-gray-400">No upcoming events found.</p>
           ) : null}
           {upcoming && upcoming.length > 0 ? (
-            <div className="text-sm text-gray-500 mt-8">Showing upcoming events:</div>
+            <div className="mt-8 text-sm text-gray-500">Showing upcoming events:</div>
           ) : null}
-          {upcoming && upcoming.map((job) => (
-            <SearchResult key={`upcoming-events-job-${job.id}`} job={job} />
-          ))}
-          {searchResults && searchResults.map((job) => (
-            <SearchResult key={`search-results-job-${job.id}`} job={job} />
-          ))}
+          {upcoming &&
+            upcoming.map((job) => <SearchResult key={`upcoming-events-job-${job.id}`} job={job} />)}
+          {searchResults &&
+            searchResults.map((job) => (
+              <SearchResult key={`search-results-job-${job.id}`} job={job} />
+            ))}
           {noResultsText ? (
-            < p className="light:text-gray-700 dark:text-gray-400">{noResultsText}</p>
-          ) : null }
+            <p className="light:text-gray-700 dark:text-gray-400">{noResultsText}</p>
+          ) : null}
         </div>
       </div>
     </div>

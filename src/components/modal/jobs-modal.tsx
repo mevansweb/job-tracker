@@ -1,13 +1,9 @@
 import { useCallback, useMemo, useState } from 'react'
 
-import { localStorageKey } from '@/components/providers//const'
-import { useAuth } from '@/components/providers//hooks'
 import { ChevronDownIcon } from 'lucide-react'
 
-import { setJobs } from '@/global/shared'
-import { newJob } from '@/global/template'
-import type { Job } from '@/global/types'
-
+import { localStorageKey } from '@/components/providers//const'
+import { useAuth } from '@/components/providers//hooks'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import {
@@ -31,6 +27,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { setJobs } from '@/global/shared'
+import { newJob } from '@/global/template'
+import type { Job } from '@/global/types'
 
 type Props = {
   job?: Job

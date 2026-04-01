@@ -16,11 +16,11 @@
   "trailingComma": "es5",
 
   "importOrder": [
-    "^react(.*)$",
+    "^react$",
+    "^react-.*",
+    "^lucide-react",
+    "^@?\\w",
     "<THIRD_PARTY_MODULES>",
-    "^@/global/(.*)$",
-    "^@/components/ui/(.*)$",
-    "^/components/(.*)$",
     "^[./]"
   ],
   "importOrderParserPlugins": ["typescript", "jsx", "decorators"],

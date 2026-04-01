@@ -1,13 +1,9 @@
 import { type SetStateAction, memo, useCallback, useMemo, useState } from 'react'
 
-import { localStorageKey } from '@/components/providers//const'
-import { useAuth } from '@/components/providers//hooks'
 import { ChevronDownIcon, CirclePlus, Edit, X } from 'lucide-react'
 
-import { setTasks } from '@/global/shared'
-import { newTask } from '@/global/template'
-import type { Task, TaskEvent, TaskStatus } from '@/global/types'
-
+import { localStorageKey } from '@/components/providers//const'
+import { useAuth } from '@/components/providers//hooks'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import {
@@ -31,6 +27,9 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { setTasks } from '@/global/shared'
+import { newTask } from '@/global/template'
+import type { Task, TaskEvent, TaskStatus } from '@/global/types'
 
 type Props = {
   task?: Task

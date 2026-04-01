@@ -1,5 +1,4 @@
 import { AuthProvider } from '@/components/providers/auth-provider'
-
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { Toaster } from '@/components/ui/sonner'
 

@@ -2,18 +2,15 @@ import { useMemo, useState } from 'react'
 
 import { BookCopy, FilePen, Save, Undo2 } from 'lucide-react'
 
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import { Textarea } from '@/components/ui/textarea'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+import { Textarea } from '@/components/ui/textarea'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { getIsEmpty } from '@/global/functions'
+
 import type { Mode, TextUpdateEvent } from './types'
 
 type ResumeInputProps = {
@@ -44,51 +41,74 @@ type ButtonWithTooltipProps = {
   value?: string
 }
 
-const ButtonWithTooltip = ({ id, onClick, setMode, tooltipText, type, value }: ButtonWithTooltipProps) => {
+const ButtonWithTooltip = ({
+  id,
+  onClick,
+  setMode,
+  tooltipText,
+  type,
+  value,
+}: ButtonWithTooltipProps) => {
   return (
-  <Tooltip>
-    <TooltipTrigger asChild>
-      {type === 'copy' && value ? (
-        <BookCopy
-          className="mr-2 w-4 h-4 cursor-pointer"
-          onClick={() => onClick('copy', id, value)}
-        />
-      ) : type === 'edit' ? (
-        <FilePen
-          className="mr-2 w-4 h-4 cursor-pointer"
-          onClick={() => {
-            onClick('edit', id)
-            setMode('edit')
-          }}
-          size={16}
-        />
-      ) : type === 'save' ? (
-        <Save
-          className="mr-2 w-4 h-4 cursor-pointer"
-          onClick={() => {
-            onClick('save', id)
-            setMode('view')
-          }}
-          size={16}
-        />
-      ) : type === 'undo' ? (
-        <Undo2
-          className="mr-2 w-4 h-4 cursor-pointer"
-          onClick={() => {
-            onClick('undo', id)
-            setMode('view')
-          }}
-          size={16}
-        />
-      ) : null}
-    </TooltipTrigger>
-    <TooltipContent>
-      <p>{tooltipText}</p>
-    </TooltipContent>
-  </Tooltip>
-)}
+    <Tooltip>
+      <TooltipTrigger asChild>
+        {type === 'copy' && value ? (
+          <BookCopy
+            className="mr-2 h-4 w-4 cursor-pointer"
+            onClick={() => onClick('copy', id, value)}
+          />
+        ) : type === 'edit' ? (
+          <FilePen
+            className="mr-2 h-4 w-4 cursor-pointer"
+            onClick={() => {
+              onClick('edit', id)
+              setMode('edit')
+            }}
+            size={16}
+          />
+        ) : type === 'save' ? (
+          <Save
+            className="mr-2 h-4 w-4 cursor-pointer"
+            onClick={() => {
+              onClick('save', id)
+              setMode('view')
+            }}
+            size={16}
+          />
+        ) : type === 'undo' ? (
+          <Undo2
+            className="mr-2 h-4 w-4 cursor-pointer"
+            onClick={() => {
+              onClick('undo', id)
+              setMode('view')
+            }}
+            size={16}
+          />
+        ) : null}
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{tooltipText}</p>
+      </TooltipContent>
+    </Tooltip>
+  )
+}
 
-export const ResumeInput = ({ className = '', data, id, inputType, instructions, label, name, originalData, parentMode,placeholder, update, updateDate, setButtonAction, warning }: ResumeInputProps) => {
+export const ResumeInput = ({
+  className = '',
+  data,
+  id,
+  inputType,
+  instructions,
+  label,
+  name,
+  originalData,
+  parentMode,
+  placeholder,
+  update,
+  updateDate,
+  setButtonAction,
+  warning,
+}: ResumeInputProps) => {
   const [mode, setMode] = useState<Mode>(parentMode ?? 'view')
   const isEmpty = useMemo(() => getIsEmpty(data), [data])
   const [calendarOpen, setCalendarOpen] = useState(false)
@@ -101,8 +121,14 @@ export const ResumeInput = ({ className = '', data, id, inputType, instructions,
 
   return (
     <Field className={`mt-6 ${className}`}>
-      {label ? <FieldLabel className="font-bold" htmlFor={name}>{label}</FieldLabel> : null}
-      {instructions ? <FieldDescription className="text-sm font-light">{instructions}</FieldDescription> : null}
+      {label ? (
+        <FieldLabel className="font-bold" htmlFor={name}>
+          {label}
+        </FieldLabel>
+      ) : null}
+      {instructions ? (
+        <FieldDescription className="text-sm font-light">{instructions}</FieldDescription>
+      ) : null}
       {(mode === 'edit' || isEmpty) && inputType !== 'calendar' ? (
         <div className="flex justify-between gap-4">
           {inputType === 'input' ? (
@@ -112,7 +138,9 @@ export const ResumeInput = ({ className = '', data, id, inputType, instructions,
               defaultValue={data}
               id={name}
               name={name}
-              onChange={(event) => id && update ? update(event, id) : update ? update(event) : null}
+              onChange={(event) =>
+                id && update ? update(event, id) : update ? update(event) : null
+              }
               placeholder={placeholder}
             />
           ) : inputType === 'textarea' ? (
@@ -143,9 +171,8 @@ export const ResumeInput = ({ className = '', data, id, inputType, instructions,
                   tooltipText="Undo Changes"
                   type="undo"
                   onClick={() => setButtonAction('undo', id)}
-
                 />
-               ) : null}  
+              ) : null}
               {showUndo && setButtonAction ? (
                 <ButtonWithTooltip
                   id={id}
@@ -165,11 +192,11 @@ export const ResumeInput = ({ className = '', data, id, inputType, instructions,
           <PopoverTrigger asChild>
             <Button
               aria-invalid={warning}
-              className={`w-23.75 flex text-muted-foreground font-normal justify-between`}
+              className={`text-muted-foreground flex w-23.75 justify-between font-normal`}
               id={name}
               variant="outline"
             >
-              {data ? new Date(data).toLocaleDateString() : "From Date"}
+              {data ? new Date(data).toLocaleDateString() : 'From Date'}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto overflow-hidden p-0" align="start">
@@ -181,7 +208,7 @@ export const ResumeInput = ({ className = '', data, id, inputType, instructions,
                 if (d) {
                   updateDate(d, name, id)
                   setCalendarOpen(false)
-                } 
+                }
               }}
               required={true}
               selected={data ? new Date(data) : new Date()}
@@ -192,50 +219,49 @@ export const ResumeInput = ({ className = '', data, id, inputType, instructions,
         <div className="flex justify-between text-sm font-light">
           {data}
           <div className="flex flex-col gap-4">
-              <ButtonWithTooltip
-                id={id}
-                name={name}
-                onClick={() => setButtonAction('edit', id)}
-                setMode={setMode}
-                tooltipText="Edit"
-                type="edit"
-              />
-              <ButtonWithTooltip
-                id={id}
-                name={name}
-                onClick={() => setButtonAction('copy', id, undefined, data)}
-                setMode={setMode}
-                tooltipText="Copy"
-                type="copy"
-                value={data}
-              />
+            <ButtonWithTooltip
+              id={id}
+              name={name}
+              onClick={() => setButtonAction('edit', id)}
+              setMode={setMode}
+              tooltipText="Edit"
+              type="edit"
+            />
+            <ButtonWithTooltip
+              id={id}
+              name={name}
+              onClick={() => setButtonAction('copy', id, undefined, data)}
+              setMode={setMode}
+              tooltipText="Copy"
+              type="copy"
+              value={data}
+            />
           </div>
         </div>
-        ) : mode === 'view' && !isEmpty && inputType === 'textarea' ? (
+      ) : mode === 'view' && !isEmpty && inputType === 'textarea' ? (
         <div className="flex justify-between">
           <div className="w-9/10 text-sm font-light whitespace-pre-line">{data}</div>
-            <div className="flex flex-col gap-4">
-              <ButtonWithTooltip
-                id={id}
-                name={name}
-                onClick={() => setButtonAction('edit', id)}
-                setMode={setMode}
-                tooltipText="Edit"
-                type="edit"
-              />
-              <ButtonWithTooltip
-                id={id}
-                name={name}
-                onClick={() => setButtonAction('copy', id, undefined, data)}
-                setMode={setMode}
-                tooltipText="Copy"
-                type="copy"
-                value={data}
-                />
-            </div>       
+          <div className="flex flex-col gap-4">
+            <ButtonWithTooltip
+              id={id}
+              name={name}
+              onClick={() => setButtonAction('edit', id)}
+              setMode={setMode}
+              tooltipText="Edit"
+              type="edit"
+            />
+            <ButtonWithTooltip
+              id={id}
+              name={name}
+              onClick={() => setButtonAction('copy', id, undefined, data)}
+              setMode={setMode}
+              tooltipText="Copy"
+              type="copy"
+              value={data}
+            />
           </div>
+        </div>
       ) : null}
     </Field>
   )
 }
-

@@ -1,8 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 
-import { JobsModal } from '@/components/modal/jobs-modal'
-import { localStorageKey } from '@/components/providers//const'
-import { useAuth } from '@/components/providers//hooks'
+import { ChevronDown, ChevronUp, FunnelIcon, SaveIcon, XIcon } from 'lucide-react'
+
 import {
   type ColumnFiltersState,
   type SortingState,
@@ -14,11 +13,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ChevronDown, ChevronUp, FunnelIcon, SaveIcon, XIcon } from 'lucide-react'
 
-import { capitalizeWords } from '@/global/functions'
-import { type Job, months } from '@/global/types'
-
+import { JobsModal } from '@/components/modal/jobs-modal'
+import { localStorageKey } from '@/components/providers//const'
+import { useAuth } from '@/components/providers//hooks'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -36,6 +34,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { capitalizeWords } from '@/global/functions'
+import { type Job, months } from '@/global/types'
 
 import { createColumns, getStatusColor } from './columns'
 
