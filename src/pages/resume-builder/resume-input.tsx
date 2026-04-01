@@ -6,14 +6,14 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Textarea } from '@/components/ui/textarea'
-import { Field, FieldLabel } from '@/components/ui/field'
+import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { capitalizeWords, getIsEmpty } from '@/global/functions'
+import { getIsEmpty } from '@/global/functions'
 import type { Mode, TextUpdateEvent } from './types'
 
 type ResumeInputProps = {
@@ -21,15 +21,16 @@ type ResumeInputProps = {
   data: string
   id: string
   inputType: 'input' | 'textarea' | 'calendar'
+  instructions?: string
   label: string
   name: string
+  originalData?: string
   parentMode?: Mode
   placeholder: string
   update?: (event: TextUpdateEvent, id?: string) => void
   updateDate?: (d: Date, name: string, id?: string) => void
-  save?: (event: React.MouseEvent<SVGSVGElement>) => void
   saveById?: (id?: string | undefined) => void
-  setButtonAction: (mode: Mode, id: string, value?: string) => void
+  setButtonAction: (mode: Mode, id: string, name?: string, value?: string) => void
   warning?: boolean
 }
 
@@ -43,7 +44,7 @@ type ButtonWithTooltipProps = {
   value?: string
 }
 
-const ButtonWithTooltip = ({ id, name, onClick, setMode, tooltipText, type, value }: ButtonWithTooltipProps) => {
+const ButtonWithTooltip = ({ id, onClick, setMode, tooltipText, type, value }: ButtonWithTooltipProps) => {
   return (
   <Tooltip>
     <TooltipTrigger asChild>
@@ -64,7 +65,10 @@ const ButtonWithTooltip = ({ id, name, onClick, setMode, tooltipText, type, valu
       ) : type === 'save' ? (
         <Save
           className="mr-2 w-4 h-4 cursor-pointer"
-          onClick={() => onClick('save', id)}
+          onClick={() => {
+            onClick('save', id)
+            setMode('view')
+          }}
           size={16}
         />
       ) : type === 'undo' ? (
@@ -79,20 +83,27 @@ const ButtonWithTooltip = ({ id, name, onClick, setMode, tooltipText, type, valu
       ) : null}
     </TooltipTrigger>
     <TooltipContent>
-      <p>{tooltipText + ' ' + capitalizeWords(name)}</p>
+      <p>{tooltipText}</p>
     </TooltipContent>
   </Tooltip>
 )}
 
-export const ResumeInput = ({ className = '', data, id, inputType, label, name, parentMode, placeholder, save, update, updateDate, setButtonAction, warning }: ResumeInputProps) => {
-  const [mode, setMode] = useState<Mode>(parentMode)
+export const ResumeInput = ({ className = '', data, id, inputType, instructions, label, name, originalData, parentMode,placeholder, update, updateDate, setButtonAction, warning }: ResumeInputProps) => {
+  const [mode, setMode] = useState<Mode>(parentMode ?? 'view')
   const isEmpty = useMemo(() => getIsEmpty(data), [data])
   const [calendarOpen, setCalendarOpen] = useState(false)
+  const showUndo = useMemo(() => {
+    if (originalData !== undefined && mode === 'edit') {
+      return originalData !== data
+    }
+    return false
+  }, [originalData, data, mode])
 
   return (
-    <Field className={`${className} mt-6`}>
-      <FieldLabel className="font-bold" htmlFor={name}>{label}</FieldLabel>
-      {(mode === 'edit' || mode === 'add' || isEmpty) && inputType !== 'calendar' ? (
+    <Field className={`mt-6 ${className}`}>
+      {label ? <FieldLabel className="font-bold" htmlFor={name}>{label}</FieldLabel> : null}
+      {instructions ? <FieldDescription className="text-sm font-light">{instructions}</FieldDescription> : null}
+      {(mode === 'edit' || isEmpty) && inputType !== 'calendar' ? (
         <div className="flex justify-between gap-4">
           {inputType === 'input' ? (
             <Input
@@ -124,18 +135,18 @@ export const ResumeInput = ({ className = '', data, id, inputType, label, name, 
 
           {['textarea', 'input'].includes(inputType) ? (
             <div className="flex flex-col gap-4">
-              {setButtonAction ? (
+              {showUndo && setButtonAction ? (
                 <ButtonWithTooltip
                   id={id}
                   name={name}
                   setMode={setMode}
-                  tooltipText="Go back"
+                  tooltipText="Undo Changes"
                   type="undo"
-                  onClick={() => setButtonAction('view', id)}
+                  onClick={() => setButtonAction('undo', id)}
 
                 />
                ) : null}  
-              {save ? (
+              {showUndo && setButtonAction ? (
                 <ButtonWithTooltip
                   id={id}
                   name={name}
@@ -177,7 +188,7 @@ export const ResumeInput = ({ className = '', data, id, inputType, label, name, 
             />
           </PopoverContent>
         </Popover>
-      ) : mode !== 'add' && mode !== 'edit' && inputType === 'input' ? (
+      ) : mode === 'view' && !isEmpty && inputType === 'input' ? (
         <div className="flex justify-between text-sm font-light">
           {data}
           <div className="flex flex-col gap-4">
@@ -192,14 +203,15 @@ export const ResumeInput = ({ className = '', data, id, inputType, label, name, 
               <ButtonWithTooltip
                 id={id}
                 name={name}
-                onClick={() => setButtonAction('copy', id, data)}
+                onClick={() => setButtonAction('copy', id, undefined, data)}
                 setMode={setMode}
                 tooltipText="Copy"
                 type="copy"
+                value={data}
               />
           </div>
         </div>
-        ) : mode !== 'add' && mode !== 'edit' && inputType === 'textarea' ? (
+        ) : mode === 'view' && !isEmpty && inputType === 'textarea' ? (
         <div className="flex justify-between">
           <div className="w-9/10 text-sm font-light whitespace-pre-line">{data}</div>
             <div className="flex flex-col gap-4">
@@ -214,7 +226,7 @@ export const ResumeInput = ({ className = '', data, id, inputType, label, name, 
               <ButtonWithTooltip
                 id={id}
                 name={name}
-                onClick={() => setButtonAction('copy', id, data)}
+                onClick={() => setButtonAction('copy', id, undefined, data)}
                 setMode={setMode}
                 tooltipText="Copy"
                 type="copy"
