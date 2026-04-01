@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { FieldLegend } from '@/components/ui/field'
 import { Field, FieldLabel } from '@/components/ui/field'
-import { ResumeInput } from '@/pages/resume-builder/resume-input'
+import { ResumeInput } from '@/pages/resume-builder/input'
 import { useResume } from '@/components/providers/resume-provider'
 
 import type { Mode, TextUpdateEvent } from './types'

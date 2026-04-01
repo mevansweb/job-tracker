@@ -46,6 +46,8 @@ const SearchResult = ({ job } : { job: Job }) => {
       <div key={job.id} className="mb-2">
         <strong>{job.position}</strong> at {job.company} (Applied on: {new Date(job.applicationDate).toLocaleDateString()})
         {job.linkToJobPosting ? <span> - <a href={job.linkToJobPosting} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">View Posting</a></span> : null}
+        {job.address ? <p className="font-light text-sm">{job.address}</p> : null}
+        {job.phone ? <p className="font-light text-sm">{job.phone}</p> : null}
       </div>
         <div className="text-sm light:text-gray-700 dark:text-gray-400">
         {job.events && job.events.length > 0 ? (

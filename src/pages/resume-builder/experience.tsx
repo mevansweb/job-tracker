@@ -9,7 +9,7 @@ import type { Employer } from '@/global/types'
 import { spliceOrConcatArray } from '@/global/functions'
 import { FieldLegend } from '@/components/ui/field'
 import { localStorageKey } from '@/components/providers/const'
-import { ResumeInput } from '@/pages/resume-builder/resume-input'
+import { ResumeInput } from '@/pages/resume-builder/input'
 import { useResume } from '@/components/providers/resume-provider'
 
 import type { Mode, TextUpdateEvent } from './types'

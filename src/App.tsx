@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Home from './pages/home'
 import Tasks from './pages/tasks'
-import ResumeHome from './pages/resume-builder/resume-home'
+import ResumeHome from './pages/resume-builder/home'
 import Search from './pages/search'
 import Practice from './pages/practice'
 import Settings from './pages/settings'
