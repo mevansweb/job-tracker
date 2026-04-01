@@ -1,18 +1,42 @@
 import { useCallback, useMemo, useState } from 'react'
 
+import { JobsModal } from '@/components/modal/jobs-modal'
+import { localStorageKey } from '@/components/providers//const'
+import { useAuth } from '@/components/providers//hooks'
+import {
+  type ColumnFiltersState,
+  type SortingState,
+  type VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
 import { ChevronDown, ChevronUp, FunnelIcon, SaveIcon, XIcon } from 'lucide-react'
 
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { capitalizeWords } from '@/global/functions'
-import { JobsModal } from '@/components/modal/jobs-modal'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, type ColumnFiltersState, type SortingState, type VisibilityState, useReactTable } from '@tanstack/react-table'
+import { type Job, months } from '@/global/types'
 
-import { useAuth } from '../providers/hooks'
-import { localStorageKey } from '../providers/const'
-import { months, type Job } from '../../global/types'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+
 import { createColumns, getStatusColor } from './columns'
 
 type JobsTableProps = {
@@ -34,7 +58,7 @@ function getNumberOfJobsByWeek(jobs: Job[], weekNumber: number) {
   }).length
 }
 
-function getJobsActivity (jobs: Job[]) {
+function getJobsActivity(jobs: Job[]) {
   const jobsWithActivity = jobs.filter((job) => {
     const events = job.events || []
     return events.length > 1
@@ -42,15 +66,18 @@ function getJobsActivity (jobs: Job[]) {
   return jobsWithActivity
 }
 
-export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCount, year }: JobsTableProps) {
+export function JobsTable({
+  lastWeeksJobs,
+  month,
+  monthSubGroup,
+  thisWeeksJobsCount,
+  year,
+}: JobsTableProps) {
   const { existing, postData, state } = useAuth()
   const [sorting, setSorting] = useState<SortingState>([])
   const [filterBy, setFilterBy] = useState<string>('company')
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-    []
-  )
-  const [columnVisibility, setColumnVisibility] =
-    useState<VisibilityState>({})
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
   const [viewSummary, setViewSummary] = useState(false)
 
@@ -60,9 +87,7 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
         return columnFilters.every((filter) => {
           const jobValue = job[filter.id as keyof Job]
           if (typeof jobValue === 'string') {
-            return jobValue
-              .toLowerCase()
-              .includes((filter.value as string).toLowerCase())
+            return jobValue.toLowerCase().includes((filter.value as string).toLowerCase())
           }
           return true
         })
@@ -79,14 +104,17 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
     const saveEmail: string = state.email
     if (saveEmail) {
       postData('PUT', { email: saveEmail, jobs: state.jobs.length > 0 ? state.jobs : [] })
-      localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, jobs: state.jobs || []}))
+      localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, jobs: state.jobs || [] }))
     }
   }, [existing, postData, state.email, state.jobs])
 
-  const columns = useMemo(() => createColumns(getStatusColor, state.settings?.theme || 'light'), [state.settings])
+  const columns = useMemo(
+    () => createColumns(getStatusColor, state.settings?.theme || 'light'),
+    [state.settings]
+  )
 
   const table = useReactTable({
-    data: month > 0 || Number.isNaN(month) ? filteredJobs : lastWeeksJobs ?? [],
+    data: month > 0 || Number.isNaN(month) ? filteredJobs : (lastWeeksJobs ?? []),
     columns,
     autoResetPageIndex: false,
     autoResetExpanded: false,
@@ -107,64 +135,79 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
   })
 
   return (
-    <div className='w-full'>
-      <div className='flex items-center py-4'>
+    <div className="w-full">
+      <div className="flex items-center py-4">
         <div className="relative w-full max-w-sm">
           <Input
-            placeholder='Filter companies...'
+            placeholder="Filter companies..."
             value={(table.getColumn('company')?.getFilterValue() as string) ?? ''}
             onChange={(event) => {
               table.getColumn(filterBy)?.setFilterValue(event.target.value)
             }}
-            className='max-w-sm'
+            className="max-w-sm"
           />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='absolute right-8 top-1/2 -translate-y-1/2 h-7 w-7 p-0'>
-                  <span className='sr-only'>Filter By</span>
-                  <FunnelIcon className='h-4 w-4' />
-                </Button>
+              <Button
+                variant="ghost"
+                className="absolute top-1/2 right-8 h-7 w-7 -translate-y-1/2 p-0"
+              >
+                <span className="sr-only">Filter By</span>
+                <FunnelIcon className="h-4 w-4" />
+              </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              <DropdownMenuItem onClick={() => setFilterBy('company')}>Company Name</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterBy('position')}>Position Applied For</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterBy('contactPerson')}>Recruiter</DropdownMenuItem>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setFilterBy('company')}>
+                Company Name
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterBy('position')}>
+                Position Applied For
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterBy('contactPerson')}>
+                Recruiter
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+            className="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
             onClick={() => table.getColumn('company')?.setFilterValue('')}
-        >
-            <XIcon className="h-4 w-4"/>
+          >
+            <XIcon className="h-4 w-4" />
             <span className="sr-only">Clear</span>
           </Button>
         </div>
         <JobsModal />
-        <Button onClick={handleSave} variant="outline"><SaveIcon />Save</Button>
-        <span className="text-sm ml-4">
+        <Button onClick={handleSave} variant="outline">
+          <SaveIcon />
+          Save
+        </Button>
+        <span className="ml-4 text-sm">
           Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
         </span>
-        <span className="text-sm ml-4">
-          Number of Jobs: {table.getFilteredRowModel().rows.length} {month === 0 ? ' last week' : ''}
+        <span className="ml-4 text-sm">
+          Number of Jobs: {table.getFilteredRowModel().rows.length}{' '}
+          {month === 0 ? ' last week' : ''}
           {month === 0 && thisWeeksJobsCount ? ` (vs. This week: ${thisWeeksJobsCount})` : ''}
         </span>
         {month > 0 ? (
-          <span className="text-sm ml-4">
-            Jobs by week: {getNumberOfJobsByWeek(monthSubGroup || [], 1)}/{getNumberOfJobsByWeek(monthSubGroup || [], 2)}/
-            {getNumberOfJobsByWeek(monthSubGroup || [], 3)}/{getNumberOfJobsByWeek(monthSubGroup || [], 4)}/
+          <span className="ml-4 text-sm">
+            Jobs by week: {getNumberOfJobsByWeek(monthSubGroup || [], 1)}/
+            {getNumberOfJobsByWeek(monthSubGroup || [], 2)}/
+            {getNumberOfJobsByWeek(monthSubGroup || [], 3)}/
+            {getNumberOfJobsByWeek(monthSubGroup || [], 4)}/
             {getNumberOfJobsByWeek(monthSubGroup || [], 5)}
           </span>
-        ) : null } 
+        ) : null}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant='outline' className='ml-auto'>
+            <Button variant="outline" className="ml-auto">
               Columns <ChevronDown />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
+          <DropdownMenuContent align="end">
             {table
               .getAllColumns()
               .filter((column) => column.getCanHide())
@@ -172,11 +215,9 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
                 return (
                   <DropdownMenuCheckboxItem
                     key={column.id}
-                    className='capitalize'
+                    className="capitalize"
                     checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
@@ -185,14 +226,17 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className='flex items-center py-4'>
-        <h2>Jobs you applied to {month === 0 ? 'last week' : `in ${months[month - 1]} ${year ? year : ''}`}:</h2>
+      <div className="flex items-center py-4">
+        <h2>
+          Jobs you applied to{' '}
+          {month === 0 ? 'last week' : `in ${months[month - 1]} ${year ? year : ''}`}:
+        </h2>
       </div>
       {jobsWithActivity.length > 0 && (
         <Button
-          className="cursor-pointer mb-4"
+          className="mb-4 cursor-pointer"
           variant={viewSummary ? 'default' : 'outline'}
-          size='sm'
+          size="sm"
           onClick={() => setViewSummary(!viewSummary)}
         >
           {viewSummary ? 'Hide' : 'View'} Summary of Job Activity
@@ -200,27 +244,30 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
         </Button>
       )}
       {jobsWithActivity.length > 0 && viewSummary && (
-        <div className='mb-4 italic text-sm'>
+        <div className="mb-4 text-sm italic">
           {jobsWithActivity.map((job) => (
             <div key={job.id}>
               Activity on <strong>{job.position}</strong> at <strong>{job.company}</strong>:{' '}
               <ul>
-              {job.events
-                .slice()
-                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                .map((event, index) => event.status !== 'waiting-for-response' && (
-                  <li className="ml-4" key={index}>
-                    {event.date} - {capitalizeWords(event.status.replace(/-/g, ' '))}
-                    {event.note ? ` (${event.note})` : ''}
-                    {index < job.events.length - 1 ? '; ' : ''}
-                  </li>
-                ))}
-                </ul>
+                {job.events
+                  .slice()
+                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                  .map(
+                    (event, index) =>
+                      event.status !== 'waiting-for-response' && (
+                        <li className="ml-4" key={index}>
+                          {event.date} - {capitalizeWords(event.status.replace(/-/g, ' '))}
+                          {event.note ? ` (${event.note})` : ''}
+                          {index < job.events.length - 1 ? '; ' : ''}
+                        </li>
+                      )
+                  )}
+              </ul>
             </div>
           ))}
         </div>
       )}
-      <div className='rounded-md border'>
+      <div className="rounded-md border">
         <Table>
           <TableHeader className={``}>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -230,10 +277,7 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   )
                 })}
@@ -243,26 +287,17 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className='h-24 text-center'
-                >
+                <TableCell colSpan={columns.length} className="h-24 text-center">
                   No results.
                 </TableCell>
               </TableRow>
@@ -270,23 +305,23 @@ export function JobsTable({ lastWeeksJobs, month, monthSubGroup, thisWeeksJobsCo
           </TableBody>
         </Table>
       </div>
-      <div className='flex items-center justify-end space-x-2 py-4'>
-        <div className='text-muted-foreground flex-1 text-sm'>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="text-muted-foreground flex-1 text-sm">
           {table.getFilteredSelectedRowModel().rows.length} of{' '}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className='space-x-2'>
+        <div className="space-x-2">
           <Button
-            variant='outline'
-            size='sm'
+            variant="outline"
+            size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
             Previous
           </Button>
           <Button
-            variant='outline'
-            size='sm'
+            variant="outline"
+            size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >

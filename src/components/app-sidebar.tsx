@@ -1,9 +1,29 @@
-import { ClipboardCheck, ClipboardList, CodeXml, FilePenLine, Home, School, Search, Settings } from 'lucide-react'
+import { useAuth } from '@/components/providers/hooks'
+import {
+  ClipboardCheck,
+  ClipboardList,
+  CodeXml,
+  FilePenLine,
+  Home,
+  School,
+  Search,
+  Settings,
+} from 'lucide-react'
 
 import { getStyles } from '@/global/functions'
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger } from '@/components/ui/sidebar'
 
-import { useAuth } from './providers/hooks'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarTrigger,
+} from '@/components/ui/sidebar'
 
 // Menu items.
 const items = [
@@ -15,7 +35,7 @@ const items = [
   {
     title: 'Resume',
     url: '/resume',
-    icon: FilePenLine
+    icon: FilePenLine,
   },
   {
     title: 'Coding Practice',
@@ -45,14 +65,14 @@ const items = [
   {
     title: 'Test Prep Page',
     url: '/test-prep',
-    icon: School
-  }
+    icon: School,
+  },
 ]
 
 export function AppSidebar() {
   const { state } = useAuth()
-  const { sidebarColor, theme } = state.settings || { sidebarColor: '', theme: ''}
-  const themeClasses = `${getStyles({ theme, name: 'sidebarColor', strKey: sidebarColor})}`
+  const { sidebarColor, theme } = state.settings || { sidebarColor: '', theme: '' }
+  const themeClasses = `${getStyles({ theme, name: 'sidebarColor', strKey: sidebarColor })}`
 
   return (
     <Sidebar className={themeClasses} collapsible={'icon'}>
@@ -60,9 +80,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>
             <div className="flex items-center">
-                <h1 className="text-xl capitalize">
-                  Job Tracker
-                </h1>
+              <h1 className="text-xl capitalize">Job Tracker</h1>
             </div>
           </SidebarGroupLabel>
           <SidebarGroupContent className="mt-8">
@@ -79,10 +97,10 @@ export function AppSidebar() {
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
-        </SidebarGroup> 
+        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarTrigger /> 
+        <SidebarTrigger />
       </SidebarFooter>
     </Sidebar>
   )

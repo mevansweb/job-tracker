@@ -1,14 +1,22 @@
+import { type ColumnDef } from '@tanstack/react-table'
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
-import { type ColumnDef } from '@tanstack/react-table'
-import { ProgressBar } from '@/components/progress-bar'
 import { capitalizeWords, getProgress } from '@/global/functions'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { type Job, type Status } from '@/global/types'
 
-import { JobsModal } from '../modal/jobs-modal'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+
+import { ProgressBar } from '@/components/progress-bar'
+
 import { EventsModal } from '../modal/events-modal'
-import { type Job, type Status } from '../../global/types'
+import { JobsModal } from '../modal/jobs-modal'
 
 export const getStatusColor = (status: Status, isDarkMode: boolean) => {
   switch (status) {
@@ -33,7 +41,7 @@ export const getStatusColor = (status: Status, isDarkMode: boolean) => {
     case 'accepted-offer':
       return isDarkMode ? 'bg-green-500' : 'bg-green-400'
     case 'ghosted':
-      return isDarkMode ? 'bg-red-500' : 'bg-red-100' 
+      return isDarkMode ? 'bg-red-500' : 'bg-red-100'
     case 'rejected':
       return isDarkMode ? 'bg-red-500' : 'bg-red-100'
     default:
@@ -59,19 +67,21 @@ const jobHostToContactName = (link: string) => {
       default:
         return host
     }
-
   } catch {
     return link
   }
 }
 
-export const createColumns = (getStatusColor: (status: Status, isDarkMode: boolean) => string, theme: string): ColumnDef<Job>[] => [
+export const createColumns = (
+  getStatusColor: (status: Status, isDarkMode: boolean) => string,
+  theme: string
+): ColumnDef<Job>[] => [
   {
     accessorKey: 'applicationDate',
     header: ({ column }) => {
       return (
         <Button
-          variant='ghost'
+          variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
           Applied Date
@@ -80,7 +90,7 @@ export const createColumns = (getStatusColor: (status: Status, isDarkMode: boole
       )
     },
     cell: ({ row }) => (
-      <div className='text-left font-medium'>{row.getValue('applicationDate')}</div>
+      <div className="text-left font-medium">{row.getValue('applicationDate')}</div>
     ),
     sortingFn: (rowA, rowB, columnId) => {
       const dateA = new Date(rowA.getValue(columnId))
@@ -93,7 +103,7 @@ export const createColumns = (getStatusColor: (status: Status, isDarkMode: boole
     header: ({ column }) => {
       return (
         <Button
-          variant='ghost'
+          variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
           Company
@@ -101,7 +111,7 @@ export const createColumns = (getStatusColor: (status: Status, isDarkMode: boole
         </Button>
       )
     },
-    cell: ({ row }) => <div className='capitalize'>{row.getValue('company')}</div>,
+    cell: ({ row }) => <div className="capitalize">{row.getValue('company')}</div>,
   },
   {
     id: 'actions',
@@ -110,19 +120,23 @@ export const createColumns = (getStatusColor: (status: Status, isDarkMode: boole
     cell: ({ row }) => {
       const job = row.original
       const events = row.getValue('events') as Array<{ status?: string }> | undefined
-      const lastStatus = (events && events.length > 0 ? events[events.length - 1]?.status ?? '' : 'waiting-for-response') as Status
+      const lastStatus = (
+        events && events.length > 0
+          ? (events[events.length - 1]?.status ?? '')
+          : 'waiting-for-response'
+      ) as Status
       const jobHost = job.linkToJobPosting ? jobHostToContactName(job.linkToJobPosting) : 'N/A'
 
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
-              <span className='sr-only'>Open menu</span>
+            <Button variant="ghost" className="h-8 w-8 cursor-pointer p-0">
+              <span className="sr-only">Open menu</span>
               <MoreHorizontal />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="cursor-pointer" align="end">
-            <div className="flex justify-between mt-1 mb-2">
+            <div className="mt-1 mb-2 flex justify-between">
               <JobsModal job={job} />
               <EventsModal job={job} />
             </div>
@@ -159,7 +173,9 @@ export const createColumns = (getStatusColor: (status: Status, isDarkMode: boole
             </DropdownMenuItem>
             <DropdownMenuItem
               disabled={false}
-              onClick={() => navigator.clipboard.writeText(job.contactPerson ? job.contactPerson : jobHost)}
+              onClick={() =>
+                navigator.clipboard.writeText(job.contactPerson ? job.contactPerson : jobHost)
+              }
             >
               Copy Contact Name or Job Website
             </DropdownMenuItem>
@@ -179,56 +195,55 @@ export const createColumns = (getStatusColor: (status: Status, isDarkMode: boole
     header: 'Status',
     cell: ({ row }) => {
       const events = row.getValue('events') as Array<{ status?: string }> | undefined
-      const lastStatus = (events && events.length > 0 ? events[events.length - 1]?.status ?? '' : 'waiting-for-response') as Status
+      const lastStatus = (
+        events && events.length > 0
+          ? (events[events.length - 1]?.status ?? '')
+          : 'waiting-for-response'
+      ) as Status
       const progress = getProgress(lastStatus)
       return (
         <div>
-          <ProgressBar color={['ghosted', 'rejected'].includes(lastStatus) ? 'red' : 'blue'} progress={progress} />
-          <div className={`font-medium mt-2 p-1 rounded-lg w-auto text-center ${getStatusColor(lastStatus, theme === 'dark' ? true : false)}`}>{capitalizeWords(lastStatus.replace(/-/g, ' '))}</div>
+          <ProgressBar
+            color={['ghosted', 'rejected'].includes(lastStatus) ? 'red' : 'blue'}
+            progress={progress}
+          />
+          <div
+            className={`mt-2 w-auto rounded-lg p-1 text-center font-medium ${getStatusColor(lastStatus, theme === 'dark' ? true : false)}`}
+          >
+            {capitalizeWords(lastStatus.replace(/-/g, ' '))}
+          </div>
         </div>
       )
-    }
+    },
   },
   {
     accessorKey: 'address',
     header: 'Address',
-    cell: ({ row }) => (
-      <div className='text-left font-medium'>{row.getValue('address')}</div>
-    ),
+    cell: ({ row }) => <div className="text-left font-medium">{row.getValue('address')}</div>,
   },
   {
     accessorKey: 'phone',
     header: 'Phone',
-    cell: ({ row }) => (
-      <div className='text-left font-medium'>{row.getValue('phone')}</div>
-    ),
+    cell: ({ row }) => <div className="text-left font-medium">{row.getValue('phone')}</div>,
   },
   {
     accessorKey: 'position',
     header: 'Position',
-    cell: ({ row }) => (
-      <div className='text-left font-medium'>{row.getValue('position')}</div>
-    ),
+    cell: ({ row }) => <div className="text-left font-medium">{row.getValue('position')}</div>,
   },
   {
     accessorKey: 'salaryRange',
     header: 'Salary Range',
-    cell: ({ row }) => (
-      <div className='text-left font-medium'>{row.getValue('salaryRange')}</div>
-    ),
+    cell: ({ row }) => <div className="text-left font-medium">{row.getValue('salaryRange')}</div>,
   },
   {
     accessorKey: 'contactPerson',
     header: 'Contact',
-    cell: ({ row }) => (
-      <div className='text-left font-medium'>{row.getValue('contactPerson')}</div>
-    ),
+    cell: ({ row }) => <div className="text-left font-medium">{row.getValue('contactPerson')}</div>,
   },
   {
     accessorKey: 'notes',
     header: 'Notes',
-    cell: ({ row }) => (
-      <div className='text-left font-medium'>{row.getValue('notes')}</div>
-    ),
+    cell: ({ row }) => <div className="text-left font-medium">{row.getValue('notes')}</div>,
   },
 ]

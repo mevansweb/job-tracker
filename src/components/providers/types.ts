@@ -1,14 +1,8 @@
 import { type ReactNode } from 'react'
 
-import type {
-  ApiResult,
-  Certification,
-  Education,
-  Employer,
-  Resume,
-  Skill,
-} from '../../global/types'
-import type { Action, State } from '../providers/auth-provider'
+import type { Action, State } from '@/components/providers//auth-provider'
+
+import type { ApiResult, Certification, Education, Employer, Resume, Skill } from '@/global/types'
 
 export type ResumeState = Resume & {
   college: Education

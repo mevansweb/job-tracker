@@ -1,31 +1,62 @@
 import { useCallback, useMemo, useState } from 'react'
 
+import { localStorageKey } from '@/components/providers//const'
+import { useAuth } from '@/components/providers//hooks'
 import { ChevronDownIcon } from 'lucide-react'
 
-import { Input } from '@/components/ui/input'
+import { setJobs } from '@/global/shared'
+import { newJob } from '@/global/template'
+import type { Job } from '@/global/types'
+
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-
-import { setJobs } from '../../global/shared'
-import { useAuth } from '../providers/hooks'
-import { newJob } from '../../global/template'
-import type { Job } from '../../global/types'
-import { localStorageKey } from '../providers/const'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 type Props = {
   job?: Job
 }
 
-export function JobsModal({ job } : Props){
+export function JobsModal({ job }: Props) {
   const { dispatch, existing, postData, state } = useAuth()
   const jobs = useMemo(() => state.jobs ?? [], [state])
-  const [editJob, setEditJob ] = useState<Job>(job ? job : newJob)
-  const { address, applicationDate, contactPerson, company, jobType, linkToJobAccount, linkToJobPosting, notes, phone, position, salaryRange } = editJob
+  const [editJob, setEditJob] = useState<Job>(job ? job : newJob)
+  const {
+    address,
+    applicationDate,
+    contactPerson,
+    company,
+    jobType,
+    linkToJobAccount,
+    linkToJobPosting,
+    notes,
+    phone,
+    position,
+    salaryRange,
+  } = editJob
   const [open, setOpen] = useState(false)
-  const [date, setDate] = useState<Date | undefined>(applicationDate ? new Date(applicationDate) : undefined)
+  const [date, setDate] = useState<Date | undefined>(
+    applicationDate ? new Date(applicationDate) : undefined
+  )
 
   const update = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target
@@ -38,7 +69,7 @@ export function JobsModal({ job } : Props){
   const handleDelete = useCallback(async () => {
     const jobsCopy = jobs.filter((j) => j.id !== editJob.id)
     await setJobs({ dispatch, email: state.email, jobs: jobsCopy, postData, setEditJob })
-    localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, jobs: jobsCopy || []}))
+    localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, jobs: jobsCopy || [] }))
   }, [dispatch, editJob.id, existing, jobs, postData, state.email])
 
   const handleSave = useCallback(async () => {
@@ -48,60 +79,120 @@ export function JobsModal({ job } : Props){
       jobsCopy = jobs.filter((j) => j.id !== editJob.id)
       jobsCopy.splice(pos, 0, editJob)
     } else {
-      jobsCopy.push({ ...editJob, applicationDate: `${!editJob.applicationDate && date ? date.toLocaleDateString() : editJob.applicationDate}`, id:crypto.randomUUID()})
+      jobsCopy.push({
+        ...editJob,
+        applicationDate: `${!editJob.applicationDate && date ? date.toLocaleDateString() : editJob.applicationDate}`,
+        id: crypto.randomUUID(),
+      })
     }
     await setJobs({ dispatch, email: state.email, jobs: jobsCopy, postData, setEditJob })
-    localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, jobs: jobsCopy || []}))
+    localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, jobs: jobsCopy || [] }))
   }, [date, dispatch, editJob, existing, job, jobs, postData, state.email])
 
   return (
     <Dialog>
       <form>
         <DialogTrigger asChild>
-          <Button className={`${job ? 'justify-start px-2 ml-2' : 'mx-4'} cursor-pointer`} variant="outline">{job ? 'Edit Job Info' : 'Add New Job +'}</Button>
+          <Button
+            className={`${job ? 'ml-2 justify-start px-2' : 'mx-4'} cursor-pointer`}
+            variant="outline"
+          >
+            {job ? 'Edit Job Info' : 'Add New Job +'}
+          </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-106.25">
           <DialogHeader>
             <DialogTitle>{job ? 'Edit Job Info' : 'Add New Job'}</DialogTitle>
             <DialogDescription>
-              {job ? 'Edit information for' : 'Add information about'} the job you applied to. <br />Click save when you are done.
+              {job ? 'Edit information for' : 'Add information about'} the job you applied to.{' '}
+              <br />
+              Click save when you are done.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4">
             <div className="grid gap-3">
-              <Input onChange={update} name="company" placeholder="Company Name" defaultValue={company} />
+              <Input
+                onChange={update}
+                name="company"
+                placeholder="Company Name"
+                defaultValue={company}
+              />
             </div>
             <div className="grid gap-3">
-              <Input onChange={update} name="address" placeholder="Company Address" defaultValue={address} />
+              <Input
+                onChange={update}
+                name="address"
+                placeholder="Company Address"
+                defaultValue={address}
+              />
             </div>
             <div className="grid gap-3">
-              <Input onChange={update} name="phone" placeholder="Company Phone Number" defaultValue={phone} />
+              <Input
+                onChange={update}
+                name="phone"
+                placeholder="Company Phone Number"
+                defaultValue={phone}
+              />
             </div>
             <div className="grid gap-3">
-              <Input onChange={update} name="position" placeholder="Position" defaultValue={position} />
+              <Input
+                onChange={update}
+                name="position"
+                placeholder="Position"
+                defaultValue={position}
+              />
             </div>
             <div className="grid gap-3">
-              <Input onChange={update} name="salaryRange" placeholder="Salary Range" defaultValue={salaryRange} />
+              <Input
+                onChange={update}
+                name="salaryRange"
+                placeholder="Salary Range"
+                defaultValue={salaryRange}
+              />
             </div>
             <div className="grid gap-3">
-              <Input onChange={update} name="contactPerson" placeholder="Contact Person (e.g. recruiter)" defaultValue={contactPerson}/>
+              <Input
+                onChange={update}
+                name="contactPerson"
+                placeholder="Contact Person (e.g. recruiter)"
+                defaultValue={contactPerson}
+              />
             </div>
             <div className="grid gap-3">
-              <Input onChange={update} name="linkToJobPosting" placeholder="Link to Job Posting (e.g. linkedin.com, indeed.com)" defaultValue={linkToJobPosting} />
+              <Input
+                onChange={update}
+                name="linkToJobPosting"
+                placeholder="Link to Job Posting (e.g. linkedin.com, indeed.com)"
+                defaultValue={linkToJobPosting}
+              />
             </div>
             <div className="grid gap-3">
-              <Input onChange={update} name="linkToJobAccount" placeholder="Link to Job Account (e.g. workday.com, greenhouse.io)" defaultValue={linkToJobAccount} />
+              <Input
+                onChange={update}
+                name="linkToJobAccount"
+                placeholder="Link to Job Account (e.g. workday.com, greenhouse.io)"
+                defaultValue={linkToJobAccount}
+              />
             </div>
             <div className="grid gap-3">
-              <Input onChange={update} name="notes" placeholder="Notes/Additional Details" defaultValue={notes} />
+              <Input
+                onChange={update}
+                name="notes"
+                placeholder="Notes/Additional Details"
+                defaultValue={notes}
+              />
             </div>
             <div className="flex justify-between">
-              <Select name="jobType" defaultValue={jobType} onValueChange={(val) => {
-                setEditJob((prevData) => ({
-                  ...prevData,
-                  jobType: val,
-                }))
-              }}>
+              <Select
+                name="jobType"
+                defaultValue={jobType}
+                onValueChange={(val) => {
+                  setEditJob((prevData) => ({
+                    ...prevData,
+                    jobType: val,
+                  }))
+                }}
+              >
                 <SelectTrigger className="w-45">
                   <SelectValue placeholder="Job Type" />
                 </SelectTrigger>
@@ -120,9 +211,9 @@ export function JobsModal({ job } : Props){
                   <Button
                     variant="outline"
                     id="date"
-                    className="w-45 flex text-muted-foreground font-normal justify-between"
+                    className="text-muted-foreground flex w-45 justify-between font-normal"
                   >
-                    {date ? date.toLocaleDateString() : "Application date"}
+                    {date ? date.toLocaleDateString() : 'Application date'}
                     <ChevronDownIcon />
                   </Button>
                 </PopoverTrigger>
@@ -140,7 +231,7 @@ export function JobsModal({ job } : Props){
                         }))
                         setDate(d)
                         setOpen(false)
-                      } 
+                      }
                     }}
                   />
                 </PopoverContent>
@@ -150,14 +241,18 @@ export function JobsModal({ job } : Props){
           <DialogFooter>
             {job ? (
               <DialogClose asChild>
-                <Button variant="outline" onClick={handleDelete}>Delete</Button>
+                <Button variant="outline" onClick={handleDelete}>
+                  Delete
+                </Button>
               </DialogClose>
-            ): null}
+            ) : null}
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
             <DialogClose asChild>
-              <Button type="submit" onClick={handleSave}>Save changes</Button>
+              <Button type="submit" onClick={handleSave}>
+                Save changes
+              </Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>
