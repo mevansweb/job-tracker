@@ -28,7 +28,6 @@ type ResumeInputProps = {
   updateDate?: (d: Date, name: string, id?: string) => void
   saveById?: (id?: string | undefined) => void
   setButtonAction: (mode: Mode, id: string, name?: string, value?: string) => void
-  warning?: boolean
 }
 
 type ButtonWithTooltipProps = {
@@ -107,7 +106,6 @@ export const ResumeInput = ({
   update,
   updateDate,
   setButtonAction,
-  warning,
 }: ResumeInputProps) => {
   const [mode, setMode] = useState<Mode>(parentMode ?? 'view')
   const isEmpty = useMemo(() => getIsEmpty(data), [data])
@@ -133,19 +131,6 @@ export const ResumeInput = ({
         <div className="flex justify-between gap-4">
           {inputType === 'input' ? (
             <Input
-              aria-invalid={warning}
-              className="w-9/10"
-              defaultValue={data}
-              id={name}
-              name={name}
-              onChange={(event) =>
-                id && update ? update(event, id) : update ? update(event) : null
-              }
-              placeholder={placeholder}
-            />
-          ) : inputType === 'textarea' ? (
-            <Textarea
-              aria-invalid={warning}
               className="w-9/10"
               defaultValue={data}
               id={name}
@@ -156,6 +141,23 @@ export const ResumeInput = ({
                 } else if (update) {
                   update(event)
                 }
+                setMode('edit')
+              }}
+              placeholder={placeholder}
+            />
+          ) : inputType === 'textarea' ? (
+            <Textarea
+              className="w-9/10"
+              defaultValue={data}
+              id={name}
+              name={name}
+              onChange={(event) => {
+                if (id && update) {
+                  update(event, id)
+                } else if (update) {
+                  update(event)
+                }
+                setMode('edit')
               }}
               placeholder={placeholder}
             />
@@ -191,7 +193,6 @@ export const ResumeInput = ({
         <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
           <PopoverTrigger asChild>
             <Button
-              aria-invalid={warning}
               className={`text-muted-foreground flex w-23.75 justify-between font-normal`}
               id={name}
               variant="outline"

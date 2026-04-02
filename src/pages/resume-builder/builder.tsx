@@ -11,8 +11,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { setResume } from '@/global/shared'
 import { ResumeInput } from '@/pages/resume-builder/input'
 
+import { ResumeCertifications } from './certifications'
 import { ResumeCoverLetter } from './coverletter'
+import { ResumeEducation } from './education'
 import { ResumeExperience } from './experience'
+import { ResumeSkills } from './skills'
 import type { Mode } from './types'
 
 const ResumeBuilder = () => {
@@ -39,7 +42,6 @@ const ResumeBuilder = () => {
     async (_id?: string) => {
       dispatchAuth({ type: 'SET_RESUME', resume: { ...state } })
       await setResume({
-        action: 'edit',
         dispatch: dispatchAuth,
         email: authState.email,
         resume: { ...state },
@@ -106,10 +108,14 @@ const ResumeBuilder = () => {
                 </FieldGroup>
               </FieldSet>
             </TabsContent>
-            <TabsContent value="education">Make changes to your education here.</TabsContent>
-            <TabsContent value="skills">Make changes to your skills here.</TabsContent>
+            <TabsContent value="education">
+              <ResumeEducation />
+            </TabsContent>
+            <TabsContent value="skills">
+              <ResumeSkills />
+            </TabsContent>
             <TabsContent value="certifications">
-              Make changes to your certifications here.
+              <ResumeCertifications />
             </TabsContent>
             <TabsContent value="cover-letter">
               <ResumeCoverLetter />

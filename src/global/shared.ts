@@ -19,7 +19,6 @@ export type EditNotesProps = {
 }
 
 export type EditResumeProps = {
-  action: 'add' | 'edit' | 'delete'
   dispatch: (action: Action) => void
   email: string
   postData: (method: 'POST' | 'GET' | 'PUT' | 'DELETE', body: unknown) => Promise<void>
@@ -97,7 +96,7 @@ export const setNotes = async ({
   }
 }
 
-export const setResume = async ({ action, dispatch, email, resume, postData }: EditResumeProps) => {
+export const setResume = async ({ dispatch, email, resume, postData }: EditResumeProps) => {
   dispatch({ type: 'SET_RESUME', resume })
   await postData('PUT', { email, resume, form: 'update-resume' })
 }

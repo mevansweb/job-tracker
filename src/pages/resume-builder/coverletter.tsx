@@ -92,7 +92,6 @@ ${body}`
       dispatch({ type: 'SET_COVERLETTER', coverLetter })
       dispatchAuth({ type: 'SET_RESUME', resume: { ...state, coverLetter } })
       await setResume({
-        action: 'edit',
         dispatch: dispatchAuth,
         email: authState.email,
         resume: { ...state, coverLetter },
@@ -110,7 +109,7 @@ ${body}`
 
   return (
     <div className="mt-4">
-      <FieldLegend className="border-b pb-2 font-bold">Cover Letter</FieldLegend>
+      <FieldLegend className="mt-4 border-b pb-2 font-bold">Cover Letter</FieldLegend>
       <div className="flex flex-col gap-4">
         <ResumeInput
           data={position}

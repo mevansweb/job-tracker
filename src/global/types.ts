@@ -173,7 +173,7 @@ export const programmingLanguages: ProgrammingLanguage[] = [
 export type Framework = ProgrammingLanguage | FrontendFramework | Pattern
 
 export type Resume = {
-  college: {}
+  college: Education
   coverLetter: CoverLetter
   certifications: Certification[]
   education: Education[]

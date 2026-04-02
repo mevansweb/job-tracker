@@ -1,3 +1,5 @@
+import equal from 'fast-deep-equal/es6/react'
+
 import { bgThemeVariants, fontVariants, sbThemeVariants } from '@/global/constants'
 import { Status } from '@/global/types'
 
@@ -106,6 +108,26 @@ export function spliceOrConcatArray(item: UnknownWithId, arr: UnknownWithId[]) {
   return arrCopy
 }
 
+export function getItemToEdit(item: UnknownWithId, arr: UnknownWithId[], id: string) {
+  let itemToUpdate = item
+  if (id !== item.id) {
+    const found = arr.find((f) => f.id === id)
+    if (found) {
+      itemToUpdate = found
+    }
+  }
+  return itemToUpdate
+}
+
+export function disableSave(item: UnknownWithId, arr: UnknownWithId[], id: string) {
+  const local = item
+  const original = arr.find((a) => a.id === id)
+  const isEmpty = getIsEmpty({ ...local, id: '' })
+  if (isEmpty) return true
+  if (!original || !local) return false // should not disable if either copy is missing, user may have added or deleted an item and should be allowed to save
+  return equal(local, original)
+}
+
 export function getIsEmpty(data: string | object) {
   if (typeof data === 'string' && !data) {
     return true
@@ -151,27 +173,4 @@ export function getEmptyRequiredFields<T extends Record<string, any>>(
   }
 
   return emptyFields
-}
-
-export function arePropsEmpty<T extends object>(obj: T, keys: (keyof T)[]): boolean {
-  if (obj == null || typeof obj !== 'object') {
-    throw new Error('Invalid object provided.')
-  }
-
-  return keys.every((key) => {
-    const value = obj[key]
-
-    // Empty string check
-    if (typeof value === 'string') {
-      return value.trim() === ''
-    }
-
-    // Empty array check
-    if (Array.isArray(value)) {
-      return value.length === 0
-    }
-
-    // If property is neither string nor array, treat as not empty
-    return false
-  })
 }
