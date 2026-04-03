@@ -38,9 +38,9 @@ const convertArray = (arr: string[]) => {
 }
 
 const getFunctionOutput = (input: InputType, code: string, secondInput?: InputType) => {
-  let corrected = getProcessedInputs(input)
+  const corrected = getProcessedInputs(input)
   if (corrected && secondInput) {
-    let corrected2 = getProcessedInputs(secondInput)
+    const corrected2 = getProcessedInputs(secondInput)
     const func = new Function('x', 'y', code)
     return func(corrected, corrected2)
   } else if (corrected) {
@@ -62,7 +62,7 @@ const getCorrectAnswer = ({
   question: PracticeQuestion
   secondInput?: InputType
 }) => {
-  let expectedStr = question.shouldReturn
+  const expectedStr = question.shouldReturn
   const defaultInput = question.exampleInput
   if (input && !notFinishedTyping(input) && input !== defaultInput) {
     // recalculate the correct answer if inputs were changed
@@ -159,11 +159,11 @@ const Practice = () => {
 
   const defaultInput = useMemo(
     () => getProcessedInputs(questions[question].exampleInput),
-    [questions]
+    [question, questions]
   )
   const defaultSecondInput = useMemo(
     () => getProcessedInputs(questions[question].secondInput ?? ''),
-    [questions]
+    [question, questions]
   )
 
   const [input, setInput] = useState<InputType>(defaultInput)
@@ -171,7 +171,7 @@ const Practice = () => {
 
   const correctAnswer = useMemo(() => {
     return getCorrectAnswer({ input, question: questions[question], secondInput })
-  }, [input, question, secondInput])
+  }, [input, question, questions, secondInput])
 
   const isCorrect = useMemo(() => {
     return getIsCorrect({ answer, correctAnswer })
@@ -202,7 +202,7 @@ const Practice = () => {
     } else {
       toast.error(<ErrorMessage errors={missing} />)
     }
-  }, [code, input, secondInput, setAnswer])
+  }, [code, input, question, questions, secondInput])
 
   const resetQuestion = useCallback(
     (goTo: number, which: 'number' | 'group') => {

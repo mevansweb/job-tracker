@@ -8,15 +8,16 @@ import tseslint from 'typescript-eslint'
 export default tseslint.config(
   { ignores: ['dist'] },
   {
-    extends: [
-      js.configs.recommended,
-      ...tseslint.configs.recommended,
-      'plugin:prettier/recommended',
-    ],
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      // other options...
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     plugins: {
       'react-hooks': reactHooks,
@@ -24,6 +25,7 @@ export default tseslint.config(
       prettier: prettier,
     },
     rules: {
+      ...prettier.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       '@typescript-eslint/no-floating-promises': 'error',
@@ -34,6 +36,8 @@ export default tseslint.config(
         },
       ],
       'prettier/prettier': 'error',
+      'react-hooks/rules-of-hooks': 'error', // Checks rules of Hooks
+      'react-hooks/exhaustive-deps': 'warn', // Checks effect dependencies
     },
   }
 )

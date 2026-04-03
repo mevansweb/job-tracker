@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { localStorageKey } from '@/components/providers/const'
-import { useResume } from '@/components/providers/resume-provider'
+import { useResume } from '@/components/providers/hooks'
 import { Button } from '@/components/ui/button'
 import { FieldLegend } from '@/components/ui/field'
 import { disableSave, spliceOrConcatArray } from '@/global/functions'
@@ -31,12 +31,43 @@ export const ResumeCertifications = () => {
     mode: undefined,
   })
 
+  const saveById = useCallback(
+    async (id?: string) => {
+      try {
+        const arr = spliceOrConcatArray(certification, certifications)
+        dispatch({ type: 'SET_CERTIFICATIONS', certifications: arr as Certification[] })
+        dispatchAuth({
+          type: 'SET_RESUME',
+          resume: { ...state, certifications: arr as Certification[] },
+        })
+        await setResume({
+          dispatch: dispatchAuth,
+          email: authState.email,
+          resume: { ...state, certifications: arr as Certification[] },
+          postData,
+        })
+        localStorage.setItem(
+          localStorageKey,
+          JSON.stringify({
+            ...authState,
+            resume: { ...state, certifications: arr as Certification[] },
+          })
+        )
+        setEditing({ id: id || certification.id, mode: 'view' })
+        toast.success('Saved successfully')
+      } catch (error) {
+        toast.error(`Error saving work history: ${error}`)
+      }
+    },
+    [certification, certifications, dispatch, dispatchAuth, state, authState, postData]
+  )
+
   const setButtonAction = useCallback(
-    (mode: Mode, id: string, _name?: string, value?: string) => {
+    async (mode: Mode, id: string, _name?: string, value?: string) => {
       const current = getItemToEdit(certification, certifications, id)
       switch (mode) {
         case 'copy':
-          navigator.clipboard.writeText(value || '')
+          await navigator.clipboard.writeText(value || '')
           toast.success('Copied to clipboard')
           break
         case 'edit':
@@ -44,20 +75,21 @@ export const ResumeCertifications = () => {
           setCertification(current as Certification)
           break
         case 'save':
-          saveById(id)
+          await saveById(id)
           break
-        case 'undo':
+        case 'undo': {
           const original = authState?.resume?.certifications?.find((item) => item.id === id)
           if (original) {
             setCertification(original)
           }
           setEditing({ id, mode: 'view' })
           break
+        }
         default:
           break
       }
     },
-    [certifications, certification, setEditing]
+    [certification, certifications, saveById, authState?.resume?.certifications]
   )
 
   const update = useCallback(
@@ -85,37 +117,6 @@ export const ResumeCertifications = () => {
     [certification, certifications, setCertification]
   )
 
-  const saveById = useCallback(
-    async (id?: string) => {
-      try {
-        const arr = spliceOrConcatArray(certification, certifications)
-        dispatch({ type: 'SET_CERTIFICATIONS', certifications: arr as Certification[] })
-        dispatchAuth({
-          type: 'SET_RESUME',
-          resume: { ...state, certifications: arr as Certification[] },
-        })
-        await setResume({
-          dispatch: dispatchAuth,
-          email: authState.email,
-          resume: { ...state, certifications: arr as Certification[] },
-          postData,
-        })
-        localStorage.setItem(
-          localStorageKey,
-          JSON.stringify({
-            ...authState,
-            resume: { ...state, certifications: arr as Certification[] },
-          })
-        )
-        setEditing({ id: id || certification.id, mode: 'view' })
-        toast.success('Saved successfully')
-      } catch (error) {
-        toast.error('Error saving work history')
-      }
-    },
-    [dispatch, dispatchAuth, certification, certifications, setEditing, setResume, state]
-  )
-
   const addNew = useCallback(() => {
     const nextId = crypto.randomUUID()
     setEditing({ id: nextId, mode: 'add' })
@@ -136,7 +137,7 @@ export const ResumeCertifications = () => {
       certifications
     )
     dispatch({ type: 'SET_CERTIFICATIONS', certifications: arr as Certification[] })
-  }, [dispatch, certification, certifications, setEditing])
+  }, [dispatch, certifications, setEditing])
 
   const deleteById = useCallback(
     async (id: string) => {
@@ -162,10 +163,10 @@ export const ResumeCertifications = () => {
         )
         toast.success('Deleted successfully')
       } catch (error) {
-        toast.error('Error deleting work history')
+        toast.error(`Error deleting work history: ${error}`)
       }
     },
-    [dispatchAuth, state]
+    [authState, certifications, dispatch, dispatchAuth, postData, state]
   )
 
   return (

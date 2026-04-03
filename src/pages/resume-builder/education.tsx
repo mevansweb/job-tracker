@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { localStorageKey } from '@/components/providers/const'
-import { useResume } from '@/components/providers/resume-provider'
+import { useResume } from '@/components/providers/hooks'
 import { Button } from '@/components/ui/button'
 import { FieldLegend } from '@/components/ui/field'
 import { disableSave, spliceOrConcatArray } from '@/global/functions'
@@ -26,12 +26,37 @@ export const ResumeEducation = () => {
     mode: undefined,
   })
 
+  const saveById = useCallback(
+    async (id?: string) => {
+      try {
+        const arr = spliceOrConcatArray(college, education)
+        dispatch({ type: 'SET_EDUCATION', education: arr as Education[] })
+        dispatchAuth({ type: 'SET_RESUME', resume: { ...state, education: arr as Education[] } })
+        await setResume({
+          dispatch: dispatchAuth,
+          email: authState.email,
+          resume: { ...state, education: arr as Education[] },
+          postData,
+        })
+        localStorage.setItem(
+          localStorageKey,
+          JSON.stringify({ ...authState, resume: { ...state, education: arr as Education[] } })
+        )
+        setEditing({ id: id || college.id, mode: 'view' })
+        toast.success('Saved successfully')
+      } catch (error) {
+        toast.error(`Error saving work history: ${error}`)
+      }
+    },
+    [college, education, dispatch, dispatchAuth, state, authState, postData]
+  )
+
   const setButtonAction = useCallback(
-    (mode: Mode, id: string, _name?: string, value?: string) => {
+    async (mode: Mode, id: string, _name?: string, value?: string) => {
       const current = getItemToEdit(college, education, id)
       switch (mode) {
         case 'copy':
-          navigator.clipboard.writeText(value || '')
+          await navigator.clipboard.writeText(value || '')
           toast.success('Copied to clipboard')
           break
         case 'edit':
@@ -39,20 +64,21 @@ export const ResumeEducation = () => {
           dispatch({ type: 'SET_COLLEGE', college: current as Education })
           break
         case 'save':
-          saveById(id)
+          await saveById(id)
           break
-        case 'undo':
+        case 'undo': {
           const original = authState?.resume?.education?.find((item) => item.id === id)
           if (original) {
             dispatch({ type: 'SET_COLLEGE', college: original })
           }
           setEditing({ id, mode: 'view' })
           break
+        }
         default:
           break
       }
     },
-    [education, college, setEditing]
+    [college, education, dispatch, saveById, authState?.resume?.education]
   )
 
   const update = useCallback(
@@ -78,31 +104,6 @@ export const ResumeEducation = () => {
       dispatch({ type: 'SET_COLLEGE', college: { ...(edited as Education) } })
     },
     [college, education, dispatch]
-  )
-
-  const saveById = useCallback(
-    async (id?: string) => {
-      try {
-        const arr = spliceOrConcatArray(college, education)
-        dispatch({ type: 'SET_EDUCATION', education: arr as Education[] })
-        dispatchAuth({ type: 'SET_RESUME', resume: { ...state, education: arr as Education[] } })
-        await setResume({
-          dispatch: dispatchAuth,
-          email: authState.email,
-          resume: { ...state, education: arr as Education[] },
-          postData,
-        })
-        localStorage.setItem(
-          localStorageKey,
-          JSON.stringify({ ...authState, resume: { ...state, education: arr as Education[] } })
-        )
-        setEditing({ id: id || college.id, mode: 'view' })
-        toast.success('Saved successfully')
-      } catch (error) {
-        toast.error('Error saving work history')
-      }
-    },
-    [dispatch, dispatchAuth, college, education, setEditing, setResume, state]
   )
 
   const addNew = useCallback(() => {
@@ -131,7 +132,7 @@ export const ResumeEducation = () => {
       education
     )
     dispatch({ type: 'SET_EDUCATION', education: arr as Education[] })
-  }, [dispatch, college, education, setEditing])
+  }, [dispatch, education, setEditing])
 
   const deleteById = useCallback(
     async (id: string) => {
@@ -151,10 +152,10 @@ export const ResumeEducation = () => {
         )
         toast.success('Deleted successfully')
       } catch (error) {
-        toast.error('Error deleting work history')
+        toast.error(`Error deleting work history: ${error}`)
       }
     },
-    [dispatchAuth, state]
+    [authState, dispatch, dispatchAuth, education, postData, state]
   )
 
   return (

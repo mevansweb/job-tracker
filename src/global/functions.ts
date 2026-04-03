@@ -102,7 +102,11 @@ export function spliceOrConcatArray(item: UnknownWithId, arr: UnknownWithId[]) {
   const pos = arr.map((e) => e.id).indexOf(item.id)
   let arrCopy = arr
   if (pos === -1) {
-    arrCopy = arr.concat(item)
+    let newItem = item
+    if (!item.id) {
+      newItem = { ...item, id: crypto.randomUUID() }
+    }
+    arrCopy = arr.concat(newItem)
   } else {
     arrCopy = arr.filter((j) => j.id !== item.id)
     arrCopy.splice(pos, 0, item)

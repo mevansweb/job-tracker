@@ -6,7 +6,7 @@ import equal from 'fast-deep-equal/es6/react'
 import { toast } from 'sonner'
 
 import { localStorageKey } from '@/components/providers/const'
-import { useResume } from '@/components/providers/resume-provider'
+import { useResume } from '@/components/providers/hooks'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { FieldLegend } from '@/components/ui/field'
@@ -54,7 +54,7 @@ export const ResumeCoverLetter = () => {
   )
   const personalizedGreeting = useMemo(
     () => getGreeting({ companyName, greeting, personalize, position }),
-    [companyName, personalize, position]
+    [companyName, greeting, personalize, position]
   )
   const coverLetterText = useMemo(() => {
     return `${personalizedGreeting}
@@ -71,10 +71,10 @@ ${body}`
   )
 
   const setButtonAction = useCallback(
-    (mode: Mode, _id: string, value?: string) => {
+    async (mode: Mode, _id: string, value?: string) => {
       switch (mode) {
         case 'copy':
-          navigator.clipboard.writeText(value || '')
+          await navigator.clipboard.writeText(value || '')
           break
         case 'save':
           dispatch({ type: 'SET_COVERLETTER', coverLetter })
@@ -103,9 +103,9 @@ ${body}`
       )
       toast.success('Saved successfully')
     } catch (error) {
-      toast.error('Failed to save cover letter')
+      toast.error(`Failed to save cover letter ${error}`)
     }
-  }, [dispatch, dispatchAuth, state, coverLetter])
+  }, [dispatch, coverLetter, dispatchAuth, state, authState, postData])
 
   return (
     <div className="mt-4">

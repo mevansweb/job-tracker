@@ -1,8 +1,10 @@
 import { createContext } from 'react'
 
-import type { AuthContextType, ResumeState } from './types'
+import type { AuthContextType, ResumeContextType, ResumeState } from './types'
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+export const ResumeContext = createContext<ResumeContextType | undefined>(undefined)
 
 export const localStorageKey = 'job-tracker-local-data'
 

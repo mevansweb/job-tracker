@@ -19,7 +19,7 @@ const Header = ({
     theme === 'dark'
       ? `bg-[url('/job-tracker-logo-dark.png')]`
       : `bg-[url('/job-tracker-logo-light.png')]`
-  // grid place-items-center border border-red-600 relative
+
   return (
     <div className="flex justify-between">
       <div className="flex">

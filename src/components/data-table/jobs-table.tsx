@@ -105,7 +105,7 @@ export function JobsTable({
   const handleSave = useCallback(async () => {
     const saveEmail: string = state.email
     if (saveEmail) {
-      postData('PUT', { email: saveEmail, jobs: state.jobs.length > 0 ? state.jobs : [] })
+      await postData('PUT', { email: saveEmail, jobs: state.jobs.length > 0 ? state.jobs : [] })
       localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, jobs: state.jobs || [] }))
     }
   }, [existing, postData, state.email, state.jobs])
@@ -141,7 +141,7 @@ export function JobsTable({
       table.getColumn(filterBy)?.setFilterValue(event.target.value)
       table.setPageIndex(0) // Reset to first page
     },
-    [table]
+    [filterBy, table]
   )
 
   return (

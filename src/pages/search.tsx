@@ -101,7 +101,7 @@ const Search = () => {
   const { id, jobs } = state
   const [companyQuery, setCompanyQuery] = useState('')
   const [positionQuery, setPositionQuery] = useState('')
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [searchResults, setSearchResults] = useState<Job[] | null>([])
   const [upcoming, setUpcoming] = useState<Job[] | null>([])
 
@@ -164,8 +164,8 @@ const Search = () => {
       }
 
       if (newQuery.trim().length >= MIN_QUERY_LENGTH) {
-        timeoutRef.current = setTimeout(() => {
-          performSearch(newQuery, searchType)
+        timeoutRef.current = setTimeout(async () => {
+          await performSearch(newQuery, searchType)
         }, 500)
       }
     },

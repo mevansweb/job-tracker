@@ -103,8 +103,8 @@ const SettingToggle = memo(function SettingToggle({
                     <DropdownMenuItem
                       id={optionTitle}
                       key={`${name}-${optionTitle}`}
-                      onClick={() => {
-                        handleChange({ name, value: optionValue })
+                      onClick={async () => {
+                        await handleChange({ name, value: optionValue })
                       }}
                     >
                       {optionTitle ? optionTitle : 'Default'}
@@ -160,7 +160,11 @@ const Settings = () => {
     async ({ name, value }: { name: string; value: string }) => {
       const updatedSettings = { ...editSettings, [name]: value }
       setEditSettings(updatedSettings)
-      postData('PUT', { email: state.email, settings: updatedSettings, form: 'update-settings' })
+      await postData('PUT', {
+        email: state.email,
+        settings: updatedSettings,
+        form: 'update-settings',
+      })
       dispatch({ type: 'SET_SETTINGS', settings: updatedSettings })
       localStorage.setItem(localStorageKey, JSON.stringify({ ...state, settings: updatedSettings }))
     },

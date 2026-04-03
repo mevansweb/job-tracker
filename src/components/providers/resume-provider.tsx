@@ -1,12 +1,11 @@
-import { type ReactNode, createContext, useContext, useReducer } from 'react'
+import { type ReactNode, useReducer } from 'react'
 
-import { type Action, type State as AuthState } from '@/components/providers/auth-provider'
 import { useAuth } from '@/components/providers/hooks'
 
-import { initialResume } from './const'
+import { ResumeContext, initialResume } from './const'
 import { type ResumeState } from './types'
 
-type ResumeAction =
+export type ResumeAction =
   | ({ type: 'SET_ALL_DATA' } & ResumeState)
   | ({ type: 'SET_CERTIFICATION' } & Pick<ResumeState, 'certification'>)
   | ({ type: 'SET_COLLEGE' } & Pick<ResumeState, 'college'>)
@@ -19,14 +18,6 @@ type ResumeAction =
   | ({ type: 'SET_SUMMARY' } & Pick<ResumeState, 'summary'>)
   | ({ type: 'SET_SKILL' } & Pick<ResumeState, 'skill'>)
   | ({ type: 'SET_SKILLS' } & Pick<ResumeState, 'skills'>)
-
-interface ResumeContextType {
-  authState: AuthState
-  dispatch: React.ActionDispatch<[action: ResumeAction]>
-  dispatchAuth: React.ActionDispatch<[action: Action]>
-  postData: (method: 'POST' | 'GET' | 'PUT' | 'DELETE', body: unknown) => Promise<void>
-  state: ResumeState
-}
 
 const reducer = (state: ResumeState, action: ResumeAction) => {
   switch (action.type) {
@@ -107,16 +98,6 @@ const reducer = (state: ResumeState, action: ResumeAction) => {
         ...state,
       }
   }
-}
-
-const ResumeContext = createContext<ResumeContextType | undefined>(undefined)
-
-export const useResume = (): ResumeContextType => {
-  const context = useContext(ResumeContext)
-  if (!context) {
-    throw new Error('useResume must be used within an ResumeProvider')
-  }
-  return context
 }
 
 export const ResumeProvider = ({ children }: { children: ReactNode }) => {

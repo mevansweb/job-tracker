@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { localStorageKey } from '@/components/providers/const'
-import { useResume } from '@/components/providers/resume-provider'
+import { useResume } from '@/components/providers/hooks'
 import { Button } from '@/components/ui/button'
 import { FieldLegend } from '@/components/ui/field'
 import { disableSave, spliceOrConcatArray } from '@/global/functions'
@@ -30,60 +30,6 @@ export const ResumeSkills = () => {
     mode: undefined,
   })
 
-  const setButtonAction = useCallback(
-    (mode: Mode, id: string, _name?: string, value?: string) => {
-      const current = getItemToEdit(skill, skills, id)
-      switch (mode) {
-        case 'copy':
-          navigator.clipboard.writeText(value || '')
-          toast.success('Copied to clipboard')
-          break
-        case 'edit':
-          setEditing({ id, mode })
-          setSkill(current as Skill)
-          break
-        case 'save':
-          saveById(id)
-          break
-        case 'undo':
-          const original = authState?.resume?.skills?.find((item) => item.id === id)
-          if (original) {
-            setSkill(original)
-          }
-          setEditing({ id, mode: 'view' })
-          break
-        default:
-          break
-      }
-    },
-    [skills, skill, setEditing]
-  )
-
-  const update = useCallback(
-    (event: TextUpdateEvent, id?: string) => {
-      const { name, value } = event.target
-      const edited = getItemToEdit(skill, skills, id || '')
-      const updated = {
-        ...edited,
-        [name]: value,
-      }
-      setSkill(updated as Skill)
-    },
-    [skill, skills, setSkill]
-  )
-
-  const updateDate = useCallback(
-    async (d: Date, name: string, id?: string) => {
-      let edited = getItemToEdit(skill, skills, id || '')
-      edited = {
-        ...edited,
-        [name]: d.toLocaleDateString(),
-      }
-      setSkill(edited as Skill)
-    },
-    [skill, skills, setSkill]
-  )
-
   const saveById = useCallback(
     async (id?: string) => {
       try {
@@ -109,10 +55,53 @@ export const ResumeSkills = () => {
         setEditing({ id: id || skill.id, mode: 'view' })
         toast.success('Saved successfully')
       } catch (error) {
-        toast.error('Error saving work history')
+        toast.error(`Error saving work history: ${error}`)
       }
     },
-    [dispatch, dispatchAuth, skill, skills, setEditing, setResume, state]
+    [skill, skills, dispatch, dispatchAuth, state, authState, postData]
+  )
+
+  const setButtonAction = useCallback(
+    async (mode: Mode, id: string, _name?: string, value?: string) => {
+      const current = getItemToEdit(skill, skills, id)
+      switch (mode) {
+        case 'copy':
+          await navigator.clipboard.writeText(value || '')
+          toast.success('Copied to clipboard')
+          break
+        case 'edit':
+          setEditing({ id, mode })
+          setSkill(current as Skill)
+          break
+        case 'save':
+          await saveById(id)
+          break
+        case 'undo': {
+          const original = authState?.resume?.skills?.find((item) => item.id === id)
+          if (original) {
+            setSkill(original)
+          }
+          setEditing({ id, mode: 'view' })
+          break
+        }
+        default:
+          break
+      }
+    },
+    [skill, skills, saveById, authState?.resume?.skills]
+  )
+
+  const update = useCallback(
+    (event: TextUpdateEvent, id?: string) => {
+      const { name, value } = event.target
+      const edited = getItemToEdit(skill, skills, id || '')
+      const updated = {
+        ...edited,
+        [name]: value,
+      }
+      setSkill(updated as Skill)
+    },
+    [skill, skills, setSkill]
   )
 
   const addNew = useCallback(() => {
@@ -130,7 +119,7 @@ export const ResumeSkills = () => {
       skills
     )
     dispatch({ type: 'SET_SKILLS', skills: arr as Skill[] })
-  }, [dispatch, skill, skills, setEditing])
+  }, [dispatch, skills, setEditing])
 
   const deleteById = useCallback(
     async (id: string) => {
@@ -156,10 +145,10 @@ export const ResumeSkills = () => {
         )
         toast.success('Deleted successfully')
       } catch (error) {
-        toast.error('Error deleting work history')
+        toast.error(`Error deleting work history: ${error}`)
       }
     },
-    [dispatchAuth, state]
+    [authState, dispatch, dispatchAuth, postData, skills, state]
   )
 
   return (

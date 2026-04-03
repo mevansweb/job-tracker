@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 
 import Header from '@/components/header'
 import { emptyState, initialResume, localStorageKey } from '@/components/providers/const'
-import { useResume } from '@/components/providers/resume-provider'
+import { useResume } from '@/components/providers/hooks'
 import { RoundedContainer } from '@/components/rounded-container'
 import { FieldGroup, FieldLegend, FieldSet } from '@/components/ui/field'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -37,7 +37,7 @@ const ResumeBuilder = () => {
         skill: initialResume.skill,
       })
     }
-  }, [authState.resume, emptyState, isEqual, state])
+  }, [authState.resume, dispatch, dispatchAuth, isEqual, state])
 
   const saveById = useCallback(
     async (_id?: string) => {
@@ -50,18 +50,18 @@ const ResumeBuilder = () => {
       })
       localStorage.setItem(localStorageKey, JSON.stringify({ ...authState, resume: { ...state } }))
     },
-    [authState, dispatchAuth, state]
+    [authState, dispatchAuth, postData, state]
   )
 
   const setButtonAction = useCallback(
-    (mode: Mode, _id?: string, _name?: string, value?: string) => {
+    async (mode: Mode, _id?: string, _name?: string, value?: string) => {
       switch (mode) {
         case 'copy':
-          navigator.clipboard.writeText(value || '')
+          await navigator.clipboard.writeText(value || '')
           toast.success('Copied to clipboard')
           break
         case 'save':
-          saveById(_id)
+          await saveById(_id)
           break
         default:
           break

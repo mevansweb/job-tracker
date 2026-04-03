@@ -1,8 +1,16 @@
 import { type ReactNode } from 'react'
 
-import type { Action, State } from '@/components/providers//auth-provider'
-
+import type { Action, State as AuthState, State } from '@/components/providers/auth-provider'
+import type { ResumeAction } from '@/components/providers/resume-provider'
 import type { ApiResult, Certification, Education, Employer, Resume, Skill } from '@/global/types'
+
+export interface ResumeContextType {
+  authState: AuthState
+  dispatch: React.ActionDispatch<[action: ResumeAction]>
+  dispatchAuth: React.ActionDispatch<[action: Action]>
+  postData: (method: 'POST' | 'GET' | 'PUT' | 'DELETE', body: unknown) => Promise<void>
+  state: ResumeState
+}
 
 export type ResumeState = Resume & {
   college: Education

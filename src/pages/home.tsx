@@ -46,7 +46,7 @@ const Home = () => {
         setErrors(err)
         if (err.length === 0) {
           hashedPassword = bcrypt.hashSync(password, data.salt)
-          postData('PUT', { email, hashedPassword, salt: data.salt, form: view })
+          await postData('PUT', { email, hashedPassword, salt: data.salt, form: view })
         }
       }
     } else {
