@@ -1,6 +1,6 @@
 import equal from 'fast-deep-equal/es6/react'
 
-import { bgThemeVariants, fontVariants, sbThemeVariants } from '@/global/constants'
+import { acThemeVariants, bgThemeVariants, fontVariants, sbThemeVariants } from '@/global/constants'
 import { Status } from '@/global/types'
 
 type StylesProps = {
@@ -9,18 +9,20 @@ type StylesProps = {
   theme: string
 }
 
-const colorSettings = ['backgroundColor', 'sidebarColor']
+const colorSettings = ['accentColor', 'backgroundColor', 'sidebarColor']
 const nonColorSettings = ['font']
 
 export function getStyles({ theme, name, strKey }: StylesProps) {
   const themeVariant =
     name === 'backgroundColor'
       ? bgThemeVariants
-      : name === 'sidebarColor'
-        ? sbThemeVariants
-        : name === 'font'
-          ? fontVariants
-          : null
+      : name === 'accentColor'
+        ? acThemeVariants
+        : name === 'sidebarColor'
+          ? sbThemeVariants
+          : name === 'font'
+            ? fontVariants
+            : null
   if (colorSettings.includes(name) && theme && themeVariant) {
     const themeKey = theme as keyof typeof themeVariant
     const colorKey = themeVariant[themeKey]

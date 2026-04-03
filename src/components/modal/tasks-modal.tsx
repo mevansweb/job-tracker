@@ -116,7 +116,7 @@ const SubTask = memo(function SubTask({
                 <Button
                   variant="outline"
                   id="date"
-                  className="text-muted-foreground flex w-23.75 justify-between font-normal"
+                  className="bg-background! text-muted-foreground flex w-23.75 justify-between font-normal"
                 >
                   {subtask.dueDate ? new Date(subtask.dueDate).toLocaleDateString() : 'Due date'}
                 </Button>
@@ -312,7 +312,7 @@ export function TasksModal({ task }: Props) {
                 <Button
                   variant="outline"
                   id="date"
-                  className="text-muted-foreground flex w-45 justify-between font-normal"
+                  className="bg-background! text-muted-foreground flex w-45 justify-between font-normal"
                 >
                   {date ? date.toLocaleDateString() : 'Create date'}
                   <ChevronDownIcon />

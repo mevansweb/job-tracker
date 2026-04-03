@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import Header from '@/components/header'
 import { emptyState, initialResume, localStorageKey } from '@/components/providers/const'
 import { useResume } from '@/components/providers/resume-provider'
+import { RoundedContainer } from '@/components/rounded-container'
 import { FieldGroup, FieldLegend, FieldSet } from '@/components/ui/field'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { setResume } from '@/global/shared'
@@ -72,57 +73,52 @@ const ResumeBuilder = () => {
   return (
     <div className="flex flex-col p-4">
       <Header greeting="" middle="" title="" />
-      <div className="mx-auto mt-8 space-y-12 sm:w-9/8 md:w-9/10 lg:w-2/3">
-        <div className="mb-8 rounded-lg border border-gray-900/10 p-8 pb-12 shadow-md">
-          <FieldLegend className="border-b pb-2 text-xl! font-bold">Resume Builder</FieldLegend>
-          <p className="mb-4">
-            Enter your resume information and easily copy and paste to your applications!
-          </p>
-          <Tabs defaultValue="experience">
-            <TabsList>
-              <TabsTrigger value="experience">Experience</TabsTrigger>
-              <TabsTrigger value="education">Education</TabsTrigger>
-              <TabsTrigger value="skills">Skills</TabsTrigger>
-              <TabsTrigger value="certifications">Certifications</TabsTrigger>
-              <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
-            </TabsList>
-            <TabsContent value="experience">
-              <FieldSet>
-                <FieldGroup>
-                  <FieldLegend className="mt-4 mb-0 border-b pb-2 font-bold">Summary</FieldLegend>
-                  <ResumeInput
-                    className="mt-0!"
-                    data={summary}
-                    id={state.id}
-                    inputType="textarea"
-                    label=""
-                    name="summary"
-                    placeholder="Professional Summary"
-                    setButtonAction={setButtonAction}
-                    saveById={saveById}
-                    update={(event) =>
-                      dispatch({ type: 'SET_SUMMARY', summary: event.target.value })
-                    }
-                  />
-                  <ResumeExperience />
-                </FieldGroup>
-              </FieldSet>
-            </TabsContent>
-            <TabsContent value="education">
-              <ResumeEducation />
-            </TabsContent>
-            <TabsContent value="skills">
-              <ResumeSkills />
-            </TabsContent>
-            <TabsContent value="certifications">
-              <ResumeCertifications />
-            </TabsContent>
-            <TabsContent value="cover-letter">
-              <ResumeCoverLetter />
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
+      <RoundedContainer title="Resume Builder">
+        <p className="mb-4 text-sm font-light">
+          Enter your resume information and easily copy and paste to your applications!
+        </p>
+        <Tabs defaultValue="experience">
+          <TabsList>
+            <TabsTrigger value="experience">Experience</TabsTrigger>
+            <TabsTrigger value="education">Education</TabsTrigger>
+            <TabsTrigger value="skills">Skills</TabsTrigger>
+            <TabsTrigger value="certifications">Certifications</TabsTrigger>
+            <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
+          </TabsList>
+          <TabsContent value="experience">
+            <FieldSet>
+              <FieldGroup>
+                <FieldLegend className="mt-4 mb-0 border-b pb-2 font-bold">Summary</FieldLegend>
+                <ResumeInput
+                  className="mt-0!"
+                  data={summary}
+                  id={state.id}
+                  inputType="textarea"
+                  label=""
+                  name="summary"
+                  placeholder="Professional Summary"
+                  setButtonAction={setButtonAction}
+                  saveById={saveById}
+                  update={(event) => dispatch({ type: 'SET_SUMMARY', summary: event.target.value })}
+                />
+                <ResumeExperience />
+              </FieldGroup>
+            </FieldSet>
+          </TabsContent>
+          <TabsContent value="education">
+            <ResumeEducation />
+          </TabsContent>
+          <TabsContent value="skills">
+            <ResumeSkills />
+          </TabsContent>
+          <TabsContent value="certifications">
+            <ResumeCertifications />
+          </TabsContent>
+          <TabsContent value="cover-letter">
+            <ResumeCoverLetter />
+          </TabsContent>
+        </Tabs>
+      </RoundedContainer>
     </div>
   )
 }

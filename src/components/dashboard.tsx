@@ -72,7 +72,7 @@ export const Dashboard = () => {
               return (
                 <Button
                   key={`view-jobs-by-month-year-${monthYear}`}
-                  className={`mr-2 size-min cursor-pointer hover:border-orange-500 hover:bg-orange-200 ${month === monthPart && year === new Date().getFullYear() ? 'border-green-500 bg-green-200 font-extrabold' : ''}`}
+                  className={`mr-2 size-min cursor-pointer hover:border-orange-500 hover:bg-orange-200 ${month === monthPart && yearPart === new Date().getFullYear() ? 'border-green-500 bg-green-200 font-extrabold' : ''}`}
                   onClick={() => {
                     setMonth(monthPart)
                     setYear(yearPart)

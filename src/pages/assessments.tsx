@@ -98,14 +98,11 @@ const Assessments = () => {
         title="Assessments"
       />
       <div className="my-4 w-full">
-        <button
-          onClick={() => setOpen(!open)}
-          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-        >
+        <Button onClick={() => setOpen(!open)} className="mx-4 px-4">
           {open ? 'Close Note Editor' : 'Add Note'}
-        </button>
+        </Button>
         {open ? (
-          <div className="mt-4 rounded border p-4">
+          <div className="mt-4 rounded-lg border p-4 shadow-md">
             <Input
               id="title"
               name="title"
@@ -324,7 +321,7 @@ const Assessments = () => {
           {allNotes.map((note) => (
             <div
               key={`${note.id}-card`}
-              className="light:bg-white dark:bg-input mt-4 rounded border p-4"
+              className="light:bg-white dark:bg-input mt-4 rounded-lg border p-4 shadow-md"
             >
               <h3 className="text-lg font-semibold">{note.title}</h3>
               <p className="light:text-gray-700">{note.description}</p>
@@ -384,6 +381,15 @@ const Assessments = () => {
 
               <div className="flex justify-end gap-2">
                 <Button
+                  className="px-4 py-2"
+                  disabled={open}
+                  onClick={handleDelete}
+                  variant="outline"
+                >
+                  Delete Note
+                </Button>
+                <Button
+                  className="bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
                   disabled={open}
                   onClick={() => {
                     setEditNote(note)
@@ -392,16 +398,8 @@ const Assessments = () => {
                       setOpenSteps(true)
                     }
                   }}
-                  className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
                 >
                   Edit Note
-                </Button>
-                <Button
-                  disabled={open}
-                  onClick={handleDelete}
-                  className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-                >
-                  Delete Note
                 </Button>
               </div>
             </div>

@@ -16,7 +16,7 @@ import {
 
 import { JobsModal } from '@/components/modal/jobs-modal'
 import { localStorageKey } from '@/components/providers//const'
-import { useAuth } from '@/components/providers//hooks'
+import { useAuth } from '@/components/providers/hooks'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -34,7 +34,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { capitalizeWords } from '@/global/functions'
+import { capitalizeWords, getStyles } from '@/global/functions'
 import { type Job, months } from '@/global/types'
 
 import { createColumns, getStatusColor } from './columns'
@@ -80,6 +80,8 @@ export function JobsTable({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
   const [viewSummary, setViewSummary] = useState(false)
+  const { accentColor, theme } = state.settings || { accentColor: '', theme: '' }
+  const accentClasses = `${getStyles({ theme, name: 'accentColor', strKey: accentColor })}`
 
   const filteredJobs = useMemo(() => {
     if (monthSubGroup && monthSubGroup.length > 0) {
@@ -134,6 +136,14 @@ export function JobsTable({
     },
   })
 
+  const handleFilterChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      table.getColumn(filterBy)?.setFilterValue(event.target.value)
+      table.setPageIndex(0) // Reset to first page
+    },
+    [table]
+  )
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
@@ -141,9 +151,7 @@ export function JobsTable({
           <Input
             placeholder="Filter companies..."
             value={(table.getColumn('company')?.getFilterValue() as string) ?? ''}
-            onChange={(event) => {
-              table.getColumn(filterBy)?.setFilterValue(event.target.value)
-            }}
+            onChange={handleFilterChange}
             className="max-w-sm"
           />
           <DropdownMenu>
@@ -269,7 +277,7 @@ export function JobsTable({
       )}
       <div className="rounded-md border">
         <Table>
-          <TableHeader className={``}>
+          <TableHeader className={accentClasses}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {

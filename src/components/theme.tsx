@@ -6,11 +6,9 @@ import { type ApiResult } from '@/global/types'
 
 export default function Theme({ children }: { children: React.ReactNode }) {
   const { data, dispatch, existing, state } = useAuth()
-  const {
-    backgroundColor = '',
-    font,
-    theme,
-  } = state.settings ? state.settings : { backgroundColor: '', font: '', theme: '' }
+  const { backgroundColor, font, theme } = state.settings
+    ? state.settings
+    : { backgroundColor: '', font: '', theme: '' }
   const themeClasses = `${getStyles({ theme, name: 'backgroundColor', strKey: backgroundColor })} ${getStyles({ theme, name: 'font', strKey: font })}`
 
   useEffect(() => {

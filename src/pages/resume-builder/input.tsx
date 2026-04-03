@@ -193,7 +193,7 @@ export const ResumeInput = ({
         <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
           <PopoverTrigger asChild>
             <Button
-              className={`text-muted-foreground flex w-23.75 justify-between font-normal`}
+              className="text-muted-foreground bg-background! flex w-23.75 justify-between font-normal"
               id={name}
               variant="outline"
             >

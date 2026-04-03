@@ -5,8 +5,8 @@ import { ChevronDownIcon } from 'lucide-react'
 import Header from '@/components/header'
 import { localStorageKey } from '@/components/providers/const'
 import { useAuth } from '@/components/providers/hooks'
+import { RoundedContainer } from '@/components/rounded-container'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,13 +15,24 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { backgroundColors, fonts, sidebarColors, themes } from '@/global/constants'
+import { availableColors, fonts, themes } from '@/global/constants'
 import { capitalizeWords, getAfterChar, getStyles } from '@/global/functions'
 
-const initialState = { backgroundColor: '', sidebarColor: '', font: '', theme: '' }
+const settingDescriptions = {
+  theme:
+    'Choose between light and dark mode themes. Light mode uses a bright background with dark text, while dark mode inverts this with a dark background and light text, each offering unique benefits for readability, accessibility, and user experience.',
+  backgroundColor: 'Change the background color of the app.',
+  font: 'Change the font used throughout the app.',
+  sidebarColor: 'Change the background color of the sidebar.',
+  accentColor:
+    'Change the color of accents throughout the app, such as buttons, table headers, and header backgrounds.',
+}
+
+const initialState = { accentColor: '', backgroundColor: '', sidebarColor: '', font: '', theme: '' }
 
 type SettingToggleProps = {
   name: string
+  description?: string
   handleChange: ({ name, value }: { name: string; value: string }) => Promise<void>
   options: string[]
   selectedValue: string
@@ -31,8 +42,9 @@ type SettingToggleProps = {
 }
 
 const SettingToggle = memo(function SettingToggle({
-  name,
+  description,
   handleChange,
+  name,
   options,
   selectedStyle,
   selectedValue,
@@ -42,12 +54,13 @@ const SettingToggle = memo(function SettingToggle({
   const buttonCss = getAfterChar(selectedStyle, ':')
   return (
     <div className="mt-4 flex flex-col">
-      <div className="my-4 ml-4 flex flex-col">
-        <h1 className="mb-2 text-lg">{title}</h1>
+      <div className="my-4 ml-4 flex flex-col gap-4">
+        <h1 className="border-b pb-2 text-base font-bold">{title}</h1>
+        {description && <p className="text-muted-foreground text-sm">{description}</p>}
         {type === 'radio' ? (
           <RadioGroup
             className="flex flex-wrap"
-            name="backgroundColor"
+            name={name}
             defaultValue={selectedValue}
             onValueChange={(val) => handleChange({ name, value: val })}
           >
@@ -109,11 +122,15 @@ const SettingToggle = memo(function SettingToggle({
 const Settings = () => {
   const { dispatch, postData, state } = useAuth()
   const {
+    accentColor = '',
     backgroundColor = '',
     font,
     sidebarColor = '',
     theme,
-  } = state.settings ? state.settings : { backgroundColor: '', font: '', theme: '' }
+  } = state.settings
+    ? state.settings
+    : { accentColor: '', backgroundColor: '', font: '', theme: '' }
+  const acStyle = getStyles({ theme, name: 'accentColor', strKey: accentColor })
   const bgStyle = getStyles({ theme, name: 'backgroundColor', strKey: backgroundColor })
   const sbStyle = getStyles({ theme, name: 'sidebarColor', strKey: sidebarColor })
   const fontStyle = getStyles({ theme, name: 'font', strKey: font })
@@ -122,12 +139,14 @@ const Settings = () => {
   useEffect(() => {
     if (
       state.settings &&
-      (state.settings.backgroundColor ||
+      (state.settings.accentColor ||
+        state.settings.backgroundColor ||
         state.settings.font ||
         state.settings.sidebarColor ||
         state.settings.theme)
     ) {
       setEditSettings({
+        accentColor: state.settings.accentColor,
         backgroundColor: state.settings?.backgroundColor,
         font: state.settings.font,
         sidebarColor: state.settings?.sidebarColor,
@@ -154,10 +173,10 @@ const Settings = () => {
         middle=""
         title="Settings"
       />
-      <Card className="mx-auto my-8 mb-4 flex w-200 flex-col p-4">
-        <h1 className="flex justify-center text-2xl">Settings</h1>
+      <RoundedContainer title="Settings">
         <SettingToggle
           name="theme"
+          description={settingDescriptions.theme}
           handleChange={handleSettingsChange}
           options={themes}
           selectedStyle=""
@@ -167,8 +186,9 @@ const Settings = () => {
         />
         <SettingToggle
           name="backgroundColor"
+          description={settingDescriptions.backgroundColor}
           handleChange={handleSettingsChange}
-          options={backgroundColors}
+          options={availableColors}
           selectedStyle={bgStyle}
           selectedValue={editSettings.backgroundColor}
           title="Background Color"
@@ -176,6 +196,7 @@ const Settings = () => {
         />
         <SettingToggle
           name="font"
+          description={settingDescriptions.font}
           handleChange={handleSettingsChange}
           options={fonts}
           selectedStyle={fontStyle}
@@ -185,14 +206,25 @@ const Settings = () => {
         />
         <SettingToggle
           name="sidebarColor"
+          description={settingDescriptions.sidebarColor}
           handleChange={handleSettingsChange}
-          options={sidebarColors}
+          options={availableColors}
           selectedStyle={sbStyle}
           selectedValue={editSettings.sidebarColor}
           title="Sidebar Color"
           type="dropdown"
         />
-      </Card>
+        <SettingToggle
+          name="accentColor"
+          description={settingDescriptions.accentColor}
+          handleChange={handleSettingsChange}
+          options={availableColors}
+          selectedStyle={acStyle}
+          selectedValue={editSettings.accentColor}
+          title="Accent Color"
+          type="dropdown"
+        />
+      </RoundedContainer>
     </div>
   )
 }

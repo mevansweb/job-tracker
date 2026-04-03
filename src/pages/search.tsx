@@ -4,9 +4,11 @@ import { toast } from 'sonner'
 
 import Header from '@/components/header'
 import { useAuth } from '@/components/providers/hooks'
+import { RoundedContainer } from '@/components/rounded-container'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { capitalizeWords } from '@/global/functions'
 import type { Job } from '@/global/types'
 
@@ -181,9 +183,9 @@ const Search = () => {
   return (
     <div className="flex flex-col p-4">
       <Header greeting="Search for a job that you have applied for." middle="" title="Search" />
-      <div className="border-input mx-auto mt-8 w-200 rounded-xl border p-10 shadow">
+      <RoundedContainer title="Search">
         <div className="my-4 ml-4 flex flex-col">
-          <h1 className="mb-2 text-lg">Search</h1>
+          <Label htmlFor="company">Company Name</Label>
           <Input
             className="my-4 w-full"
             name="company"
@@ -192,6 +194,7 @@ const Search = () => {
             value={companyQuery}
             type="text"
           />
+          <Label htmlFor="position">Position Name</Label>
           <Input
             className="my-4 w-full"
             name="position"
@@ -204,11 +207,11 @@ const Search = () => {
         <Button className="ml-4" onClick={getUpcomingEvents}>
           Get Upcoming Events
         </Button>
-      </div>
+      </RoundedContainer>
 
-      <div className="mx-auto flex w-200 flex-col">
+      <div className="mx-auto flex flex-col sm:w-9/8 md:w-9/10 lg:w-2/3">
         {(searchResults && searchResults.length > 0) || (upcoming && upcoming.length > 0) ? (
-          <h2 className="mt-4 text-lg font-semibold">Search Results:</h2>
+          <h2 className="mt-8 text-lg font-semibold">Search Results:</h2>
         ) : null}
         {companyQuery || positionQuery ? (
           <div className="mt-8 text-sm text-gray-500">
@@ -217,7 +220,9 @@ const Search = () => {
         ) : null}
         <div className="mt-2">
           {upcoming === null ? (
-            <p className="light:text-gray-700 dark:text-gray-400">No upcoming events found.</p>
+            <p className="light:text-gray-700 mt-8 text-center dark:text-gray-400">
+              No upcoming events found.
+            </p>
           ) : null}
           {upcoming && upcoming.length > 0 ? (
             <div className="mt-8 text-sm text-gray-500">Showing upcoming events:</div>

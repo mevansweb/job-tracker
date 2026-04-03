@@ -233,7 +233,7 @@ export const ResumeExperience = () => {
                 className="w-40 cursor-pointer"
                 name="delete-experience"
                 onClick={() => deleteById(item.id)}
-                variant="secondary"
+                variant="outline"
               >
                 Delete
               </Button>

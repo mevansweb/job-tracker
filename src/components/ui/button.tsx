@@ -3,6 +3,8 @@ import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { type VariantProps, cva } from 'class-variance-authority'
 
+import { useAuth } from '@/components/providers/hooks'
+import { getStyles } from '@/global/functions'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
@@ -44,11 +46,24 @@ function Button({
     asChild?: boolean
   }) {
   const Comp = asChild ? Slot : 'button'
+  const {
+    state: { settings },
+  } = useAuth()
+  const { accentColor } = settings || { accentColor: '' }
+  const accentClasses = React.useMemo(
+    () =>
+      variant === 'ghost' || variant === 'link' || variant === 'secondary'
+        ? ''
+        : variant === undefined || variant === 'default'
+          ? `${getStyles({ theme: 'dark', name: 'accentColor', strKey: accentColor })}`
+          : `${getStyles({ theme: 'lighter', name: 'accentColor', strKey: accentColor })}`,
+    [accentColor, getStyles, variant]
+  )
 
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size, className }), accentClasses)}
       {...props}
     />
   )

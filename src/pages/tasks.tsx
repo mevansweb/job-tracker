@@ -58,7 +58,7 @@ const Tasks = () => {
       <div className="mx-auto my-4">
         <TasksModal />
       </div>
-      <div className="align-center mx-auto my-4 flex w-220 justify-center">
+      <div className="align-center mx-auto my-4 flex justify-center sm:w-9/8 md:w-9/10 lg:w-2/3">
         {allTasks && allTasks.length > 0 ? (
           <div className="w-full">
             {allTasks.map((task) => (
@@ -81,7 +81,7 @@ const Tasks = () => {
                               </div>
                               <Checkbox
                                 checked={event.done}
-                                className="ml-4"
+                                className="ml-4 border-2 border-blue-500 data-[state=checked]:bg-blue-500 data-[state=checked]:text-white dark:data-[state=checked]:bg-blue-900"
                                 onCheckedChange={(checked) =>
                                   handleChange({ checked: checked === true, task, subtask: event })
                                 }

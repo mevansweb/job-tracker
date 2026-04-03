@@ -71,10 +71,10 @@ const items = [
 export function AppSidebar() {
   const { state } = useAuth()
   const { sidebarColor, theme } = state.settings || { sidebarColor: '', theme: '' }
-  const themeClasses = `${getStyles({ theme, name: 'sidebarColor', strKey: sidebarColor })}`
+  const sidebarClasses = `${getStyles({ theme, name: 'sidebarColor', strKey: sidebarColor })}`
 
   return (
-    <Sidebar className={themeClasses} collapsible={'icon'}>
+    <Sidebar className={sidebarClasses} collapsible={'icon'}>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>

@@ -1,7 +1,132 @@
 export const themes = ['light', 'dark']
-export const backgroundColors = ['default', 'amber', 'blue', 'cyan', 'emerald', 'fuchsia', 'gray', 'green', 'indigo', 'lime', 'mauve', 'mist', 'neutral', 'olive', 'orange', 'pink', 'purple', 'red', 'rose', 'slate', 'sky', 'stone', 'taupe', 'teal', 'violet', 'yellow', 'zinc']
-export const fonts = ['default', 'inter', 'montserrat', 'monospace', 'outfit', 'roboto', 'sans', 'serif']
-export const sidebarColors = ['default', 'amber', 'blue', 'cyan', 'emerald', 'fuchsia', 'gray', 'green', 'indigo', 'lime', 'mauve', 'mist', 'neutral', 'olive', 'orange', 'pink', 'purple', 'red', 'rose', 'slate', 'sky', 'stone', 'taupe', 'teal', 'violet', 'yellow', 'zinc']
+
+export const availableColors = [
+  'default',
+  'amber',
+  'blue',
+  'cyan',
+  'emerald',
+  'fuchsia',
+  'gray',
+  'green',
+  'indigo',
+  'lime',
+  'mauve',
+  'mist',
+  'neutral',
+  'olive',
+  'orange',
+  'pink',
+  'purple',
+  'red',
+  'rose',
+  'slate',
+  'sky',
+  'stone',
+  'taupe',
+  'teal',
+  'violet',
+  'yellow',
+  'zinc',
+]
+
+export const fonts = [
+  'default',
+  'inter',
+  'montserrat',
+  'monospace',
+  'outfit',
+  'roboto',
+  'sans',
+  'serif',
+]
+
+export const acThemeVariants = {
+  dark: {
+    amber: 'bg-amber-900',
+    blue: 'bg-blue-900',
+    cyan: 'bg-cyan-900',
+    emerald: 'bg-emerald-900',
+    fuchsia: 'bg-fuchsia-900',
+    gray: 'bg-gray-900',
+    green: 'bg-green-900',
+    indigo: 'bg-indigo-900',
+    lime: 'bg-lime-900',
+    mauve: 'bg-mauve-900',
+    mist: 'bg-mist-900',
+    neutral: 'bg-neutral-900',
+    olive: 'bg-olive-900',
+    orange: 'bg-orange-900',
+    pink: 'bg-pink-900',
+    purple: 'bg-purple-900',
+    red: 'bg-red-900',
+    rose: 'bg-rose-900',
+    slate: 'bg-slate-900',
+    sky: 'bg-sky-900',
+    stone: 'bg-stone-900',
+    taupe: 'bg-taupe-900',
+    teal: 'bg-teal-900',
+    yellow: 'bg-yellow-900',
+    violet: 'bg-violet-900',
+    zinc: 'bg-zinc-900',
+  },
+  light: {
+    amber: 'bg-amber-100',
+    blue: 'bg-blue-100',
+    cyan: 'bg-cyan-100',
+    emerald: 'bg-emerald-100',
+    fuchsia: 'bg-fuchsia-100',
+    indigo: 'bg-indigo-100',
+    gray: 'bg-gray-100',
+    green: 'bg-green-100',
+    lime: 'bg-lime-100',
+    mauve: 'bg-mauve-100',
+    mist: 'bg-mist-100',
+    neutral: 'bg-neutral-100',
+    olive: 'bg-olive-100',
+    orange: 'bg-orange-100',
+    pink: 'bg-pink-100',
+    purple: 'bg-purple-100',
+    red: 'bg-red-100',
+    rose: 'bg-rose-100',
+    slate: 'bg-slate-100',
+    sky: 'bg-sky-100',
+    stone: 'bg-stone-100',
+    taupe: 'bg-taupe-100',
+    teal: 'bg-teal-100',
+    violet: 'bg-violet-100',
+    yellow: 'bg-yellow-100',
+    zinc: 'bg-zinc-100',
+  },
+  lighter: {
+    amber: 'bg-amber-50',
+    blue: 'bg-blue-50',
+    cyan: 'bg-cyan-50',
+    emerald: 'bg-emerald-50',
+    fuchsia: 'bg-fuchsia-50',
+    indigo: 'bg-indigo-50',
+    gray: 'bg-gray-50',
+    green: 'bg-green-50',
+    lime: 'bg-lime-50',
+    mauve: 'bg-mauve-50',
+    mist: 'bg-mist-50',
+    neutral: 'bg-neutral-50',
+    olive: 'bg-olive-50',
+    orange: 'bg-orange-50',
+    pink: 'bg-pink-50',
+    purple: 'bg-purple-50',
+    red: 'bg-red-50',
+    rose: 'bg-rose-50',
+    slate: 'bg-slate-50',
+    sky: 'bg-sky-50',
+    stone: 'bg-stone-50',
+    taupe: 'bg-taupe-50',
+    teal: 'bg-teal-50',
+    violet: 'bg-violet-50',
+    yellow: 'bg-yellow-50',
+    zinc: 'bg-zinc-50',
+  },
+}
 
 export const bgThemeVariants = {
   dark: {
@@ -30,7 +155,7 @@ export const bgThemeVariants = {
     teal: 'bg-teal-900',
     yellow: 'bg-yellow-900',
     violet: 'bg-violet-900',
-    zinc: 'bg-zinc-900'
+    zinc: 'bg-zinc-900',
   },
   light: {
     amber: 'bg-amber-200',
@@ -58,8 +183,8 @@ export const bgThemeVariants = {
     teal: 'bg-teal-200',
     violet: 'bg-violet-200',
     yellow: 'bg-yellow-200',
-    zinc: 'bg-zinc-200'
-  } 
+    zinc: 'bg-zinc-200',
+  },
 }
 
 export const sbThemeVariants = {
@@ -89,7 +214,7 @@ export const sbThemeVariants = {
     teal: '[&_>_div_>_div]:bg-teal-900',
     violet: '[&_>_div_>_div]:bg-violet-900',
     yellow: '[&_>_div_>_div]:bg-yellow-900',
-    zinc: '[&_>_div_>_div]:bg-zinc-900'
+    zinc: '[&_>_div_>_div]:bg-zinc-900',
   },
   light: {
     amber: '[&_>_div_>_div]:bg-amber-200',
@@ -117,8 +242,8 @@ export const sbThemeVariants = {
     teal: '[&_>_div_>_div]:bg-teal-200',
     violet: '[&_>_div_>_div]:bg-violet-200',
     yellow: '[&_>_div_>_div]:bg-yellow-200',
-    zinc: '[&_>_div_>_div]:bg-zinc-200'
-  }
+    zinc: '[&_>_div_>_div]:bg-zinc-200',
+  },
 }
 
 export const fontVariants = {
@@ -128,5 +253,5 @@ export const fontVariants = {
   outfit: 'font-outfit',
   roboto: 'font-roboto',
   sans: 'font-sans',
-  serif: 'font-serif'
+  serif: 'font-serif',
 }

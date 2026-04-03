@@ -210,7 +210,7 @@ export function JobsModal({ job }: Props) {
                   <Button
                     variant="outline"
                     id="date"
-                    className="text-muted-foreground flex w-45 justify-between font-normal"
+                    className="bg-background! text-muted-foreground flex w-45 justify-between font-normal"
                   >
                     {date ? date.toLocaleDateString() : 'Application date'}
                     <ChevronDownIcon />

@@ -123,9 +123,9 @@ export function EventsModal({ job }: Props) {
                   <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                       <Button
-                        variant="outline"
+                        className="bg-background! text-muted-foreground flex w-45 justify-between font-normal"
                         id="date"
-                        className="text-muted-foreground flex w-45 justify-between font-normal"
+                        variant="ghost"
                       >
                         {date ? date.toLocaleDateString() : 'Event date'}
                         <ChevronDownIcon />

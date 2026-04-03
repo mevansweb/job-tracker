@@ -185,6 +185,7 @@ export type Resume = {
 }
 
 export type Settings = {
+  accentColor: string
   backgroundColor: string
   font: string
   sidebarColor: string

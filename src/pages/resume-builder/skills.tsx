@@ -186,7 +186,7 @@ export const ResumeSkills = () => {
                 className="w-40 cursor-pointer"
                 name="delete-skills"
                 onClick={() => deleteById(item.id)}
-                variant="secondary"
+                variant="outline"
               >
                 Delete
               </Button>
