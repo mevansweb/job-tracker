@@ -6,7 +6,6 @@ import Header from '@/components/header'
 import { localStorageKey } from '@/components/providers/const'
 import { useAuth } from '@/components/providers/hooks'
 import { RoundedContainer } from '@/components/rounded-container'
-import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
