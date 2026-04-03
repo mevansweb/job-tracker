@@ -41,7 +41,7 @@ export default function Theme({ children }: { children: React.ReactNode }) {
 
   return (
     <main
-      className={`${themeClasses.trim()} h-screen w-[calc(100vw-48px)] peer-data-[state=expanded]:w-[calc(100vw-256px)]`}
+      className={`${themeClasses.trim()} h-full w-[calc(100vw-48px)] peer-data-[state=expanded]:w-[calc(100vw-256px)]`}
     >
       {children}
     </main>

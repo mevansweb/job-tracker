@@ -28,6 +28,9 @@ const settingDescriptions = {
     'Change the color of accents throughout the app, such as buttons, table headers, and header backgrounds.',
 }
 
+const buttonStyle =
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border shadow-xs hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 w-50 cursor-pointer'
+
 const initialState = { accentColor: '', backgroundColor: '', sidebarColor: '', font: '', theme: '' }
 
 type SettingToggleProps = {
@@ -51,7 +54,7 @@ const SettingToggle = memo(function SettingToggle({
   title,
   type,
 }: SettingToggleProps) {
-  const buttonCss = getAfterChar(selectedStyle, ':')
+  const settingCss = getAfterChar(selectedStyle, ':')
   return (
     <div className="mt-4 flex flex-col">
       <div className="my-4 ml-4 flex flex-col gap-4">
@@ -86,13 +89,12 @@ const SettingToggle = memo(function SettingToggle({
           <div className="flex justify-between">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  className={`w-50 cursor-pointer ${buttonCss ? `${buttonCss} hover:${buttonCss}` : ''}`}
-                  variant="outline"
+                <button
+                  className={`${buttonStyle} ${settingCss ? `${settingCss} hover:${settingCss}` : ''}`}
                 >
                   {title}
                   <ChevronDownIcon />
-                </Button>
+                </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-50" align="start">
                 {options.map((option) => {
