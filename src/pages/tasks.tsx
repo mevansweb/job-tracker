@@ -63,36 +63,47 @@ const Tasks = () => {
           <div className="w-full">
             {allTasks.map((task) => (
               <Card key={`${task.id}-card`} className="mb-4 p-4">
-                <div className="flex items-center justify-between">
-                  <div className="w-2/3">
-                    <h3 className="text-lg font-semibold">{task.description}</h3>
-                    <p className="text-sm text-gray-500">Status: {task.status}</p>
-                    {task.events && task.events.length > 0 ? (
-                      <div className="mt-2">
-                        <p className="text-sm font-light italic">Sub-Tasks:</p>
-                        <ul className="light:text-gray-700 list-inside list-disc text-sm dark:text-gray-400">
-                          {task.events.map((event, index) => (
-                            <li className="flex justify-between" key={`${task.id}-event-${index}`}>
-                              <div>
+                <div className="flex flex-col">
+                  <div className="flex justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold">{task.description}</h3>
+                      <p className="text-sm text-gray-500">Status: {task.status}</p>
+                    </div>
+                    <TasksModal key={`${task.id}-modal`} task={task} />
+                  </div>
+                  {task.events && task.events.length > 0 ? (
+                    <div className="mt-2">
+                      <p className="text-sm font-light italic">Sub-Tasks:</p>
+                      <ul className="light:text-gray-700 list-inside list-disc text-sm md:w-100 lg:w-150 dark:text-gray-400">
+                        {task.events.map((event, index) => (
+                          <li
+                            className="flex justify-between border-b border-dotted"
+                            key={`${task.id}-event-${index}`}
+                          >
+                            <div className="flex md:w-9/10 lg:w-9/10">
+                              <div className="md:w-1/5 lg:w-1/5">
                                 {event.dueDate
                                   ? `${new Date(event.dueDate).toLocaleDateString()}: `
                                   : ''}
-                                {event.note}
                               </div>
-                              <Checkbox
-                                checked={event.done}
-                                className="ml-4 border-2 border-blue-500 data-[state=checked]:bg-blue-500 data-[state=checked]:text-white dark:data-[state=checked]:bg-blue-900"
-                                onCheckedChange={(checked) =>
-                                  handleChange({ checked: checked === true, task, subtask: event })
-                                }
-                              />
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ) : null}
-                  </div>
-                  <TasksModal key={`${task.id}-modal`} task={task} />
+                              <div className="flex md:w-4/5 lg:w-4/5">{event.note}</div>
+                            </div>
+                            <Checkbox
+                              checked={event.done}
+                              className="ml-4 border-2 border-blue-500 data-[state=checked]:bg-blue-500 data-[state=checked]:text-white dark:data-[state=checked]:bg-blue-900"
+                              onCheckedChange={(checked) =>
+                                handleChange({
+                                  checked: checked === true,
+                                  task,
+                                  subtask: event,
+                                })
+                              }
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
                 </div>
               </Card>
             ))}
