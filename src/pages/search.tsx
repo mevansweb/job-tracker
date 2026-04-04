@@ -108,9 +108,9 @@ const Search = () => {
   const noResultsText = useMemo(
     () =>
       searchResults === null && companyQuery.trim().length >= MIN_QUERY_LENGTH
-        ? `No results found for "{${companyQuery}}`
+        ? `No results found for "${companyQuery}`
         : searchResults === null && positionQuery.trim().length >= MIN_QUERY_LENGTH
-          ? `No results found for "{${positionQuery}}`
+          ? `No results found for "${positionQuery}`
           : '',
     [companyQuery, positionQuery, searchResults]
   )

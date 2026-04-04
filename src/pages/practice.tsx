@@ -7,8 +7,9 @@ import { toast } from 'sonner'
 
 import { ErrorMessage } from '@/components/error-message'
 import Header from '@/components/header'
+import { RoundedContainer } from '@/components/rounded-container'
 import { Button } from '@/components/ui/button'
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
+import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { type PracticeQuestion } from '@/global/types'
@@ -230,120 +231,128 @@ const Practice = () => {
   return (
     <div className="flex flex-col p-4">
       <Header greeting="Practice Questions and solutions." middle="" title="Practice Page" />
-      <div className="mx-auto flex w-200 flex-col gap-8">
-        <Field>
-          <FieldLabel htmlFor="textarea-message">Question #{question + 1}:</FieldLabel>
-          <FieldDescription>{questions[question].question}</FieldDescription>
-          <FieldDescription>Example input: // {questions[question].exampleInput}</FieldDescription>
-          <FieldDescription>Should return: // {questions[question].shouldReturn}</FieldDescription>
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="textarea-message">Your Code:</FieldLabel>
-          <FieldDescription>
-            Enter the body of your function below (without the outer function), assuming that x is
-            the function's argument.
-          </FieldDescription>
-          <Textarea
-            tabIndex={-1}
-            className="h-80 font-mono"
-            id="text-area-code"
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="Enter your code here"
-            spellCheck={false}
-            value={code}
-          />
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="textarea-message">Your function argument(s):</FieldLabel>
-          <FieldDescription>
-            Enter your function's input below (e.g. numbers or strings separated by commas for an
-            array, or a string).
-          </FieldDescription>
-          <Input
-            name="firstInput"
-            onChange={(e) => processInput(e.target.name, e.target.value)}
-            value={Array.isArray(input) ? input.join(',') : input}
-          />
-          {questions[question].secondInput ? (
-            <>
+      <RoundedContainer title={`Question #${question + 1}:`}>
+        <FieldSet>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="textarea-message"></FieldLabel>
+              <FieldDescription>{questions[question].question}</FieldDescription>
               <FieldDescription>
-                Enter your function's second input below (e.g. numbers or strings separated by
-                commas for an array, or a string).
+                Example input: // {questions[question].exampleInput}
+              </FieldDescription>
+              <FieldDescription>
+                Should return: // {questions[question].shouldReturn}
+              </FieldDescription>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="textarea-message">Your Code:</FieldLabel>
+              <FieldDescription>
+                Enter the body of your function below (without the outer function), assuming that x
+                is the function's argument.
+              </FieldDescription>
+              <Textarea
+                tabIndex={-1}
+                className="h-80 font-mono"
+                id="text-area-code"
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="Enter your code here"
+                spellCheck={false}
+                value={code}
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="textarea-message">Your function argument(s):</FieldLabel>
+              <FieldDescription>
+                Enter your function's input below (e.g. numbers or strings separated by commas for
+                an array, or a string).
               </FieldDescription>
               <Input
-                name="secondInput"
+                name="firstInput"
                 onChange={(e) => processInput(e.target.name, e.target.value)}
-                value={Array.isArray(secondInput) ? secondInput.join(',') : secondInput}
+                value={Array.isArray(input) ? input.join(',') : input}
               />
-            </>
-          ) : null}
-        </Field>
-        {answer ? (
-          <Field>
-            <FieldLabel htmlFor="textarea-message">
-              Your function's return value:{' '}
-              {isCorrect ? <span className="font-bold text-green-500">Correct!</span> : null}
-            </FieldLabel>
-            <code
-              className={`${isCorrect ? 'light:bg-green-100 dark:bg-green-900' : 'light:bg-red-100 dark:bg-red-900'} rounded-lg border border-gray-200 p-2`}
-            >
-              {Array.isArray(answer)
-                ? answer.join(',')
-                : typeof answer === 'object'
-                  ? JSON.stringify(answer).replace(/"/g, "'")
-                  : String(answer)}
-            </code>
-          </Field>
-        ) : null}
-        <div className="flex justify-end gap-4">
-          <Button
-            className="light:bg-amber-500 w-44 dark:bg-amber-400"
-            id="showSolution"
-            onClick={() => {
-              setCode(questions[question].solution)
-            }}
-          >
-            Show the solution
-            <Eye />
-          </Button>
-          <Button
-            className="light:bg-sky-500 w-40 dark:bg-sky-400"
-            id="changeGroup"
-            onClick={() => {
-              resetQuestion(0, 'group')
-            }}
-          >
-            Next Group
-            <CircleChevronRight />
-          </Button>
-          <Button
-            className="light:bg-gray-500 w-30 dark:bg-gray-400"
-            id="prevQuestion"
-            onClick={() => {
-              const next = question - 1 > -1 ? question - 1 : questions.length - 1
-              resetQuestion(next, 'number')
-            }}
-          >
-            <CircleChevronLeft />
-            Previous
-          </Button>
-          <Button
-            className="light:bg-gray-500 w-30 dark:bg-gray-400"
-            id="nextQuestion"
-            onClick={() => {
-              const next = question + 1 < questions.length ? question + 1 : 0
-              resetQuestion(next, 'number')
-            }}
-          >
-            Next
-            <CircleChevronRight />
-          </Button>
-          <Button className="w-40" onClick={runFunction}>
-            Run Code
-            <CircleChevronRight />
-          </Button>
-        </div>
-      </div>
+              {questions[question].secondInput ? (
+                <>
+                  <FieldDescription>
+                    Enter your function's second input below (e.g. numbers or strings separated by
+                    commas for an array, or a string).
+                  </FieldDescription>
+                  <Input
+                    name="secondInput"
+                    onChange={(e) => processInput(e.target.name, e.target.value)}
+                    value={Array.isArray(secondInput) ? secondInput.join(',') : secondInput}
+                  />
+                </>
+              ) : null}
+            </Field>
+            {answer ? (
+              <Field>
+                <FieldLabel htmlFor="textarea-message">
+                  Your function's return value:{' '}
+                  {isCorrect ? <span className="font-bold text-green-500">Correct!</span> : null}
+                </FieldLabel>
+                <code
+                  className={`${isCorrect ? 'light:bg-green-100 dark:bg-green-900' : 'light:bg-red-100 dark:bg-red-900'} rounded-lg border border-gray-200 p-2`}
+                >
+                  {Array.isArray(answer)
+                    ? answer.join(',')
+                    : typeof answer === 'object'
+                      ? JSON.stringify(answer).replace(/"/g, "'")
+                      : String(answer)}
+                </code>
+              </Field>
+            ) : null}
+            <div className="flex justify-end gap-4">
+              <Button
+                className="light:bg-amber-500 w-44 dark:bg-amber-400"
+                id="showSolution"
+                onClick={() => {
+                  setCode(questions[question].solution)
+                }}
+              >
+                Show the solution
+                <Eye />
+              </Button>
+              <Button
+                className="light:bg-sky-500 w-40 dark:bg-sky-400"
+                id="changeGroup"
+                onClick={() => {
+                  resetQuestion(0, 'group')
+                }}
+              >
+                Next Group
+                <CircleChevronRight />
+              </Button>
+              <Button
+                className="light:bg-gray-500 w-30 dark:bg-gray-400"
+                id="prevQuestion"
+                onClick={() => {
+                  const next = question - 1 > -1 ? question - 1 : questions.length - 1
+                  resetQuestion(next, 'number')
+                }}
+              >
+                <CircleChevronLeft />
+                Previous
+              </Button>
+              <Button
+                className="light:bg-gray-500 w-30 dark:bg-gray-400"
+                id="nextQuestion"
+                onClick={() => {
+                  const next = question + 1 < questions.length ? question + 1 : 0
+                  resetQuestion(next, 'number')
+                }}
+              >
+                Next
+                <CircleChevronRight />
+              </Button>
+              <Button className="w-40" onClick={runFunction}>
+                Run Code
+                <CircleChevronRight />
+              </Button>
+            </div>
+          </FieldGroup>
+        </FieldSet>
+      </RoundedContainer>
     </div>
   )
 }

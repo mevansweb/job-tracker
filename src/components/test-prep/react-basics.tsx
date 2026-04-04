@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -105,8 +105,30 @@ export const ReactBasics = () => {
         </a>
         <Card className="my-4 p-4">
           <h3>What happens when the Increment button is clicked?</h3>
+          <pre>
+            {`import {useState} from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+
+  const secondCount = count
+  const obj = { value: count }
+
+  return (
+    <div>
+      <p>Second Count: {secondCount}</p>
+      <p>Object Value: {obj.value}</p>
+
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+    </div>
+  )
+}`}
+          </pre>
           <p>Second Count: {secondCount}</p>
           <p>Object Value: {obj.value}</p>
+          <Button className="mx-auto w-50" onClick={() => setCount(count + 1)}>
+            Increment
+          </Button>
           {isMilestoneAchieved && <p>🎉 Milestone Achieved!</p>}
           <p className="text-sm italic">
             <strong>Answer:</strong> Both Second Count and Object Value update together
@@ -115,6 +137,29 @@ export const ReactBasics = () => {
             recalculated on every render.
           </p>
           <h3>What happens when the Increment button is clicked?</h3>
+          <pre>
+            {`import { useState } from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  const [isMilestoneAchieved, setIsMilestoneAchieved] = useState(false)
+
+  if (count >= 5) {
+    setIsMilestoneAchieved(true)
+  }
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+      {isMilestoneAchieved && <p>🎉 Milestone Achieved!</p>}
+    </div>
+  )
+}`}
+          </pre>
+          <Button className="mx-auto w-50" onClick={() => setCount(count + 1)}>
+            Increment
+          </Button>
           <p className="text-sm italic">
             <strong>Answer:</strong> The app crashes with “Too many re-renders” error when count
             reaches 5.
@@ -123,6 +168,26 @@ export const ReactBasics = () => {
             loop.
           </p>
           <h3>Will component re-render?</h3>
+          <pre>
+            {`import { useState } from 'react'
+
+function ResetButton() {
+  const [value, setValue] = useState(0)
+
+  const handleUpdate = () => {
+    setValue(0)
+  }
+
+  console.log('Rendered')
+
+  return (
+    <div>
+      <span>{value}</span>
+      <button onClick={handleUpdate}>Update</button>
+    </div>
+  )
+}`}
+          </pre>
           <p className="text-sm italic">
             <strong>Answer:</strong> The component re-renders every time the button is clicked
             <br />
@@ -135,6 +200,19 @@ export const ReactBasics = () => {
         </Card>
         <Card className="my-4 p-4">
           <h3>What will be rendered when the Parent component is rendered?</h3>
+          <pre>
+            {`function Child(props) {
+  props.user.name = 'John'
+  return <div>{props.user.name}</div>
+}
+
+function Parent() {
+  const user = { name: 'Alex' }
+  return <Child user={user} />
+}
+
+export default Parent`}
+          </pre>
           <p className="text-sm italic">
             <strong>Answer:</strong> John – The Child component mutates the user object passed from
             Parent.
@@ -146,6 +224,28 @@ export const ReactBasics = () => {
         </Card>
         <Card className="my-4 p-4">
           <h3>Which UI design pattern is used in the following code?</h3>
+          <pre>
+            {`import { useState } from 'react'
+
+function Toggle({ isOn, onToggle, children }) {
+  return children({
+    isOn,
+    toggle: () => onToggle(!isOn),
+  })
+}
+
+function App() {
+  const [isOn, setIsOn] = useState(false)
+
+  return (
+    <Toggle isOn={isOn} onToggle={setIsOn}>
+      {({ isOn, toggle }) => (
+        <button onClick={toggle}>{isOn ? 'ON' : 'OFF'}</button>
+      )}
+    </Toggle>
+  )
+}`}
+          </pre>
           <p className="text-sm italic">
             <strong>Answer:</strong> Portal pattern (The Toggle component does not render any UI
             itself.)
@@ -185,6 +285,26 @@ export const ReactBasics = () => {
         </Card>
         <Card className="my-4 p-4">
           <h3>What happens if the Increment button is clicked 3 times quickly? (setTimeout)</h3>
+          <pre>
+            {`import { useState } from 'react'
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  const handleClick = () => {
+    setTimeout(() => {
+      setCount((prevCount) => prevCount + 1)
+    }, 1000)
+  }
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={handleClick}>Increment</button>
+    </div>
+  )
+}`}
+          </pre>
           <p>Count: {count2}</p>
           <p className="text-sm italic">
             <strong>Answer:</strong> Count becomes 3 after 3 seconds
@@ -198,6 +318,29 @@ export const ReactBasics = () => {
         </Card>
         <Card className="my-4 p-4">
           <h3>What will be the value of type prop?</h3>
+          <pre>
+            {`function Project({ name, duration, status, type }) {
+  return (
+    <div>
+      <h2>{name}</h2>
+      <p>Duration: {duration}</p>
+      <p>Status: {status}</p>
+      <p>Type: {type}</p>
+    </div>
+  )
+}
+
+function App() {
+  const [project] = useState({
+    name: 'Website Redesign',
+    duration: '3 months',
+    status: 'In Progress',
+    type: 'Personal Project',
+  })
+
+  return <Project {...project} type="Client Work" />
+}`}
+          </pre>
           <p className="text-sm italic">
             <strong>Answer:</strong> Type will be "Client Work" because explicitly passed props
             override the spread object
@@ -231,6 +374,40 @@ export const ReactBasics = () => {
         </Card>
         <Card className="my-4 p-4">
           <h3>What happens when you click the “Add Input” button?</h3>
+          <pre>
+            {`import { useState } from 'react'
+
+function DynamicForm() {
+  const [inputs, setInputs] = useState([{ id: 1, value: '' }])
+
+  const addInput = () => {
+    inputs.push({ id: inputs.length + 1, value: '' })
+    setInputs(inputs)
+  }
+
+  const handleChange = (id, newValue) => {
+    const updated = inputs.map((input) =>
+      input.id === id ? { ...input, value: newValue } : input,
+    )
+    setInputs(updated)
+  }
+
+  return (
+    <div>
+      {inputs.map((input) => (
+        <input
+          key={input.id}
+          value={input.value}
+          onChange={(e) => handleChange(input.id, e.target.value)}
+        />
+      ))}
+      <button onClick={addInput}>Add Input</button>
+    </div>
+  )
+}
+
+export default DynamicForm`}
+          </pre>
           {inputs.map((input) => (
             <Input
               key={input.id}
