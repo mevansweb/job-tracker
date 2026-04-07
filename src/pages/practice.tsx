@@ -302,7 +302,7 @@ const Practice = () => {
                 </code>
               </Field>
             ) : null}
-            <div className="flex justify-end gap-4">
+            <div className="flex flex-wrap justify-end gap-4">
               <Button
                 className="light:bg-amber-500 w-44 dark:bg-amber-400"
                 id="showSolution"

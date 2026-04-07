@@ -59,7 +59,7 @@ export const Dashboard = () => {
         middle=""
         title="Dashboard"
       />
-      <div className="align-center my-4 flex max-w-screen flex-wrap gap-2">
+      <div className="align-center my-4 max-w-screen gap-4 max-sm:grid sm:grid sm:grid-cols-2 md:grid md:grid-cols-3 lg:grid lg:grid-cols-5 xl:flex xl:flex-wrap">
         {groupedByMonthAndYear &&
           Object.keys(groupedByMonthAndYear)
             .sort((a, b) => {
@@ -72,7 +72,7 @@ export const Dashboard = () => {
               return (
                 <Button
                   key={`view-jobs-by-month-year-${monthYear}`}
-                  className={`mr-2 size-min cursor-pointer hover:border-orange-500 hover:bg-orange-200 ${month === monthPart && yearPart === new Date().getFullYear() ? 'border-green-500 bg-green-200 font-extrabold' : ''}`}
+                  className={`mr-2 cursor-pointer hover:border-orange-500! hover:bg-orange-200! sm:w-9/10 md:w-40 lg:w-50 xl:w-min ${month === monthPart && yearPart === new Date().getFullYear() ? 'border-green-500! bg-green-200! font-extrabold' : ''}`}
                   onClick={() => {
                     setMonth(monthPart)
                     setYear(yearPart)

@@ -23,22 +23,23 @@ const Header = ({
   return (
     <div className="flex justify-between">
       <div className="flex">
-        <div className={`${logo} h-25 w-87.5 bg-cover bg-center`}>
+        <div className="md:hidden">Job Tracker &gt; {title}</div>
+        <div className={`${logo} h-25 bg-cover bg-center max-md:hidden md:w-87.5`}>
           <span className="relative left-37.5">{title}</span>
         </div>
-        <div className="ml-20 flex flex-col items-center justify-center">
+        <div className="ml-20 flex flex-col items-center justify-center max-sm:hidden">
           <div className="">{middle}</div>
           <div className="">{greeting}</div>
         </div>
       </div>
       <Button
         className="size-min cursor-pointer"
-        onClick={() => {
+        onClick={async () => {
           if (state.loggedIn) {
             logout(state.email)
             dispatch({ type: 'SET_VIEW', view: 'sign-in' })
           } else {
-            navigate('/')
+            await navigate('/')
           }
         }}
       >

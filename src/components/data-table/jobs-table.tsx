@@ -149,7 +149,7 @@ export function JobsTable({
       <div className="flex items-center py-4">
         <div className="relative w-full max-w-sm">
           <Input
-            placeholder="Filter companies..."
+            placeholder={`Filter companies ${month > 0 ? `from ${months[month - 1]}` : 'from last week'}...`}
             value={(table.getColumn('company')?.getFilterValue() as string) ?? ''}
             onChange={handleFilterChange}
             className="max-w-sm"
@@ -161,7 +161,7 @@ export function JobsTable({
                 className="absolute top-1/2 right-8 h-7 w-7 -translate-y-1/2 p-0"
               >
                 <span className="sr-only">Filter By</span>
-                <FunnelIcon className="h-4 w-4" />
+                <FunnelIcon className="hidden h-4 w-4 lg:block" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -176,32 +176,35 @@ export function JobsTable({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
-            onClick={() => table.getColumn('company')?.setFilterValue('')}
-          >
-            <XIcon className="h-4 w-4" />
-            <span className="sr-only">Clear</span>
-          </Button>
+          {typeof table.getColumn('company')?.getFilterValue() === 'string' &&
+          (table.getColumn('company')?.getFilterValue() as string).length > 0 ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+              onClick={() => table.getColumn('company')?.setFilterValue('')}
+            >
+              <XIcon className="h-4 w-4" />
+              <span className="sr-only">Clear</span>
+            </Button>
+          ) : null}
         </div>
         <JobsModal />
-        <Button onClick={handleSave} variant="outline">
+        <Button className="max-sm:hidden" onClick={handleSave} variant="outline">
           <SaveIcon />
           Save
         </Button>
-        <span className="ml-4 text-sm">
+        <span className="ml-4 text-sm max-sm:hidden">
           Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
         </span>
-        <span className="ml-4 text-sm">
+        <span className="ml-4 text-sm md:hidden">
           Number of Jobs: {table.getFilteredRowModel().rows.length}{' '}
           {month === 0 ? ' last week' : ''}
           {month === 0 && thisWeeksJobsCount ? ` (vs. This week: ${thisWeeksJobsCount})` : ''}
         </span>
         {month > 0 ? (
-          <span className="ml-4 text-sm">
+          <span className="ml-4 text-sm max-md:hidden">
             Jobs by week: {getNumberOfJobsByWeek(monthSubGroup || [], 1)}/
             {getNumberOfJobsByWeek(monthSubGroup || [], 2)}/
             {getNumberOfJobsByWeek(monthSubGroup || [], 3)}/
@@ -211,7 +214,7 @@ export function JobsTable({
         ) : null}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="outline" className="ml-auto max-md:hidden">
               Columns <ChevronDown />
             </Button>
           </DropdownMenuTrigger>

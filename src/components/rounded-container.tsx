@@ -14,7 +14,7 @@ export const RoundedContainer = ({
   return (
     <div
       className={cn(
-        'bg-card text-card-foreground mx-auto mt-8 rounded-br-lg rounded-bl-lg shadow-md sm:w-9/8 md:w-9/10 lg:w-2/3',
+        'bg-card text-card-foreground mt-8 flex flex-col rounded-br-lg rounded-bl-lg shadow-md sm:w-9/8 md:mx-auto md:w-9/10 lg:w-2/3',
         className
       )}
     >

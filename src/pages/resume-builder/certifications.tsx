@@ -202,7 +202,7 @@ export const ResumeCertifications = () => {
                 updateDate={(d) => updateDate(d, 'date', item.id)}
               />
             </div>
-            <div className="mt-4 flex justify-end gap-4 border-b pb-4">
+            <div className="mt-4 flex flex-wrap justify-end gap-4 border-b pb-4">
               <Button
                 className="w-40 cursor-pointer"
                 name="delete-certifications"

@@ -163,7 +163,7 @@ ${body}`
           setButtonAction={setButtonAction}
           update={update}
         />
-        <div className="flex justify-end gap-4">
+        <div className="flex flex-wrap justify-end gap-4">
           <Button
             className="mt-4 w-50 cursor-pointer"
             name="save"
