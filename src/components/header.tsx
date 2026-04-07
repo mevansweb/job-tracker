@@ -27,7 +27,7 @@ const Header = ({
         <div className={`${logo} h-25 bg-cover bg-center max-md:hidden md:w-87.5`}>
           <span className="relative left-37.5">{title}</span>
         </div>
-        <div className="ml-20 flex flex-col items-center justify-center max-sm:hidden">
+        <div className="ml-20 flex flex-col items-center justify-center">
           <div className="">{middle}</div>
           <div className="">{greeting}</div>
         </div>
