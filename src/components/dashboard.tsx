@@ -59,7 +59,7 @@ export const Dashboard = () => {
         middle=""
         title="Dashboard"
       />
-      <div className="align-center my-4 max-w-screen gap-4 max-sm:grid sm:grid sm:grid-cols-2 md:grid md:grid-cols-3 lg:grid lg:grid-cols-5 xl:flex xl:flex-wrap">
+      <div className="align-center my-4 max-w-screen gap-4 max-sm:grid sm:grid sm:grid-cols-2 md:grid md:grid-cols-3 lg:grid lg:grid-cols-4 xl:flex xl:flex-wrap">
         {groupedByMonthAndYear &&
           Object.keys(groupedByMonthAndYear)
             .sort((a, b) => {

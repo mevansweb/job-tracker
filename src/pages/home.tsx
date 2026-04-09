@@ -78,6 +78,7 @@ const Home = () => {
               email: user.email,
               jobs: user.jobs || [],
               notes: user.notes || [],
+              resume: user.resume,
               tasks: user.tasks || [],
               settings: user.settings,
             })

@@ -4,7 +4,7 @@ import { useAuth } from '@/components/providers/hooks'
 import { getStyles } from '@/global/functions'
 import { type ApiResult } from '@/global/types'
 
-const desk = `absolute bottom-0 left-10 opacity-50 w-[452px] h-[411px] z-[-10] bg-[url('/desk-transparent.png')] bg-cover bg-center bg-no-repeat`
+//const desk = `absolute bottom-0 left-10 opacity-50 w-[452px] h-[411px] z-[-10] bg-[url('/desk-transparent.png')] bg-cover bg-center bg-no-repeat`
 
 export default function Theme({ children }: { children: React.ReactNode }) {
   const { data, dispatch, existing, state } = useAuth()
@@ -46,7 +46,7 @@ export default function Theme({ children }: { children: React.ReactNode }) {
       className={`${themeClasses.trim()} h-full w-[calc(100vw-48px)] peer-data-[state=expanded]:w-[calc(100vw-256px)] max-md:w-[calc(100vw)] max-md:peer-data-[state=expanded]:w-[calc(100vw)]`}
     >
       {children}
-      <footer className={desk}></footer>
+      {/*<footer className={desk}></footer>*/}
     </main>
   )
 }
