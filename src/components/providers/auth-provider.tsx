@@ -134,7 +134,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     //localStorage.removeItem(localStorageKey)
     localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, loggedIn: false }))
   }
-  //console.log('loggedIn:', loggedIn, 'state.id:', state.id, 'data:', data, 'existing:', existing)
 
   useEffect(() => {
     if (existing && existing.loggedIn && existing.id && state.id === '' && data === null) {
