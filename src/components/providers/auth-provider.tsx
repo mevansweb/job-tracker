@@ -1,8 +1,8 @@
-import React, { useReducer } from 'react'
+import React, { useEffect, useReducer } from 'react'
 
 import { Navigate } from 'react-router-dom'
 
-import type { Job, Note, Resume, Settings, Task } from '@/global/types'
+import type { ApiResult, Job, Note, Resume, Settings, Task } from '@/global/types'
 
 import useApi from '../../hooks/useApi'
 import { AuthContext, localStorageKey } from './const'
@@ -125,15 +125,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const existing = stored ? JSON.parse(stored) : null
   const [state, dispatch] = useReducer(reducer, initialState)
   const { loggedIn } = state
+  const loggedInLocalStorage = existing ? existing.loggedIn : false
   const { data, error, loading, postData } = useApi('http://localhost:8080/api/data')
 
   const logout = async (email: string) => {
     await postData('POST', { email, form: 'log-out' })
     dispatch({ type: 'SET_LOGGED_IN', loggedIn: false })
-    localStorage.removeItem(localStorageKey)
+    //localStorage.removeItem(localStorageKey)
+    localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, loggedIn: false }))
   }
+  //console.log('loggedIn:', loggedIn, 'state.id:', state.id, 'data:', data, 'existing:', existing)
 
-  if (!loggedIn && state.id === '' && data === null && window.location.pathname !== '/') {
+  useEffect(() => {
+    if (existing && existing.loggedIn && existing.id && state.id === '' && data === null) {
+      const user = existing as ApiResult
+      dispatch({
+        type: 'SET_ALL_DATA',
+        email: user.email,
+        error: '',
+        id: user.id ? user.id : user._id ? user._id : '',
+        loggedIn: true,
+        jobs: user?.jobs || [],
+        notes: user?.notes || [],
+        password: user.hashedPassword,
+        resume: user.resume,
+        settings: user.settings,
+        tasks: user?.tasks || [],
+        view: 'sign-in',
+      })
+    }
+  }, [data, dispatch, existing, state.id])
+
+  if (loggedIn === false && !loggedInLocalStorage && window.location.pathname !== '/') {
     return <Navigate to="/" />
   }
 

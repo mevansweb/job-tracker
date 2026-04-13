@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import bcrypt from 'bcryptjs'
-import { v4 as uuidv4 } from 'uuid'
+
+//import { v4 as uuidv4 } from 'uuid'
 
 import { Dashboard } from '@/components/dashboard'
+import { type Action } from '@/components/providers/auth-provider'
 import { localStorageKey } from '@/components/providers/const'
 import { useAuth } from '@/components/providers/hooks'
 import { Button } from '@/components/ui/button'
@@ -13,10 +15,57 @@ import type { ApiResult } from '@/global/types'
 
 const salt = bcrypt.genSaltSync(10)
 
+const loadData = (
+  user: ApiResult,
+  to: string[],
+  dispatch: React.ActionDispatch<[action: Action]>,
+  existing: undefined | ApiResult
+) => {
+  if (to.includes('localStorage')) {
+    localStorage.setItem(
+      localStorageKey,
+      JSON.stringify({
+        id: user._id ? user._id : user.id,
+        email: user.email,
+        jobs: user.jobs || [],
+        notes: user.notes || [],
+        resume: user.resume,
+        tasks: user.tasks || [],
+        settings: user.settings,
+      })
+    )
+  } else {
+    localStorage.setItem(
+      localStorageKey,
+      JSON.stringify({
+        ...existing,
+        loggedIn: true,
+      })
+    )
+  }
+  if (to.includes('state')) {
+    dispatch({
+      type: 'SET_ALL_DATA',
+      email: user.email,
+      error: '',
+      id: user._id,
+      jobs: user?.jobs || [],
+      loggedIn: true,
+      notes: user?.notes || [],
+      password: user.hashedPassword,
+      resume: user.resume,
+      tasks: user?.tasks || [],
+      settings: user.settings,
+      view: 'sign-in',
+    })
+  }
+}
+
 const Home = () => {
   const { data, dispatch, existing, postData, state } = useAuth()
-  const uuid = uuidv4()
+  //const uuid = uuidv4()
   const [errors, setErrors] = useState<string[]>([])
+  const [loadFromStorage, setLoadFromStorage] = useState<boolean>(true)
 
   const update = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,11 +81,11 @@ const Home = () => {
     [dispatch]
   )
 
-  const handleSubmit = useCallback(async () => {
+  const handleLogin = useCallback(async () => {
     const { email, password, view } = state
     let hashedPassword = ''
     // check if user exists
-    await postData('POST', { email, form: view })
+    const response = await postData('POST', { email, form: view })
     if (data) {
       if (view === 'create-account') {
         setErrors(['An account with this email already exists.'])
@@ -51,9 +100,14 @@ const Home = () => {
       }
     } else {
       if (view === 'sign-in') {
-        setErrors([
-          'We were unable to find an account associated with this email address. Please create a new account.',
-        ])
+        if (response === undefined) {
+          setErrors(['There was no response from the server.'])
+          setLoadFromStorage(true)
+        } else {
+          setErrors([
+            'We were unable to find an account associated with this email address. Please create a new account.',
+          ])
+        }
       }
       if (view === 'create-account') {
         const err = validatePassword(password)
@@ -66,46 +120,26 @@ const Home = () => {
     }
   }, [data, state, postData])
 
+  const loadFromLocalStorage = useCallback(() => {
+    loadData(existing as ApiResult, ['state'], dispatch, existing as ApiResult)
+    setErrors([])
+  }, [dispatch, existing])
+
   useEffect(() => {
-    if (!existing && data && state.view === 'sign-in') {
+    if (data && state.view === 'sign-in') {
       const user = data as ApiResult
       bcrypt.compare(state.password, user.hashedPassword, function (_err, res) {
         if (res) {
-          localStorage.setItem(
-            localStorageKey,
-            JSON.stringify({
-              id: user._id,
-              email: user.email,
-              jobs: user.jobs || [],
-              notes: user.notes || [],
-              resume: user.resume,
-              tasks: user.tasks || [],
-              settings: user.settings,
-            })
-          )
-          dispatch({
-            type: 'SET_ALL_DATA',
-            email: user.email,
-            error: '',
-            id: user._id,
-            jobs: user?.jobs || [],
-            loggedIn: true,
-            notes: user?.notes || [],
-            password: user.hashedPassword,
-            resume: user.resume,
-            tasks: user?.tasks || [],
-            settings: user.settings,
-            view: 'sign-in',
-          })
+          loadData(user, ['state', 'localStorage'], dispatch, existing as ApiResult)
           setErrors([])
         } else if (res === false) {
           setErrors(['The password you have entered is incorrect.'])
         }
       })
     }
-  }, [data, existing, state, dispatch, uuid])
+  })
 
-  return state.loggedIn || existing ? (
+  return state.loggedIn ? (
     <Dashboard />
   ) : (
     <div className="relative inset-0 m-auto mt-36 w-md flex-col rounded-xl border border-gray-200 p-10 shadow-sm">
@@ -127,7 +161,7 @@ const Home = () => {
             placeholder={'Password'}
           />
           <div className="flex">
-            <Button className="mx-auto mt-8 w-24 cursor-pointer" onClick={handleSubmit}>
+            <Button className="mx-auto mt-8 w-24 cursor-pointer" onClick={handleLogin}>
               Log In
             </Button>
           </div>
@@ -176,7 +210,7 @@ const Home = () => {
             type="password"
           />
           <div className="flex">
-            <Button className="mx-auto mt-8 w-auto cursor-pointer" onClick={handleSubmit}>
+            <Button className="mx-auto mt-8 w-auto cursor-pointer" onClick={handleLogin}>
               Reset my Password
             </Button>
           </div>
@@ -218,7 +252,7 @@ const Home = () => {
             type="password"
           />
           <div className="flex">
-            <Button className="mx-auto mt-8 w-24 cursor-pointer" onClick={handleSubmit}>
+            <Button className="mx-auto mt-8 w-24 cursor-pointer" onClick={handleLogin}>
               Log In
             </Button>
           </div>
@@ -242,6 +276,22 @@ const Home = () => {
           {err}
         </div>
       ))}
+      {loadFromStorage &&
+      errors.includes('There was no response from the server.') &&
+      existing &&
+      existing.email ? (
+        <div className="mt-4 flex justify-center">
+          <Button
+            className="w-60 cursor-pointer"
+            onClick={() => {
+              loadFromLocalStorage()
+              setLoadFromStorage(false)
+            }}
+          >
+            Load Data from This Browser ?
+          </Button>
+        </div>
+      ) : null}
     </div>
   )
 }
