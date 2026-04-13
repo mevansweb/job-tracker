@@ -1,5 +1,7 @@
 import React, { useReducer } from 'react'
 
+import { Navigate } from 'react-router-dom'
+
 import type { Job, Note, Resume, Settings, Task } from '@/global/types'
 
 import useApi from '../../hooks/useApi'
@@ -122,12 +124,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const stored = localStorage.getItem(localStorageKey)
   const existing = stored ? JSON.parse(stored) : null
   const [state, dispatch] = useReducer(reducer, initialState)
+  const { loggedIn } = state
   const { data, error, loading, postData } = useApi('http://localhost:8080/api/data')
 
   const logout = async (email: string) => {
     await postData('POST', { email, form: 'log-out' })
     dispatch({ type: 'SET_LOGGED_IN', loggedIn: false })
     localStorage.removeItem(localStorageKey)
+  }
+
+  if (!loggedIn && state.id === '' && data === null && window.location.pathname !== '/') {
+    return <Navigate to="/" />
   }
 
   return (

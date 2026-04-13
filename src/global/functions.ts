@@ -159,7 +159,7 @@ export function getIsEmpty(data: string | object) {
   return false
 }
 
-export function getEmptyRequiredFields<T extends Record<string, any>>(
+export function getEmptyRequiredFields<T extends Record<string, unknown>>(
   obj: T,
   requiredFields: (keyof T)[]
 ): (keyof T)[] {
