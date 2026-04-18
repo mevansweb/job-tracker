@@ -98,13 +98,17 @@ export function getProgress(status: Status) {
 
 type UnknownWithId = { id: string } & Record<string, unknown>
 
-export function spliceOrConcatArray(item: UnknownWithId, arr: UnknownWithId[]) {
+export function spliceOrConcatArray(
+  item: UnknownWithId,
+  arr: UnknownWithId[],
+  additionalProps?: Record<string, unknown>
+) {
   const pos = arr.map((e) => e.id).indexOf(item.id)
   let arrCopy = arr
   if (pos === -1) {
     let newItem = item
     if (!item.id) {
-      newItem = { ...item, id: crypto.randomUUID() }
+      newItem = { ...item, id: crypto.randomUUID(), ...additionalProps }
     }
     arrCopy = arr.concat(newItem)
   } else {

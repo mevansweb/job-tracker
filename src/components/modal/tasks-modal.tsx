@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { spliceOrConcatArray } from '@/global/functions'
 import { setTasks } from '@/global/shared'
 import { newTask } from '@/global/template'
 import type { Task, TaskEvent, TaskStatus } from '@/global/types'
@@ -67,11 +68,10 @@ const SubTask = memo(function SubTask({
     (d: SetStateAction<Date>) => {
       if (d) {
         if (mode === 'edit') {
-          const eventCopy = { ...subtask, dueDate: d.toLocaleString('en-US') }
-          const pos = task.events.map((e) => e.id).indexOf(subtask.id)
-          const eventsCopy = task.events.filter((j) => j.id !== subtask.id)
-          eventsCopy.splice(pos, 0, eventCopy)
-          setEditTask({ ...task, events: eventsCopy })
+          const arr = spliceOrConcatArray(subtask, task.events, {
+            dueDate: d.toLocaleString('en-US'),
+          })
+          setEditTask({ ...task, events: arr as TaskEvent[] })
           setDateDue(d)
           setCalendarOpen(false)
         } else {
@@ -88,11 +88,8 @@ const SubTask = memo(function SubTask({
   const handleUpdateNote = useCallback(
     (e: { target: { value: string } }) => {
       if (mode === 'edit') {
-        const eventCopy = { ...subtask, note: e.target.value }
-        const pos = task.events.map((e) => e.id).indexOf(subtask.id)
-        const eventsCopy = task.events.filter((j) => j.id !== subtask.id)
-        eventsCopy.splice(pos, 0, eventCopy)
-        setEditTask({ ...task, events: eventsCopy })
+        const arr = spliceOrConcatArray({ ...subtask, note: e.target.value }, task.events)
+        setEditTask({ ...task, events: arr as TaskEvent[] })
       } else {
         setSubTask((prev) => ({
           ...prev,
@@ -135,7 +132,8 @@ const SubTask = memo(function SubTask({
             <Textarea
               className="text-muted-foreground ml-2 w-57.5 text-sm"
               placeholder="Sub-task description"
-              value={subtask.note}
+              value={subtask.note ? subtask.note : ''}
+              name="subtask-note"
               onChange={handleUpdateNote}
             />
           </div>
@@ -171,7 +169,7 @@ const SubTask = memo(function SubTask({
         <div className="mt-3.75">
           <CirclePlus
             className={`relative h-6 w-6 stroke-white ${subtask.note && subtask.dueDate ? 'cursor-pointer fill-green-500' : 'cursor-not-allowed fill-gray-500'}`}
-            onClick={() => {
+            onClick={async () => {
               if (!subtask.dueDate || !subtask.note) return
               setEditTask((prev) => ({ ...prev, events: [...prev.events, subtask] }))
               setSubTask({
@@ -233,27 +231,24 @@ export function TasksModal({ task }: Props) {
   const handleSave = useCallback(async () => {
     const saveEmail: string = state.email
     if (saveEmail) {
-      let tasksCopy = tasks
+      let arr = []
       if (task) {
-        const pos = tasks.map((e) => e.id).indexOf(task.id)
-        tasksCopy = tasks.filter((j) => j.id !== editTask.id)
-        tasksCopy.splice(pos, 0, editTask)
+        arr = spliceOrConcatArray(editTask, tasks)
       } else {
-        tasksCopy.push({
-          ...editTask,
-          createdDate: `${!editTask.createdDate && date ? date.toLocaleDateString() : editTask.createdDate}`,
-          id: crypto.randomUUID(),
-        })
+        arr = spliceOrConcatArray({ ...editTask, createdDate: date.toLocaleDateString() }, tasks)
       }
       await setTasks({
         action: task ? 'edit' : 'add',
         dispatch,
         email: saveEmail,
-        tasks: tasksCopy,
+        tasks: arr as Task[],
         postData,
         setEditTask,
       })
-      localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, tasks: tasksCopy || [] }))
+      localStorage.setItem(
+        localStorageKey,
+        JSON.stringify({ ...existing, tasks: (arr as Task[]) || [] })
+      )
     }
   }, [date, dispatch, editTask, existing, task, tasks, postData, state.email])
 

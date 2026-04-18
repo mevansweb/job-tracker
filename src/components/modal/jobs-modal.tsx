@@ -27,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { spliceOrConcatArray } from '@/global/functions'
 import { setJobs } from '@/global/shared'
 import { newJob } from '@/global/template'
 import type { Job } from '@/global/types'
@@ -72,21 +73,17 @@ export function JobsModal({ job }: Props) {
   }, [dispatch, editJob.id, existing, jobs, postData, state.email])
 
   const handleSave = useCallback(async () => {
-    let jobsCopy = jobs
-    if (job) {
-      const pos = jobs.map((e) => e.id).indexOf(job.id)
-      jobsCopy = jobs.filter((j) => j.id !== editJob.id)
-      jobsCopy.splice(pos, 0, editJob)
-    } else {
-      jobsCopy.push({
-        ...editJob,
-        applicationDate: `${!editJob.applicationDate && date ? date.toLocaleDateString() : editJob.applicationDate}`,
-        id: crypto.randomUUID(),
-      })
+    let editedJobWithDate = editJob
+    if (!editJob.applicationDate && date) {
+      editedJobWithDate = { ...editJob, applicationDate: date.toLocaleDateString() }
     }
-    await setJobs({ dispatch, email: state.email, jobs: jobsCopy, postData, setEditJob })
-    localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, jobs: jobsCopy || [] }))
-  }, [date, dispatch, editJob, existing, job, jobs, postData, state.email])
+    const arr = spliceOrConcatArray(editedJobWithDate, jobs)
+    await setJobs({ dispatch, email: state.email, jobs: arr as Job[], postData, setEditJob })
+    localStorage.setItem(
+      localStorageKey,
+      JSON.stringify({ ...existing, jobs: (arr as Job[]) || [] })
+    )
+  }, [date, dispatch, editJob, existing, jobs, postData, state.email])
 
   return (
     <Dialog>

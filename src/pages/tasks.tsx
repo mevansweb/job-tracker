@@ -8,6 +8,7 @@ import { localStorageKey } from '@/components/providers/const'
 import { useAuth } from '@/components/providers/hooks'
 import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
+import { spliceOrConcatArray } from '@/global/functions'
 import { setTasks } from '@/global/shared'
 import type { Task, TaskEvent } from '@/global/types'
 
@@ -19,25 +20,19 @@ const Tasks = () => {
     async ({ checked, task, subtask }: { checked: boolean; task: Task; subtask: TaskEvent }) => {
       const saveEmail: string = state.email
       if (saveEmail) {
-        let updatedTasks = allTasks
-        const updatedSubtask = { ...subtask, done: checked }
-        let pos = task.events.map((e) => e.id).indexOf(subtask.id)
-        const updatedEvents = task.events.filter((j) => j.id !== subtask.id)
-        updatedEvents.splice(pos, 0, updatedSubtask)
-        const updatedTask = { ...task, events: updatedEvents }
-        pos = allTasks.map((e) => e.id).indexOf(task.id)
-        updatedTasks = updatedTasks.filter((j) => j.id !== task.id)
-        updatedTasks.splice(pos, 0, updatedTask)
+        const arrSubtasks = spliceOrConcatArray({ ...subtask, done: checked }, task.events)
+        const updatedTask = { ...task, events: arrSubtasks as TaskEvent[] }
+        const arrTasks = spliceOrConcatArray(updatedTask, allTasks)
         await setTasks({
           action: 'edit',
           dispatch,
           email: saveEmail,
-          tasks: updatedTasks,
+          tasks: arrTasks as Task[],
           postData,
         })
         localStorage.setItem(
           localStorageKey,
-          JSON.stringify({ ...existing, tasks: updatedTasks || [] })
+          JSON.stringify({ ...existing, tasks: arrTasks || [] })
         )
       }
     },

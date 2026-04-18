@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { capitalizeWords } from '@/global/functions'
+import { capitalizeWords, spliceOrConcatArray } from '@/global/functions'
 import { setJobs } from '@/global/shared'
 import { Status as Statuses } from '@/global/types'
 import type { Event, Job, Status } from '@/global/types'
@@ -67,13 +67,13 @@ export function EventsModal({ job }: Props) {
   }, [])
 
   const handleSave = useCallback(async () => {
-    let jobsCopy = jobs
-    const pos = jobs.map((e) => e.id).indexOf(job.id)
-    jobsCopy = jobs.filter((j) => j.id !== editJob.id)
-    jobsCopy.splice(pos, 0, editJob)
-    await setJobs({ dispatch, email: state.email, jobs: jobsCopy, postData, setEditJob })
-    localStorage.setItem(localStorageKey, JSON.stringify({ ...existing, jobs: jobsCopy || [] }))
-  }, [dispatch, editJob, existing, job, jobs, postData, state.email])
+    const arr = spliceOrConcatArray(editJob, jobs)
+    await setJobs({ dispatch, email: state.email, jobs: arr as Job[], postData, setEditJob })
+    localStorage.setItem(
+      localStorageKey,
+      JSON.stringify({ ...existing, jobs: (arr as Job[]) || [] })
+    )
+  }, [dispatch, editJob, existing, jobs, postData, state.email])
 
   return (
     <Dialog>
@@ -183,7 +183,7 @@ export function EventsModal({ job }: Props) {
                     className={
                       newEvent.status === 'waiting-for-response'
                         ? 'cursor-not-allowed opacity-50'
-                        : 'cursor-pointer bg-emerald-500 text-white hover:bg-emerald-600 hover:text-white'
+                        : 'cursor-pointer bg-emerald-500! text-white hover:bg-emerald-600 hover:text-white'
                     }
                     disabled={!newEvent.date && !newEvent.status}
                     onClick={() => {

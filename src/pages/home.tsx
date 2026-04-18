@@ -131,7 +131,6 @@ const Home = () => {
       const user = data as ApiResult
       bcrypt.compare(state.password, user.hashedPassword, function (_err, res) {
         if (res) {
-          console.log('loading user data...') // add loading state if this takes a while
           loadData(user, ['state', 'localStorage'], dispatch, existing as ApiResult)
           setErrors([])
         } else if (res === false) {
