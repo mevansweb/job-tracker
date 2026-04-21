@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 
-import { ChevronDown, ChevronUp, FunnelIcon, SaveIcon, XIcon } from 'lucide-react'
+import { ChevronDown, FunnelIcon, SaveIcon, XIcon } from 'lucide-react'
 
 import {
   type ColumnFiltersState,
@@ -34,10 +34,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { capitalizeWords, exportToExcel, getStyles } from '@/global/functions'
+import { exportToExcel, getStyles } from '@/global/functions'
 import { type Job, months } from '@/global/types'
 
 import { createColumns, getStatusColor } from './columns'
+import JobActivity from './job-activity'
+import JobsByWeek from './jobs-by-week'
+import Pagination from './pagination'
 
 type JobsTableProps = {
   lastWeeksJobs: Job[]
@@ -45,25 +48,6 @@ type JobsTableProps = {
   monthSubGroup?: Job[]
   thisWeeksJobsCount?: number
   year?: number
-}
-
-function getNumberOfJobsByWeek(jobs: Job[], weekNumber: number) {
-  return jobs.filter((job) => {
-    const jobDate = new Date(job.applicationDate)
-    const firstDayOfMonth = new Date(jobDate.getFullYear(), jobDate.getMonth(), 1)
-    const dayOfWeek = firstDayOfMonth.getDay() // 0 (Sun) to 6 (Sat)
-    const adjustedDate = jobDate.getDate() + dayOfWeek
-    const jobWeekNumber = Math.ceil(adjustedDate / 7)
-    return jobWeekNumber === weekNumber
-  }).length
-}
-
-function getJobsActivity(jobs: Job[]) {
-  const jobsWithActivity = jobs.filter((job) => {
-    const events = job.events || []
-    return events.length > 1
-  })
-  return jobsWithActivity
 }
 
 export function JobsTable({
@@ -74,12 +58,14 @@ export function JobsTable({
   year,
 }: JobsTableProps) {
   const { existing, postData, state } = useAuth()
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [filterBy, setFilterBy] = useState<string>('company')
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = useState({})
-  const [viewSummary, setViewSummary] = useState(false)
+  const [tableState, setTableState] = useState({
+    sorting: [] as SortingState,
+    filterBy: 'company',
+    columnFilters: [] as ColumnFiltersState,
+    columnVisibility: {} as VisibilityState,
+    rowSelection: {},
+  })
+  const { sorting, filterBy, columnFilters, columnVisibility, rowSelection } = tableState
   const { accentColor, theme } = state.settings || { accentColor: '', theme: '' }
   const accentClasses = `${getStyles({ theme, name: 'accentColor', strKey: accentColor })}`
 
@@ -97,10 +83,6 @@ export function JobsTable({
     }
     return []
   }, [columnFilters, monthSubGroup])
-
-  const jobsWithActivity = useMemo(() => {
-    return getJobsActivity(monthSubGroup || [])
-  }, [monthSubGroup])
 
   const handleSave = useCallback(async () => {
     const saveEmail: string = state.email
@@ -120,14 +102,35 @@ export function JobsTable({
     columns,
     autoResetPageIndex: false,
     autoResetExpanded: false,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    onSortingChange: (sorting) =>
+      setTableState((prev) => ({
+        ...prev,
+        sorting: typeof sorting === 'function' ? sorting(prev.sorting) : sorting,
+      })),
+    onColumnFiltersChange: (columnFilters) =>
+      setTableState((prev) => ({
+        ...prev,
+        columnFilters:
+          typeof columnFilters === 'function' ? columnFilters(prev.columnFilters) : columnFilters,
+      })),
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: (columnVisibility) =>
+      setTableState((prev) => ({
+        ...prev,
+        columnVisibility:
+          typeof columnVisibility === 'function'
+            ? columnVisibility(prev.columnVisibility)
+            : columnVisibility,
+      })),
+    onRowSelectionChange: (rowSelection) =>
+      setTableState((prev) => ({
+        ...prev,
+        rowSelection:
+          typeof rowSelection === 'function' ? rowSelection(prev.rowSelection) : rowSelection,
+      })),
     state: {
       sorting,
       columnFilters,
@@ -165,13 +168,19 @@ export function JobsTable({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setFilterBy('company')}>
+              <DropdownMenuItem
+                onClick={() => setTableState((prev) => ({ ...prev, filterBy: 'company' }))}
+              >
                 Company Name
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterBy('position')}>
+              <DropdownMenuItem
+                onClick={() => setTableState((prev) => ({ ...prev, filterBy: 'position' }))}
+              >
                 Position Applied For
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterBy('contactPerson')}>
+              <DropdownMenuItem
+                onClick={() => setTableState((prev) => ({ ...prev, filterBy: 'contactPerson' }))}
+              >
                 Recruiter
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -204,13 +213,7 @@ export function JobsTable({
           {month === 0 && thisWeeksJobsCount ? ` (vs. This week: ${thisWeeksJobsCount})` : ''}
         </span>
         {month > 0 ? (
-          <span className="ml-4 text-sm max-md:hidden">
-            Jobs by week: {getNumberOfJobsByWeek(monthSubGroup || [], 1)}/
-            {getNumberOfJobsByWeek(monthSubGroup || [], 2)}/
-            {getNumberOfJobsByWeek(monthSubGroup || [], 3)}/
-            {getNumberOfJobsByWeek(monthSubGroup || [], 4)}/
-            {getNumberOfJobsByWeek(monthSubGroup || [], 5)}
-          </span>
+          <JobsByWeek keyPrefix={`jobs-for-${month}-${year}`} jobs={monthSubGroup || []} />
         ) : null}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -259,7 +262,7 @@ export function JobsTable({
                 'salaryRange',
                 'jobType',
                 'linkToJobAccount',
-              ], // Define the columns you want to export
+              ],
               `jobs-${month > 0 ? `month-${month}` : 'last-week'}${year ? `-${year}` : ''}`
             )
           }
@@ -267,41 +270,7 @@ export function JobsTable({
           Export to Excel
         </Button>
       </div>
-      {jobsWithActivity.length > 0 && (
-        <Button
-          className="mb-4 cursor-pointer"
-          variant={viewSummary ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setViewSummary(!viewSummary)}
-        >
-          {viewSummary ? 'Hide' : 'View'} Summary of Job Activity
-          {viewSummary ? <ChevronUp className="ml-2" /> : <ChevronDown className="ml-2" />}
-        </Button>
-      )}
-      {jobsWithActivity.length > 0 && viewSummary && (
-        <div className="mb-4 text-sm italic">
-          {jobsWithActivity.map((job) => (
-            <div key={job.id}>
-              Activity on <strong>{job.position}</strong> at <strong>{job.company}</strong>:{' '}
-              <ul>
-                {job.events
-                  .slice()
-                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                  .map(
-                    (event, index) =>
-                      event.status !== 'waiting-for-response' && (
-                        <li className="ml-4" key={index}>
-                          {event.date} - {capitalizeWords(event.status.replace(/-/g, ' '))}
-                          {event.note ? ` (${event.note})` : ''}
-                          {index < job.events.length - 1 ? '; ' : ''}
-                        </li>
-                      )
-                  )}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
+      <JobActivity jobs={monthSubGroup || []} />
       <div className="rounded-md border">
         <Table>
           <TableHeader className={accentClasses}>
@@ -340,30 +309,7 @@ export function JobsTable({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      <Pagination table={table} />
     </div>
   )
 }
