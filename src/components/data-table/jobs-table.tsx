@@ -34,7 +34,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { capitalizeWords, getStyles } from '@/global/functions'
+import { capitalizeWords, exportToExcel, getStyles } from '@/global/functions'
 import { type Job, months } from '@/global/types'
 
 import { createColumns, getStatusColor } from './columns'
@@ -242,6 +242,30 @@ export function JobsTable({
           Jobs you applied to{' '}
           {month === 0 ? 'last week' : `in ${months[month - 1]} ${year ? year : ''}`}:
         </h2>
+        <Button
+          variant="outline"
+          size="sm"
+          className="ml-auto"
+          onClick={() =>
+            exportToExcel(
+              month > 0 || Number.isNaN(month) ? filteredJobs : lastWeeksJobs || [],
+              [
+                'applicationDate',
+                'company',
+                'address',
+                'phone',
+                'position',
+                'linkToJobPosting',
+                'salaryRange',
+                'jobType',
+                'linkToJobAccount',
+              ], // Define the columns you want to export
+              `jobs-${month > 0 ? `month-${month}` : 'last-week'}${year ? `-${year}` : ''}`
+            )
+          }
+        >
+          Export to Excel
+        </Button>
       </div>
       {jobsWithActivity.length > 0 && (
         <Button

@@ -1,4 +1,5 @@
 import equal from 'fast-deep-equal/es6/react'
+import * as XLSX from 'xlsx'
 
 import { acThemeVariants, bgThemeVariants, fontVariants, sbThemeVariants } from '@/global/constants'
 import { Status } from '@/global/types'
@@ -183,4 +184,38 @@ export function getEmptyRequiredFields<T extends Record<string, unknown>>(
   }
 
   return emptyFields
+}
+
+export function exportToExcel<T extends object>(
+  data: T[],
+  columns: (keyof T)[],
+  fileName: string
+): void {
+  if (!Array.isArray(data) || data.length === 0) {
+    console.error('No data to export')
+    return
+  }
+
+  try {
+    // Filter data to include only selected columns
+    const filteredData = data.map((row) => {
+      const filteredRow: Partial<T> = {}
+      columns.forEach((col) => {
+        filteredRow[col] = row[col]
+      })
+      return filteredRow
+    })
+
+    // Convert JSON to worksheet
+    const worksheet = XLSX.utils.json_to_sheet(filteredData)
+
+    // Create a new workbook and append the worksheet
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1')
+
+    // Export to file
+    XLSX.writeFile(workbook, `${fileName}.xlsx`)
+  } catch (error) {
+    console.error('Error exporting to Excel:', error)
+  }
 }
