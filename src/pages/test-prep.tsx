@@ -3,6 +3,7 @@ import { useState } from 'react'
 import Header from '@/components/header'
 import { FrontendQuestions } from '@/components/test-prep/frontend-questions'
 import { ReactBasics } from '@/components/test-prep/react-basics'
+import { ReactQuiz } from '@/components/test-prep/react-quiz'
 import { Button } from '@/components/ui/button'
 
 const TestPrep = () => {
@@ -20,6 +21,13 @@ const TestPrep = () => {
           React Basics Quiz
         </Button>
         <Button
+          className={`w-50 text-white ${page === 'react-quiz' ? 'bg-blue-500!' : 'bg-gray-300'}`}
+          onClick={() => setPage('react-quiz')}
+          size="lg"
+        >
+          React Quiz
+        </Button>
+        <Button
           className={`w-50 text-white ${page === 'frontend-questions' ? 'bg-blue-500!' : 'bg-gray-300'}`}
           onClick={() => setPage('frontend-questions')}
           size="lg"
@@ -29,6 +37,7 @@ const TestPrep = () => {
       </div>
 
       {page === 'react-basics' ? <ReactBasics /> : null}
+      {page === 'react-quiz' ? <ReactQuiz /> : null}
       {page === 'frontend-questions' ? <FrontendQuestions /> : null}
     </div>
   )

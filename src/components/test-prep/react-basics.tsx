@@ -73,13 +73,13 @@ export const ReactBasics = () => {
     }, 1000)
   }
 
-  console.log('Rendered')
+  //console.log('Rendered')
 
   const [inputs, setInputs] = useState([{ id: 1, value: '' }])
 
   const addInput = () => {
     inputs.push({ id: inputs.length + 1, value: '' })
-    console.log('mutated inputs', inputs)
+    //console.log('mutated inputs', inputs)
     setInputs(inputs)
   }
 
@@ -88,7 +88,7 @@ export const ReactBasics = () => {
     setInputs(updated)
   }
 
-  console.log('current inputs', inputs)
+  //console.log('current inputs', inputs)
 
   return (
     <div className="flex flex-col p-4">
@@ -178,7 +178,7 @@ function ResetButton() {
     setValue(0)
   }
 
-  console.log('Rendered')
+  //console.log('Rendered')
 
   return (
     <div>
