@@ -22,6 +22,7 @@ export function SearchBar({ searchType = 'company' }: { searchType?: SearchType 
   const [open, setOpen] = useState(false)
   const [results, setResults] = useState<Job[] | null>(null)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const boxRef = useRef<HTMLDivElement | null>(null)
 
   const performSearch = useCallback(
     async (searchQuery: string, searchType: SearchType) => {
@@ -67,6 +68,27 @@ export function SearchBar({ searchType = 'company' }: { searchType?: SearchType 
   )
 
   useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      // If click is outside the box, close it
+      if (
+        boxRef.current &&
+        event.target instanceof Node &&
+        !boxRef.current.contains(event.target)
+      ) {
+        setOpen(false)
+      }
+    }
+
+    // Listen for clicks
+    document.addEventListener('mousedown', handleClickOutside)
+
+    // Cleanup on unmount
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
+  useEffect(() => {
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
@@ -88,7 +110,10 @@ export function SearchBar({ searchType = 'company' }: { searchType?: SearchType 
         type="text"
       />
       {open && results && results.length > 0 && (
-        <div className="absolute top-12 right-0 left-0 z-10 mt-1 w-100 rounded-md border border-gray-200 bg-white p-4 text-sm shadow-lg">
+        <div
+          className="absolute top-12 right-0 left-0 z-10 mt-1 w-100 rounded-md border border-gray-200 bg-white p-4 text-sm shadow-lg"
+          ref={boxRef}
+        >
           {results.map((result: Job) => (
             <Link
               className="flex flex-col"
