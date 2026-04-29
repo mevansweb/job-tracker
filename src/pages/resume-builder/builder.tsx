@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo } from 'react'
 import equal from 'fast-deep-equal'
 import { toast } from 'sonner'
 
-import Header from '@/components/header'
+import Header from '@/components/header/header'
 import { emptyState, initialResume, localStorageKey } from '@/components/providers/const'
 import { useResume } from '@/components/providers/hooks'
 import { RoundedContainer } from '@/components/rounded-container'

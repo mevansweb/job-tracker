@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 
 import { JobsTable } from '@/components/data-table/jobs-table'
-import Header from '@/components/header'
+import Header from '@/components/header/header'
 import { useAuth } from '@/components/providers/hooks'
 import { Button } from '@/components/ui/button'
 import { type Job, months } from '@/global/types'

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { toast } from 'sonner'
 
-import Header from '@/components/header'
+import Header from '@/components/header/header'
 import { useAuth } from '@/components/providers/hooks'
 import { RoundedContainer } from '@/components/rounded-container'
 import { Button } from '@/components/ui/button'

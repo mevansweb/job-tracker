@@ -49,6 +49,14 @@ function App() {
             }
           />
           <Route
+            path="/search/application/:id"
+            element={
+              <Layout>
+                <Search />
+              </Layout>
+            }
+          />
+          <Route
             path="/settings"
             element={
               <Layout>

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { toast } from 'sonner'
 
-import Header from '@/components/header'
+import Header from '@/components/header/header'
 import { TasksModal } from '@/components/modal/tasks-modal'
 import { localStorageKey } from '@/components/providers/const'
 import { useAuth } from '@/components/providers/hooks'
@@ -75,7 +75,9 @@ const Tasks = () => {
                     <div className="mt-2">
                       <div className="mb-2 flex items-center justify-between gap-4 border-b-2 border-gray-200 py-2">
                         <p className="text-sm font-light italic">
-                          Sub-Tasks ({task.events.length}):
+                          Sub-Tasks ({task.events.length}) / Done (
+                          {task.events.filter((e) => e.done).length}) / Not Done (
+                          {task.events.filter((e) => !e.done).length}) :
                         </p>
                         <Button
                           className="cursor-pointer px-2"

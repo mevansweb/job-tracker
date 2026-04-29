@@ -6,7 +6,7 @@ import equal from 'fast-deep-equal'
 import { toast } from 'sonner'
 
 import { ErrorMessage } from '@/components/error-message'
-import Header from '@/components/header'
+import Header from '@/components/header/header'
 import { RoundedContainer } from '@/components/rounded-container'
 import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'

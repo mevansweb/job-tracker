@@ -130,7 +130,7 @@ const SubTask = memo(function SubTask({
               </PopoverContent>
             </Popover>
             <Textarea
-              className="text-muted-foreground ml-2 w-57.5 text-sm"
+              className="text-muted-foreground ml-2 text-sm sm:w-57.5 md:w-80"
               placeholder="Sub-task description"
               value={subtask.note ? subtask.note : ''}
               name="subtask-note"
@@ -263,7 +263,7 @@ export function TasksModal({ task }: Props) {
             {task ? 'Edit Task Info' : 'Add New Task +'}
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-106.25">
+        <DialogContent className="sm:max-w-106.25 md:max-w-150">
           <DialogHeader>
             <DialogTitle>{task ? 'Edit Task Info' : 'Add New Task'}</DialogTitle>
             <DialogDescription>
