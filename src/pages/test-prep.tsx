@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import Header from '@/components/header/header'
+import Header from '@/components/header'
 import { FrontendQuestions } from '@/components/test-prep/frontend-questions'
 import { ReactBasics } from '@/components/test-prep/react-basics'
 import { ReactQuiz } from '@/components/test-prep/react-quiz'

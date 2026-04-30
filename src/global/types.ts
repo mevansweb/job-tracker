@@ -184,6 +184,8 @@ export type Resume = {
   skills: Skill[]
 }
 
+export type SearchType = 'company' | 'position'
+
 export type Settings = {
   accentColor: string
   backgroundColor: string

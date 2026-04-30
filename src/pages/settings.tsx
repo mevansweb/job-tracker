@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useState } from 'react'
 
 import { ChevronDownIcon } from 'lucide-react'
 
-import Header from '@/components/header/header'
+import Header from '@/components/header'
 import { localStorageKey } from '@/components/providers/const'
 import { useAuth } from '@/components/providers/hooks'
 import { RoundedContainer } from '@/components/rounded-container'

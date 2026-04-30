@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import './App.css'
 import Layout from './components/layout'
+import Application from './pages/application'
 import Assessments from './pages/assessments'
 import Home from './pages/home'
 import Practice from './pages/practice'
@@ -52,7 +53,7 @@ function App() {
             path="/search/application/:id"
             element={
               <Layout>
-                <Search />
+                <Application />
               </Layout>
             }
           />

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { toast } from 'sonner'
 
-import Header from '@/components/header/header'
+import Header from '@/components/header'
 import { TasksModal } from '@/components/modal/tasks-modal'
 import { localStorageKey } from '@/components/providers/const'
 import { useAuth } from '@/components/providers/hooks'

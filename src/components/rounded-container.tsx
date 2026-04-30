@@ -3,10 +3,12 @@ import { cn } from '@/lib/utils'
 import { RoundedHeader } from './rounded-header'
 
 export const RoundedContainer = ({
+  button,
   children,
   className = '',
   title,
 }: {
+  button?: React.ReactNode
   children: React.ReactNode
   className?: string
   title: string
@@ -18,7 +20,7 @@ export const RoundedContainer = ({
         className
       )}
     >
-      <RoundedHeader title={title} />
+      <RoundedHeader children={button} title={title} />
       <div className="rounded-br-lg rounded-bl-lg border-r border-b border-l p-8 pb-12">
         {children}
       </div>

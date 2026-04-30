@@ -3,15 +3,17 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/components/providers/hooks'
 import { Button } from '@/components/ui/button'
 
-import { SearchBar } from './search-bar'
+import { SearchBar } from './search/search-bar'
 
 const Header = ({
   greeting,
   middle,
+  showSearch = true,
   title,
 }: {
   greeting: string
   middle: string
+  showSearch?: boolean
   title: string
 }) => {
   const { dispatch, logout, state } = useAuth()
@@ -32,7 +34,7 @@ const Header = ({
         <div className="ml-20 flex flex-col items-center justify-center">
           <div className="">{middle}</div>
           <div className="">{greeting}</div>
-          <SearchBar />
+          {showSearch ? <SearchBar /> : null}
         </div>
       </div>
       <Button

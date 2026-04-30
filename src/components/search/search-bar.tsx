@@ -1,20 +1,27 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { Link } from 'react-router-dom'
-
 import { toast } from 'sonner'
 
 import { useAuth } from '@/components/providers/hooks'
 import { Input } from '@/components/ui/input'
-import type { Job } from '@/global/types'
+import type { Job, SearchType } from '@/global/types'
+
+import { AutoSuggestResults } from './auto-suggest-results'
+import { SearchResultCards } from './search-result-cards'
 
 const MIN_QUERY_LENGTH = 3
 
 const SEARCH_URL = 'http://localhost:8080/api/data/search/'
 
-type SearchType = 'company' | 'position'
+type DisplayType = 'auto-suggest' | 'search-result-cards'
 
-export function SearchBar({ searchType = 'company' }: { searchType?: SearchType }) {
+export function SearchBar({
+  displayType = 'auto-suggest',
+  searchType = 'company',
+}: {
+  displayType?: DisplayType
+  searchType?: SearchType
+}) {
   const {
     state: { id },
   } = useAuth()
@@ -49,6 +56,7 @@ export function SearchBar({ searchType = 'company' }: { searchType?: SearchType 
     },
     [id]
   )
+
   const handleOnChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newQuery = event.target.value
@@ -109,34 +117,17 @@ export function SearchBar({ searchType = 'company' }: { searchType?: SearchType 
         value={query}
         type="text"
       />
-      {open && results && results.length > 0 && (
-        <div
-          className="absolute top-12 right-0 left-0 z-10 mt-1 w-100 rounded-md border border-gray-200 bg-white p-4 text-sm shadow-lg"
-          ref={boxRef}
-        >
-          {results.map((result: Job) => (
-            <Link
-              className="flex flex-col"
-              key={`search-bar-result-${result.id}`}
-              to={`/search/application/${result.id}`}
-            >
-              {searchType === 'position' ? (
-                <div>
-                  <strong>{result.position}</strong>
-                  <br />
-                  at {result.company} ({result.applicationDate})
-                </div>
-              ) : (
-                <div>
-                  <strong>{result.company}</strong>
-                  <br />
-                  {result.position} ({result.applicationDate})
-                </div>
-              )}
-            </Link>
-          ))}
-        </div>
-      )}
+      {open && displayType === 'auto-suggest' ? (
+        <AutoSuggestResults ref={boxRef} results={results || []} searchType={searchType} />
+      ) : null}
+      {displayType === 'search-result-cards' ? (
+        <SearchResultCards
+          minQueryLength={MIN_QUERY_LENGTH}
+          query={query}
+          results={results || []}
+          searchType={searchType}
+        />
+      ) : null}
     </div>
   )
 }

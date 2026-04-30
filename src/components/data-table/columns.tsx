@@ -110,7 +110,19 @@ export const createColumns = (
         </Button>
       )
     },
-    cell: ({ row }) => <div className="capitalize">{row.getValue('company')}</div>,
+    cell: ({ row }) => {
+      const id = row.original.id
+      return (
+        <a
+          className="cursor-pointer text-blue-500 capitalize underline"
+          href={`/search/application/${id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {row.getValue('company')}
+        </a>
+      )
+    },
   },
   {
     id: 'actions',
