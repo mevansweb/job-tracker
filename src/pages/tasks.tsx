@@ -122,7 +122,7 @@ const Tasks = () => {
                           .map((event, index) => (
                             <li
                               className="flex justify-between border-b border-dotted"
-                              key={`${task.id}-event-${index}`}
+                              key={`${task.id}-event-${index}-${event.id}`}
                             >
                               <div className="flex md:w-9/10 lg:w-9/10">
                                 <div className="md:w-1/5 lg:w-1/5">
